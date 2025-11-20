@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import StatisticsSection from '../components/StatisticsSection.jsx';
-import StudentsTable from '../components/StudentsTable.jsx';
+import StudentsTable from '../components/StudentsTable';
+import StatisticsSection from './StatisticsSection';
 
-const Ongoing = () => {
-  const chartData = [
-    { category: 'webdev', value: 50 },
-    { category: 'ui/ux', value: 80 },
-    { category: 'Python', value: 65 },
-    { category: 'Backend', value: 40 },
-  ];
+const ActiveStudents = () => {
   const [studentsData, setStudentsData] = useState([
     {
       name: 'Jane Cooper',
@@ -51,20 +45,22 @@ const Ongoing = () => {
       capstoneStatus: 'In Progress',
     },
   ]);
-  return (
-    <main className="flex-1 overflow-y-auto p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard: Active Students</h1>
 
-        {/* Statistics Section */}
-        <StatisticsSection />
-      </div>
-      <div>
-        <StudentsTable data={studentsData} />
-      </div>
-    </main>
+  return (
+    <div>
+      <main className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard: Active Students</h1>
+
+          {/* Statistics Section */}
+          <StatisticsSection />
+        </div>
+        <div>
+          <StudentsTable data={studentsData} />
+        </div>
+      </main>
+    </div>
   );
 };
 
-export default Ongoing;
-
+export default ActiveStudents;

@@ -8,6 +8,7 @@ import {
   HelpCircle,
   LogOut,
   Megaphone,
+  FileBadge,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -100,6 +101,20 @@ const Sidebar = () => {
             >
               <Megaphone className="w-5 h-5" />
               <span className="font-medium">Announcements</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/certificate"
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors',
+                  isActive && 'text-blue-600 bg-blue-50',
+                )
+              }
+            >
+              <FileBadge className="w-5 h-5" />
+              <span className="font-medium">Manage Certificate</span>
             </NavLink>
           </li>
           <li>
