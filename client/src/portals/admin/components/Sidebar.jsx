@@ -30,7 +30,7 @@ const Sidebar = () => {
         <ul className="space-y-1">
           <li>
             <a
-              href="#"
+              href="/admin/"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <LayoutDashboard className="w-5 h-5" />
