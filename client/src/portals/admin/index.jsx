@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLayout from './layout/AdminLayout.jsx';
 import Announcements from './pages/Announcements';

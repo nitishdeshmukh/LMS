@@ -43,18 +43,18 @@ const StudentsTable = ({ data = [] }) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       {/* Filter Section */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex text-black items-center gap-2">
                 Filter by College
                 <ChevronDown className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            </DropdownMenuTrigger  >
+            <DropdownMenuContent className='text-black bg-white ' >
               <DropdownMenuItem>All Colleges</DropdownMenuItem>
               <DropdownMenuItem>Stanford University</DropdownMenuItem>
               <DropdownMenuItem>MIT</DropdownMenuItem>
@@ -64,12 +64,12 @@ const StudentsTable = ({ data = [] }) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex  text-black items-center gap-2">
                 Filter by Status
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className='text-black bg-white' >
               <DropdownMenuItem>All Status</DropdownMenuItem>
               <DropdownMenuItem>Graded</DropdownMenuItem>
               <DropdownMenuItem>Submitted</DropdownMenuItem>
