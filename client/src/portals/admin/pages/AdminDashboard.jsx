@@ -19,7 +19,7 @@ function AdminDashboard() {
     { category: 'Frontend', value: 22 },
   ];
   const donutData = [
-    { category: 'Direct', value: 45, color: '#4D79FF' },
+    { category: 'Direct', value: 45, color: '#145efc' },
     { category: 'Referral', value: 25, color: '#FFB84D' },
     { category: 'Organic', value: 20, color: '#4DFF88' },
     { category: 'Ads', value: 10, color: '#B84DFF' },
