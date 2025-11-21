@@ -29,10 +29,10 @@ function Navbar() {
                   Home
                 </Link>
                 <Link
-                  to="/program"
+                  to="/aboutus"
                   className="hover:text-blue-400 transition-colors px-3 py-2 text-white rounded-md text-sm font-medium"
                 >
-                  Programs
+                  About Us
                 </Link>
                 <Link
                   to="/howitworks"

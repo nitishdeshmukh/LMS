@@ -1,3 +1,4 @@
+import { Github, Linkedin, MessageSquareQuote, Twitter } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -22,8 +23,8 @@ const Footer = () => {
               </div>
 
               <div>
-                <h4 className="font-bold mb-4 text-white">Platform</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
+                <h4 className="font-bold mb-4 text-lg text-white">Platform</h4>
+                <ul className="space-y-2 text-lg text-gray-500">
                   <li>
                     <Link to="/browse" className="hover:text-blue-400">
                       Browse Streams
@@ -43,10 +44,10 @@ const Footer = () => {
               </div>
 
               <div>
-                <h4 className="font-bold mb-4 text-white">Community</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
+                <h4 className="font-bold mb-4 text-lg text-white">Community</h4>
+                <ul className="space-y-2 text-lg text-gray-500">
                   <li>
-                    <Link to="/campus" className="hover:text-blue-400">
+                    <Link to="/campus" className="hover:text-blue-400  ">
                       Campus Ambassador
                     </Link>
                   </li>
@@ -59,44 +60,44 @@ const Footer = () => {
               </div>
 
               <div>
-                <h4 className="font-bold mb-4 text-white">Connect</h4>
+                <h4 className="font-bold mb-4 text-lg  text-white">Connect</h4>
                 <ul className="space-y-2 text-sm text-gray-500">
-                  <li>
-                    <Link to="#" className="hover:text-blue-400">
-                      Twitter / X
+                  <li className='flex ' >
+                    <Link to="#" className="hover:text-blue-400 gap-3 text-lg  flex flex-row ">
+                      <Twitter />  Twitter / X
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" className="hover:text-blue-400">
-                      LinkedIn
+                    <Link to="#" className="hover:text-blue-400 gap-3 text-lg  flex flex-row ">
+                      <Linkedin />  LinkedIn
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" className="hover:text-blue-400">
-                      Github
+                    <Link to="#" className="hover:text-blue-400  gap-3 text-lg  flex flex-row ">
+                      <Github />  Github
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" className="hover:text-blue-400">
-                      Discord
+                    <Link to="#" className="hover:text-blue-400  gap-3 text-lg  flex flex-row ">
+                     <MessageSquareQuote />  Discord
                     </Link>
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600">
+            <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
               <p>&copy; {new Date().getFullYear()} LMS Portal. All rights reserved.</p>
               <div className="flex gap-4 mt-4 md:mt-0">
                 <Link
                   to="/privacy"
-                  className="text-gray-600 hover:text-blue-600 hover:underline transition duration-300"
+                  className="text-gray-600  hover:text-blue-600 hover:underline transition duration-300"
                 >
                   Privacy Policy
                 </Link>
                 <Link
                   to="/terms"
-                  className="text-gray-600 hover:text-blue-600 hover:underline transition duration-300"
+                  className="text-gray-600  hover:text-blue-600 hover:underline transition duration-300"
                 >
                   Terms of Service
                 </Link>

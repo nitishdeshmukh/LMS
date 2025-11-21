@@ -92,7 +92,7 @@ function HowItWorks() {
 
       {/* --- STAIRCASE JOURNEY --- */}
       <section className="py-16 bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="relative">
@@ -109,7 +109,7 @@ function HowItWorks() {
 
                   {/* Connector Node */}
                   <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black border-4 border-zinc-800 z-20 hidden md:flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,1)]">
-                    <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${step.color}`}></div>
+                    <div className={`w-3 h-3 rounded-full bg-linear-to-r ${step.color}`}></div>
                   </div>
 
                   {/* Content Card */}
@@ -120,7 +120,7 @@ function HowItWorks() {
                         <div className="md:hidden absolute left-6 top-[-48px] bottom-[-48px] w-0.5 bg-zinc-800 -z-10"></div>
 
                         <div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center text-white mb-4 shadow-lg`}
+                          className={`w-12 h-12 rounded-xl bg-linear-to-br ${step.color} flex items-center justify-center text-white mb-4 shadow-lg`}
                         >
                           {step.icon}
                         </div>

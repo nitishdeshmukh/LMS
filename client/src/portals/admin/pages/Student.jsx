@@ -11,9 +11,9 @@ function Student() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto">
+        {/* <main className="flex-1 overflow-y-auto">
           <StudentsPage />
-        </main>
+        </main> */}
       </div>
     </div>
   )

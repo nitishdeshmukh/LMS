@@ -13,6 +13,7 @@ import {
   Rocket,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ProgramsGrid from '../components/ProgramGrid';
 
 function Home() {
   // Data derived from your notes + Industry standards
@@ -24,6 +25,7 @@ function Home() {
       icon: <Code className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Limited Seats',
+      link: '/fullstack'
     },
     {
       title: 'Data Science & AI',
@@ -32,6 +34,7 @@ function Home() {
       icon: <BrainCircuit className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Filling Fast',
+      link: '/datascience'
     },
     {
       title: 'Mobile App Development',
@@ -40,6 +43,7 @@ function Home() {
       icon: <Smartphone className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Open',
+      link: '/mobiledev'
     },
     {
       title: 'Data Analytics',
@@ -47,6 +51,7 @@ function Home() {
       icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Limited Seats',
+      link: '/dataanalytics'
     },
     {
       title: 'FrontEnd Developement',
@@ -54,6 +59,7 @@ function Home() {
       icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
       price: '₹300',
       slots: 'Limited Seats',
+      link: '/frontend'
     },
     {
       title: 'BackEnd Developement',
@@ -61,6 +67,7 @@ function Home() {
       icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
       price: '₹300',
       slots: 'Limited Seats',
+      link: '/backend'
     },
     {
       title: 'DataBase',
@@ -68,6 +75,7 @@ function Home() {
       icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Limited Seats',
+      link: '/database'
     },
     {
       title: 'Python with Django + Flask',
@@ -75,6 +83,23 @@ function Home() {
       icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
       price: '₹500',
       slots: 'Limited Seats',
+      link: '/python'
+    },
+    {
+      title: 'UI/UX Design',
+      description: 'Learn design principles, Figma workflows, and how to create intuitive, user-friendly interfaces.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+      link: '/UX'
+    },
+    {
+      title: 'Version Control with Git & GitHub',
+      description: 'Understand branching, pull requests, conflict resolution, and how to collaborate professionally using Git.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+      link: '/python'
     },
   ];
 
@@ -96,6 +121,7 @@ function Home() {
     },
   ];
 
+
   return (
     <>
       <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
@@ -107,7 +133,7 @@ function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
               Master Tech Skills <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-cyan-300">
                 The Practical Way
               </span>
             </h1>
@@ -117,12 +143,17 @@ function Home() {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                to="/program"
+              <button
+                onClick={() => {
+                  document.getElementById("programs").scrollIntoView({
+                    behavior: "smooth"
+                  });
+                }}
                 className="px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 font-bold text-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.5)]"
               >
                 Explore Programs
-              </Link>
+              </button>
+
               <Link
                 to="/howitworks"
                 className="px-8 py-4 rounded-full border border-gray-600 hover:border-blue-500 hover:text-blue-400 font-bold text-lg transition-all"
@@ -174,42 +205,12 @@ function Home() {
             <p className="text-gray-400">Curated paths for the most in-demand tech roles.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {programs.map((program, index) => (
-              <div
-                key={index}
-                className="group relative p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2"
-              >
-                {/* Hover Glow Effect */}
-                <div className="absolute inset-0 bg-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <ProgramsGrid programs={programs} />
 
-                <div className="mb-4 bg-black w-14 h-14 rounded-xl flex items-center justify-center border border-zinc-800 group-hover:border-blue-500/30">
-                  {program.icon}
-                </div>
-
-                <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors">
-                  {program.title}
-                </h3>
-                <p className="text-gray-400 text-sm mb-6 leading-relaxed">{program.description}</p>
-
-                <div className="">
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-zinc-800">
-                    <div>
-                      <span className="block text-xs text-gray-500">Enrollment Fee</span>
-                      <span className="text-lg font-bold text-white">{program.price}</span>
-                    </div>
-                    <button className="p-2 rounded-lg bg-white text-black hover:bg-blue-500 hover:text-white transition-colors">
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* --- BENEFITS SECTION --- */}
-        <section id="benefits" className="py-24 bg-gradient-to-b from-black to-zinc-900">
+        <section id="benefits" className="py-24 bg-linear-to-b from-black to-zinc-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
@@ -222,7 +223,7 @@ function Home() {
                 <div className="space-y-8">
                   {benefits.map((benefit, idx) => (
                     <div key={idx} className="flex gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400">
+                      <div className="shrink-0 w-12 h-12 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400">
                         {benefit.icon}
                       </div>
                       <div>
@@ -291,7 +292,7 @@ function Home() {
                   immediately after my Capstone review."
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500"></div>
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-purple-500"></div>
                   <div>
                     <div className="font-bold text-sm">Student Name</div>
                     <div className="text-xs text-gray-500">Web Dev Cohort</div>
