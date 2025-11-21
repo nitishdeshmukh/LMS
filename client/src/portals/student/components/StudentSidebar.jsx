@@ -42,7 +42,7 @@ const StudentNavbar = () => {
   };
 
   return (
-    <div className="h-full w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+    <div className="h-full w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col ">
       {/* Header */}
       <div className="h-20 flex items-center px-6 border-b border-zinc-800">
         <span className="text-xl font-bold tracking-tighter text-white">

@@ -7,8 +7,8 @@
   --font-sans: 'Inter', 'sans-serif';
 }
 
-body {
-  @apply bg-black text-white;
+html,body,#root {
+  @apply !font-sans bg-black text-white;
 }
 
 @theme inline {
