@@ -29,7 +29,6 @@ const StudentMyCoursesPage = () => {
 
   return (
     <div className="p-6 sm:p-8 h-full overflow-y-auto custom-scrollbar bg-black text-white w-full">
-      <h1 className="text-3xl font-bold mb-8">My Learning</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map(course => (

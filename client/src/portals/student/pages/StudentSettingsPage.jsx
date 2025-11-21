@@ -1,32 +1,9 @@
 import { useState } from 'react';
-import {
-  Shield,
-  Lock,
-  LogOut,
-  User,
-  Save,
-  Menu,
-  X,
-  Bell,
-  LayoutDashboard,
-  BookOpen,
-  FileText,
-  ClipboardList,
-  Crown,
-  Award,
-  Gift,
-  Headphones,
-  Settings as SettingsIcon,
-} from 'lucide-react';
+import { Shield, Lock, LogOut, User, Save } from 'lucide-react';
 
 // Reusing Sidebar Layout
 
 const StudentSettingsPage = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  // Use window.location.pathname as a fallback for active state in preview
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-
   // --- STATE ---
   const [profileData, setProfileData] = useState({
     firstName: 'Alex',
@@ -61,102 +38,12 @@ const StudentSettingsPage = () => {
     } else {
       alert('Logged out successfully.');
     }
-    // In a real app, redirect to login here
-    // window.location.href = '/login';
   };
-
-  // Sidebar Navigation Data
-  const sidebarItems = [
-    { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/app/dashboard' },
-    { label: 'My Courses', icon: <BookOpen size={20} />, path: '/app/courses' },
-    { label: 'Assignments', icon: <FileText size={20} />, path: '/app/assignments' },
-    { label: 'Quizzes', icon: <ClipboardList size={20} />, path: '/app/quizzes' },
-    { label: 'Leaderboard', icon: <Crown size={20} />, path: '/app/leaderboard' },
-    { label: 'Certificates', icon: <Award size={20} />, path: '/app/certificates' },
-    { label: 'Refer and Earn', icon: <Gift size={20} />, path: '/app/refer' },
-    { label: 'Support', icon: <Headphones size={20} />, path: '/app/support' },
-    { label: 'Settings', icon: <SettingsIcon size={20} />, path: '/app/settings' },
-  ];
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white flex overflow-hidden">
-      {/* --- SIDEBAR --- */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 border-r border-zinc-800 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}
-      >
-        <div className="h-full flex flex-col">
-          <div className="h-20 flex items-center px-6 border-b border-zinc-800">
-            <span className="text-xl font-bold tracking-tighter">
-              LMS<span className="text-blue-500">PORTAL</span>
-            </span>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="md:hidden ml-auto text-zinc-400"
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-            {sidebarItems.map(item => {
-              const isActive = currentPath === item.path;
-              return (
-                <a
-                  key={item.label}
-                  href={item.path}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-medium'
-                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                  }`}
-                >
-                  {item.icon}
-                  <span className="text-sm">{item.label}</span>
-                </a>
-              );
-            })}
-          </nav>
-
-          <div className="p-4 border-t border-zinc-800">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/50 hover:bg-zinc-800 transition-colors cursor-pointer">
-              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm text-white shadow-md">
-                AJ
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate text-white">Alex Johnson</p>
-                <p className="text-xs text-zinc-500 truncate">Student ID: 9021</p>
-              </div>
-              <LogOut size={18} className="text-zinc-400 hover:text-red-400 transition-colors" />
-            </div>
-          </div>
-        </div>
-      </aside>
-
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <header className="h-20 bg-black/50 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-40">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden text-zinc-400 hover:text-white"
-            >
-              <Menu size={24} />
-            </button>
-            <h1 className="text-xl font-bold hidden sm:block">Settings</h1>
-          </div>
-
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="relative group">
-              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></div>
-              <Bell
-                size={20}
-                className="text-zinc-400 hover:text-white cursor-pointer transition-colors"
-              />
-            </div>
-          </div>
-        </header>
-
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Settings Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
           <div className="max-w-3xl mx-auto space-y-8">
@@ -360,7 +247,7 @@ const StudentSettingsPage = () => {
             </section>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

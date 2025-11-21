@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import StudentLayout from './layout/StudentLayout';
 import StudentDashboardPage from './pages/StudentDashboardPage';
 import StudentMyCoursesPage from './pages/StudentMyCoursesPage';
-import StudentCourseLearningPage from './pages/StudentCourseLearningPage';
+import StudentCurrentLearningPage from './pages/StudentCurrentLearningPage';
 import StudentAssignmentsPage from './pages/StudentAssignmentsPage';
 import StudentQuizzesPage from './pages/StudentQuizzesPage';
 import StudentLeaderboardPage from './pages/StudentLeaderBoardPage';
@@ -19,7 +19,7 @@ const StudentPortal = () => {
       <Route element={<StudentLayout />}>
         <Route path="/" element={<StudentDashboardPage />} />
         <Route path="/my-courses" element={<StudentMyCoursesPage />} />
-        <Route path="/course-learning" element={<StudentCourseLearningPage />} />
+        <Route path="/current-learning" element={<StudentCurrentLearningPage />} />
         <Route path="/assignments" element={<StudentAssignmentsPage />} />
         <Route path="/quizzes" element={<StudentQuizzesPage />} />
         <Route path="/leaderboard" element={<StudentLeaderboardPage />} />

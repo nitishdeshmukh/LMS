@@ -24,9 +24,9 @@ const StudentNavbar = () => {
     { label: 'Dashboard', icon: <LayoutDashboard size={20} />, navigation: '/student/' },
     { label: 'My Courses', icon: <Book size={20} />, navigation: '/student/my-courses' },
     {
-      label: 'Course Learning',
+      label: 'Current Learning',
       icon: <BookOpen size={20} />,
-      navigation: '/student/course-learning',
+      navigation: '/student/current-learning',
     },
     { label: 'Assignments', icon: <FileText size={20} />, navigation: '/student/assignments' },
     { label: 'Quizzes', icon: <ClipboardList size={20} />, navigation: '/student/quizzes' },
