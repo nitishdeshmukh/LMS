@@ -48,6 +48,34 @@ function Home() {
       price: '₹500',
       slots: 'Limited Seats',
     },
+    {
+      title: 'FrontEnd Developement',
+      description: 'Turn raw data into actionable insights using SQL, Tableau, and PowerBI.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+    },
+    {
+      title: 'BackEnd Developement',
+      description: 'Turn raw data into actionable insights using SQL, Tableau, and PowerBI.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+    },
+    {
+      title: 'Data Analytics',
+      description: 'Turn raw data into actionable insights using SQL, Tableau, and PowerBI.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+    },
+    {
+      title: 'Data Analytics',
+      description: 'Turn raw data into actionable insights using SQL, Tableau, and PowerBI.',
+      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
+      price: '₹500',
+      slots: 'Limited Seats',
+    },
   ];
 
   const benefits = [

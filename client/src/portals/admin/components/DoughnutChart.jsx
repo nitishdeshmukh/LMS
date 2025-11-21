@@ -84,7 +84,7 @@ export default function DoughnutChart({
     // Color palette (fallback)
     const defaultPalette = [
       am5.color('#FF4D4D'),
-      am5.color('#4D79FF'),
+      am5.color('#145efc'),
       am5.color('#4DFF88'),
       am5.color('#FFC44D'),
       am5.color('#B84DFF'),
