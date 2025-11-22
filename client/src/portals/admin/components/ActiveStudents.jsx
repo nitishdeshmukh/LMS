@@ -47,15 +47,13 @@ const ActiveStudents = () => {
   ]);
 
   return (
-    <div>
+    <div className=" min-h-screen">
       <main className="flex-1 overflow-y-auto p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard: Active Students</h1>
-
           {/* Statistics Section */}
           <StatisticsSection />
         </div>
-        <div>
+        <div className="mt-8">
           <StudentsTable data={studentsData} />
         </div>
       </main>

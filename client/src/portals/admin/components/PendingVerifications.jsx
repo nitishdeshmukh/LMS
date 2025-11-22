@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Badge } from '../../../common/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../common/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '../../../common/components/ui/dropdown-menu';
 import { ChevronDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/common/components/ui/button';
 
 const PendingVerifications = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,7 +79,6 @@ const PendingVerifications = () => {
 
   const handleVerify = studentName => {
     console.log('Verifying:', studentName);
-    // Add your verification logic here
   };
 
   const paginatedData = studentsData.slice(
@@ -108,39 +107,30 @@ const PendingVerifications = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="p-8 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Pending Verifications</h1>
-          <p className="text-gray-600">
-            View and verify students who have registered but not yet paid.
-          </p>
-        </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
+        <div className="bg-zinc-800 rounded-lg p-4 mb-6 shadow-sm border border-zinc-700">
           <div className="flex items-center gap-4 flex-wrap">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex text-black items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700">
                   Filter by College
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="text-black bg-white">
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'All' })}>
+              <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'All' })} className="text-zinc-200 hover:bg-zinc-700">
                   All Colleges
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'IIT Bombay' })}>
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'IIT Bombay' })} className="text-zinc-200 hover:bg-zinc-700">
                   IIT Bombay
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'NIT Trichy' })}>
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'NIT Trichy' })} className="text-zinc-200 hover:bg-zinc-700">
                   NIT Trichy
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setFilters({ ...filters, college: 'BITS Pilani' })}
-                >
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, college: 'BITS Pilani' })} className="text-zinc-200 hover:bg-zinc-700">
                   BITS Pilani
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -148,22 +138,22 @@ const PendingVerifications = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex text-black items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700">
                   Filter by Year
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="text-black bg-white">
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'All' })}>
+              <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'All' })} className="text-zinc-200 hover:bg-zinc-700">
                   All Years
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Second Year' })}>
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Second Year' })} className="text-zinc-200 hover:bg-zinc-700">
                   Second Year
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Third Year' })}>
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Third Year' })} className="text-zinc-200 hover:bg-zinc-700">
                   Third Year
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Final Year' })}>
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, year: 'Final Year' })} className="text-zinc-200 hover:bg-zinc-700">
                   Final Year
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -171,28 +161,22 @@ const PendingVerifications = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex text-black items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700">
                   Filter by Domain
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="text-black bg-white">
-                <DropdownMenuItem onClick={() => setFilters({ ...filters, domain: 'All' })}>
+              <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, domain: 'All' })} className="text-zinc-200 hover:bg-zinc-700">
                   All Domains
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setFilters({ ...filters, domain: 'Data Science' })}
-                >
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, domain: 'Data Science' })} className="text-zinc-200 hover:bg-zinc-700">
                   Data Science
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setFilters({ ...filters, domain: 'Web Development' })}
-                >
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, domain: 'Web Development' })} className="text-zinc-200 hover:bg-zinc-700">
                   Web Development
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setFilters({ ...filters, domain: 'Machine Learning' })}
-                >
+                <DropdownMenuItem onClick={() => setFilters({ ...filters, domain: 'Machine Learning' })} className="text-zinc-200 hover:bg-zinc-700">
                   Machine Learning
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -201,7 +185,7 @@ const PendingVerifications = () => {
             <Button
               variant="ghost"
               onClick={handleResetFilters}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 hover:bg-zinc-700"
             >
               Reset Filters
               <X className="h-4 w-4" />
@@ -209,30 +193,30 @@ const PendingVerifications = () => {
           </div>
         </div>
 
-        {/* Table - Using shadcn Table components */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {/* Table */}
+        <div className="bg-zinc-900 rounded-lg shadow-sm border border-zinc-800 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                <TableHead className="font-semibold text-gray-700">College</TableHead>
-                <TableHead className="font-semibold text-gray-700">Year</TableHead>
-                <TableHead className="font-semibold text-gray-700">Domain</TableHead>
-                <TableHead className="font-semibold text-gray-700">Payment Status</TableHead>
-                <TableHead className="font-semibold text-gray-700"></TableHead>
+              <TableRow className="bg-zinc-800 border-zinc-700 hover:bg-zinc-800">
+                <TableHead className="font-semibold text-zinc-300">Name</TableHead>
+                <TableHead className="font-semibold text-zinc-300">Email</TableHead>
+                <TableHead className="font-semibold text-zinc-300">College</TableHead>
+                <TableHead className="font-semibold text-zinc-300">Year</TableHead>
+                <TableHead className="font-semibold text-zinc-300">Domain</TableHead>
+                <TableHead className="font-semibold text-zinc-300">Payment Status</TableHead>
+                <TableHead className="font-semibold text-zinc-300"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedData.map(student => (
-                <TableRow key={student.id} className="hover:bg-gray-50">
-                  <TableCell className="font-medium text-gray-900">{student.name}</TableCell>
-                  <TableCell className="text-blue-600">{student.email}</TableCell>
-                  <TableCell className="text-blue-600">{student.college}</TableCell>
-                  <TableCell className="text-gray-700">{student.year}</TableCell>
-                  <TableCell className="text-gray-700">{student.domain}</TableCell>
+                <TableRow key={student.id} className="hover:bg-zinc-800 border-zinc-800">
+                  <TableCell className="font-medium text-zinc-100">{student.name}</TableCell>
+                  <TableCell className="text-blue-400">{student.email}</TableCell>
+                  <TableCell className="text-blue-400">{student.college}</TableCell>
+                  <TableCell className="text-zinc-200">{student.year}</TableCell>
+                  <TableCell className="text-zinc-200">{student.domain}</TableCell>
                   <TableCell>
-                    <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-0">
+                    <Badge className="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/20">
                       {student.paymentStatus}
                     </Badge>
                   </TableCell>
@@ -251,23 +235,23 @@ const PendingVerifications = () => {
           </Table>
 
           {/* Pagination */}
-          <div className="px-6 py-4 border-t border-gray-200 bg-white">
+          <div className="px-6 py-4 border-t border-zinc-800 bg-zinc-900">
             <div className="flex items-center justify-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2"
+                className="px-3 py-2 text-zinc-300 hover:bg-zinc-800"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <span className="text-sm text-gray-600 px-2">Previous</span>
+              <span className="text-sm text-zinc-400 px-2">Previous</span>
 
               {renderPaginationButtons().map((page, index) =>
                 page === '...' ? (
-                  <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-600">
+                  <span key={`ellipsis-${index}`} className="px-3 py-2 text-zinc-400">
                     ...
                   </span>
                 ) : (
@@ -278,8 +262,8 @@ const PendingVerifications = () => {
                     onClick={() => setCurrentPage(page)}
                     className={`px-4 py-2 ${
                       currentPage === page
-                        ? 'bg-blue-100 text-blue-600 hover:bg-blue-200 border-blue-200'
-                        : ''
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
                     }`}
                   >
                     {page}
@@ -287,14 +271,14 @@ const PendingVerifications = () => {
                 ),
               )}
 
-              <span className="text-sm text-gray-600 px-2">Next</span>
+              <span className="text-sm text-zinc-400 px-2">Next</span>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2"
+                className="px-3 py-2 text-zinc-300 hover:bg-zinc-800"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

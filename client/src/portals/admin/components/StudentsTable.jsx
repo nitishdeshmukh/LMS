@@ -1,34 +1,33 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../common/components/ui/table';
+import { Badge } from '../../../common/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '../../../common/components/ui/dropdown-menu';
 import { ChevronDown, Download } from 'lucide-react';
+import { Button } from '@/common/components/ui/button';
 
 const StudentsTable = ({ data = [] }) => {
   const getProgressColor = progress => {
     if (progress === 100) return 'bg-green-500';
     if (progress >= 75) return 'bg-blue-500';
     if (progress >= 50) return 'bg-blue-400';
-    return 'bg-gray-400';
+    return 'bg-zinc-500';
   };
 
   const getStatusBadgeVariant = status => {
     switch (status) {
       case 'Graded':
-        return 'bg-green-100 text-green-700 hover:bg-green-100';
+        return 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border-green-500/20';
       case 'Submitted':
-        return 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100';
+        return 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border-yellow-500/20';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-700 hover:bg-blue-100';
+        return 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20';
       default:
-        return 'bg-gray-100 text-gray-700 hover:bg-gray-100';
+        return 'bg-zinc-500/10 text-zinc-400 hover:bg-zinc-500/20 border-zinc-500/20';
     }
   };
 
@@ -49,31 +48,31 @@ const StudentsTable = ({ data = [] }) => {
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex text-black items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700">
                 Filter by College
                 <ChevronDown className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger  >
-            <DropdownMenuContent className='text-black bg-white ' >
-              <DropdownMenuItem>All Colleges</DropdownMenuItem>
-              <DropdownMenuItem>Stanford University</DropdownMenuItem>
-              <DropdownMenuItem>MIT</DropdownMenuItem>
-              <DropdownMenuItem>Harvard</DropdownMenuItem>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">All Colleges</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">Stanford University</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">MIT</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">Harvard</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex  text-black items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700">
                 Filter by Status
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='text-black bg-white' >
-              <DropdownMenuItem>All Status</DropdownMenuItem>
-              <DropdownMenuItem>Graded</DropdownMenuItem>
-              <DropdownMenuItem>Submitted</DropdownMenuItem>
-              <DropdownMenuItem>In Progress</DropdownMenuItem>
+            <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">All Status</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">Graded</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">Submitted</DropdownMenuItem>
+              <DropdownMenuItem className="text-zinc-200 hover:bg-zinc-700">In Progress</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -88,31 +87,31 @@ const StudentsTable = ({ data = [] }) => {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border bg-white shadow-sm">
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900 shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="font-semibold text-gray-600">NAME</TableHead>
-              <TableHead className="font-semibold text-gray-600">EMAIL</TableHead>
-              <TableHead className="font-semibold text-gray-600">COLLEGE</TableHead>
-              <TableHead className="font-semibold text-gray-600">YEAR</TableHead>
-              <TableHead className="font-semibold text-gray-600">CURRENT PROGRESS %</TableHead>
-              <TableHead className="font-semibold text-gray-600">CAPSTONE STATUS</TableHead>
-              <TableHead className="font-semibold text-gray-600">ACTION</TableHead>
+            <TableRow className="bg-zinc-800 border-zinc-700 hover:bg-zinc-800">
+              <TableHead className="font-semibold text-zinc-300">NAME</TableHead>
+              <TableHead className="font-semibold text-zinc-300">EMAIL</TableHead>
+              <TableHead className="font-semibold text-zinc-300">COLLEGE</TableHead>
+              <TableHead className="font-semibold text-zinc-300">YEAR</TableHead>
+              <TableHead className="font-semibold text-zinc-300">CURRENT PROGRESS %</TableHead>
+              <TableHead className="font-semibold text-zinc-300">CAPSTONE STATUS</TableHead>
+              <TableHead className="font-semibold text-zinc-300">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.length > 0 ? (
               data.map((student, index) => (
-                <TableRow key={index} className="hover:bg-gray-50">
-                  <TableCell className="font-medium text-gray-900">{student.name}</TableCell>
-                  <TableCell className="text-gray-600">{student.email}</TableCell>
-                  <TableCell className="text-gray-700">{student.college}</TableCell>
-                  <TableCell className="text-gray-700">{student.year}</TableCell>
+                <TableRow key={index} className="hover:bg-zinc-800 border-zinc-800">
+                  <TableCell className="font-medium text-zinc-100">{student.name}</TableCell>
+                  <TableCell className="text-zinc-300">{student.email}</TableCell>
+                  <TableCell className="text-zinc-200">{student.college}</TableCell>
+                  <TableCell className="text-zinc-200">{student.year}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="flex-1 max-w-[100px]">
-                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-zinc-700 rounded-full overflow-hidden">
                           <div
                             className={`h-full ${getProgressColor(
                               student.currentProgress,
@@ -121,7 +120,7 @@ const StudentsTable = ({ data = [] }) => {
                           />
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-zinc-200">
                         {student.currentProgress}%
                       </span>
                     </div>
@@ -129,7 +128,7 @@ const StudentsTable = ({ data = [] }) => {
                   <TableCell>
                     <Badge
                       variant="secondary"
-                      className={`${getStatusBadgeVariant(student.capstoneStatus)} font-medium`}
+                      className={`${getStatusBadgeVariant(student.capstoneStatus)} font-medium border`}
                     >
                       {student.capstoneStatus}
                     </Badge>
@@ -147,7 +146,7 @@ const StudentsTable = ({ data = [] }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-gray-500">
+                <TableCell colSpan={7} className="h-24 text-center text-zinc-400">
                   No students found.
                 </TableCell>
               </TableRow>

@@ -1,10 +1,10 @@
 import React from 'react';
 
-const StatCard = ({ title, value, bgColor = 'bg-white' }) => {
+const StatCard = ({ title, value, bgColor = 'bg-zinc-800' }) => {
   return (
-    <div className={`${bgColor} rounded-xl p-6 border border-gray-200 shadow-sm`}>
-      <h3 className="text-sm font-medium text-gray-600 mb-3">{title}</h3>
-      <p className="text-4xl font-bold text-blue-600">{value}</p>
+    <div className={`${bgColor} rounded-xl p-6 border border-zinc-700 shadow-sm`}>
+      <h3 className="text-sm font-medium text-zinc-400 mb-3">{title}</h3>
+      <p className="text-4xl font-bold text-blue-400">{value}</p>
     </div>
   );
 };

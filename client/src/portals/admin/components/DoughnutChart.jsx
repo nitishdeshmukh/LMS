@@ -21,30 +21,41 @@ export default function DoughnutChart({
   innerRadiusPercent = 50,
   showLegend = true,
 }) {
-  const chartRef = useRef(null);
+  const chartDivRef = useRef(null);
+  const rootRef = useRef(null);
 
   useLayoutEffect(() => {
-    if (!chartRef.current) return;
+    // Dispose previous root if exists
+    if (rootRef.current) {
+      rootRef.current.dispose();
+      rootRef.current = null;
+    }
 
-    const root = am5.Root.new(chartRef.current);
+    if (!chartDivRef.current) return;
+
+    const root = am5.Root.new(chartDivRef.current);
+    rootRef.current = root;
+
     root.setThemes([am5themes_Animated.new(root)]);
-    // remove amCharts logo if you don't want to show it
+    
+    // Set interface colors for dark theme
+    root.interfaceColors.set("grid", am5.color(0x3f3f46)); // zinc-700
+    root.interfaceColors.set("text", am5.color(0xe5e7eb)); // zinc-200
+    
     if (root._logo) {
       try {
         root._logo.dispose();
-      } catch (e) {
-        // ignore if not present
-      }
+      } catch (e) {}
     }
 
-    // Create chart
+    // Create chart with dark background
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
       }),
     );
 
-    // Create series (pie -> doughnut via innerRadius)
+    // Create series
     const series = chart.series.push(
       am5percent.PieSeries.new(root, {
         valueField: 'value',
@@ -53,45 +64,66 @@ export default function DoughnutChart({
       }),
     );
 
-    // Make it a donut
     series.set('innerRadius', am5.percent(innerRadiusPercent));
 
-    // Styling slices
+    // Styling slices for dark background
     series.slices.template.setAll({
-      stroke: am5.color(0xffffff),
-      strokeWidth: 1,
-      strokeOpacity: 0.6,
-      cornerRadius: 6,
+      stroke: am5.color(0x18181b), // bg-zinc-900
+      strokeWidth: 2,
+      strokeOpacity: 1,
+      cornerRadius: 8,
     });
 
-    // Tooltip shows category, value and percent
+    // Tooltip with dark theme
     series.slices.template.set(
-      'tooltipText',
-      "{category}: {value} ({valuePercent.formatNumber('#.0')}%)",
+      'tooltip',
+      am5.Tooltip.new(root, {
+        labelText: "{category}: {value} ({valuePercent.formatNumber('#.0')}%)",
+        getFillFromSprite: false,
+        background: am5.RoundedRectangle.new(root, {
+          fill: am5.color(0x27272a), // zinc-800
+          strokeWidth: 1,
+          stroke: am5.color(0x52525b), // zinc-600
+        }),
+      })
     );
 
-    // If you want labels on slices (inside/outside), configure labels/template:
+    // Tooltip label styling
+    series.slices.template.get("tooltip").label.setAll({
+      fill: am5.color(0xe5e7eb), // zinc-200
+      fontSize: 13,
+    });
+
+    // Slice labels - light color for dark background
     series.labels.template.setAll({
       text: '{category}',
-      radius: 10, // distance from slice center
+      radius: 10,
       centerX: am5.p50,
       centerY: am5.p50,
       oversizedBehavior: 'truncate',
       maxWidth: 120,
-      fontSize: 12,
+      fontSize: 13,
+      fill: am5.color(0xe5e7eb), // zinc-200
+      fontWeight: '500',
     });
 
-    // Color palette (fallback)
+    // Tick lines from slices to labels - light color
+    series.ticks.template.setAll({
+      stroke: am5.color(0xa1a1aa), // zinc-400
+      strokeOpacity: 0.5,
+    });
+
+    // Color palette
     const defaultPalette = [
-      am5.color('#FF4D4D'),
-      am5.color('#145efc'),
-      am5.color('#4DFF88'),
-      am5.color('#FFC44D'),
-      am5.color('#B84DFF'),
-      am5.color('#4DFFF7'),
+      am5.color('#ef4444'), // red-500
+      am5.color('#3b82f6'), // blue-500
+      am5.color('#10b981'), // emerald-500
+      am5.color('#f59e0b'), // amber-500
+      am5.color('#8b5cf6'), // violet-500
+      am5.color('#06b6d4'), // cyan-500
     ];
 
-    // Use colors provided in data (dataContext.color) or fallback to palette
+    // Apply colors
     series.slices.template.adapters.add('fill', (fill, target) => {
       const di = target.dataItem;
       if (di && di.dataContext && di.dataContext.color) {
@@ -101,29 +133,41 @@ export default function DoughnutChart({
       return defaultPalette[idx % defaultPalette.length];
     });
 
-    series.slices.template.adapters.add('stroke', (stroke, target) => {
-      const di = target.dataItem;
-      if (di && di.dataContext && di.dataContext.color) {
-        return am5.color(di.dataContext.color);
-      }
-      const idx = di ? di.index : 0;
-      return defaultPalette[idx % defaultPalette.length];
-    });
-
-    // Optional legend
+    // Legend with dark theme
     if (showLegend) {
       const legend = chart.children.push(
         am5.Legend.new(root, {
           centerX: am5.p50,
           x: am5.p50,
           layout: root.horizontalLayout,
-          marginTop: 10,
+          marginTop: 15,
         }),
       );
+      
+      // Legend labels - light text
+      legend.labels.template.setAll({
+        fill: am5.color(0xe5e7eb), // zinc-200
+        fontSize: 13,
+        fontWeight: '400',
+      });
+      
+      // Legend value labels - light text
+      legend.valueLabels.template.setAll({
+        fill: am5.color(0xe5e7eb), // zinc-200
+        fontSize: 13,
+        fontWeight: '500',
+      });
+      
+      // Legend markers (colored squares)
+      legend.markers.template.setAll({
+        width: 12,
+        height: 12,
+      });
+      
       legend.data.setAll(series.dataItems);
     }
 
-    // Set data (fallback sample if no data)
+    // Set data
     const chartData =
       data && data.length
         ? data
@@ -135,18 +179,23 @@ export default function DoughnutChart({
           ];
 
     series.data.setAll(chartData);
-
-    // Appear animation
     series.appear(800, 100);
 
     return () => {
       root.dispose();
+      rootRef.current = null;
     };
   }, [data, innerRadiusPercent, showLegend, height]);
 
   return (
-    <div style={{ width: '100%', height }}>
-      <div ref={chartRef} style={{ width: '100%', height: '100%' }} />
+    <div style={{
+      width: '100%',
+      height,
+      background: '#18181b', // bg-zinc-900
+      borderRadius: 12,
+      padding: 16,
+    }}>
+      <div ref={chartDivRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 }

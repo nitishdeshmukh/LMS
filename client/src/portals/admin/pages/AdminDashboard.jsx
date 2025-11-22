@@ -1,9 +1,8 @@
 import React from 'react';
 import DashboardHeader from '../components/DashboardHeader';
-import FilterSection from '../components/FilterSection';
 import StatsCardsSection from '../components/StatsCardsSection';
 import EnrollmentsTable from '../components/EnrollmentsTable';
-import ColumnWithRotatedLabels from '../components/ColumnWithRotatedLabels';
+import ColumnWithRotatedLabels from '../components/ColumnChart';
 import DoughnutChart from '../components/DoughnutChart';
 
 function AdminDashboard() {
@@ -27,19 +26,15 @@ function AdminDashboard() {
       {/* Header with Time Filters */}
       <DashboardHeader />
 
-      {/* College and Course Filters */}
-      <FilterSection />
-
       {/* Statistics Cards */}
       <StatsCardsSection />
 
       {/* Charts Section */}
       <div className="grid grid-cols-2 gap-5 mb-5 ">
-        <div className="bg-white rounded-xl p-1 border border-gray-200">
-          <h2 className="text-xl text-black font-semibold mb-4"></h2>
-          <ColumnWithRotatedLabels data={chartData} height={350} />
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-2">
+          <ColumnWithRotatedLabels data={chartData} height={350}/>
         </div>
-        <div className="bg-white rounded-xl p-1 border border-gray-200">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-2">
           <DoughnutChart data={donutData} height={360} innerRadiusPercent={60} />
         </div>
       </div>
