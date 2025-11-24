@@ -292,19 +292,27 @@ function Home() {
 
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-gray-800 pt-8">
               <div>
-                <div className="text-3xl font-bold"><Counter target={500} suffix="+" /></div>
+                <div className="text-3xl font-bold">
+                  <Counter target={500} suffix="+" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase">Active Students</div>
               </div>
               <div>
-                <div className="text-3xl font-bold"><Counter target={10} suffix="+" /></div>
+                <div className="text-3xl font-bold">
+                  <Counter target={10} suffix="+" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase">Tech Streams</div>
               </div>
               <div>
-                <div className="text-3xl font-bold"><Counter target={100} suffix="%" /></div>
+                <div className="text-3xl font-bold">
+                  <Counter target={100} suffix="%" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase">Project Based</div>
               </div>
               <div>
-                <div className="text-3xl font-bold"><Counter target={24} suffix="/7" /></div>
+                <div className="text-3xl font-bold">
+                  <Counter target={24} suffix="/7" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase">Mentor Support</div>
               </div>
             </div>
@@ -449,7 +457,7 @@ function Home() {
 
         {/* TESTIMONIAL CAROUSEL */}
         <section className="bg-zinc-900 border border-zinc-700">
-          <div className='py-24 max-w-7xl mx-auto px-4 relative'>
+          <div className="py-24 max-w-7xl mx-auto px-4 relative">
             <h2 className="text-3xl font-bold text-center mb-12">Student Stories</h2>
 
             <div className="relative group">
@@ -459,62 +467,63 @@ function Home() {
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={item.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`w-10 h-10 rounded-full bg-linear-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
+              <div className="flex items-center gap-3">
+                <a
+                  href={item.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-10 h-10 rounded-full bg-linear-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
+                >
+                  {item.name.charAt(0)}
+                </a>
+
+                <button
+                  onClick={() => scroll('right')}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                <div
+                  ref={scrollRef}
+                  className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 scrollbar-none"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {testimonials.map(item => (
+                    <div
+                      key={item.id}
+                      className="min-w-[85vw] md:min-w-[calc(33%-1rem)] snap-center bg-zinc-950 p-8 rounded-2xl border border-zinc-800 flex flex-col justify-between hover:border-blue-500/50 transition"
                     >
-                      {item.name.charAt(0)}
-                    </a>
-
-              <button
-                onClick={() => scroll('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-
-              <div
-                ref={scrollRef}
-                className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 scrollbar-none"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                {testimonials.map(item => (
-                  <div
-                    key={item.id}
-                    className="min-w-[85vw] md:min-w-[calc(33%-1rem)] snap-center bg-zinc-950 p-8 rounded-2xl border border-zinc-800 flex flex-col justify-between hover:border-blue-500/50 transition"
-                  >
-                    <div>
-                      <div className="flex gap-1 mb-4">
-                        {[...Array(5)].map((_, star) => (
-                          <span key={star} className="text-yellow-500 text-sm">
-                            ★
-                          </span>
-                        ))}
-                      </div>
-
-                      <p className="text-gray-400 italic mb-6">"{item.text}"</p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <a
-                        href={item.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
-                      >
-                        {item.name.charAt(0)}
-                      </a>
-
                       <div>
-                        <div className="font-bold text-sm">{item.name}</div>
-                        <div className="text-xs text-blue-400">{item.role}</div>
+                        <div className="flex gap-1 mb-4">
+                          {[...Array(5)].map((_, star) => (
+                            <span key={star} className="text-yellow-500 text-sm">
+                              ★
+                            </span>
+                          ))}
+                        </div>
+
+                        <p className="text-gray-400 italic mb-6">"{item.text}"</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <a
+                          href={item.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
+                        >
+                          {item.name.charAt(0)}
+                        </a>
+
+                        <div>
+                          <div className="font-bold text-sm">{item.name}</div>
+                          <div className="text-xs text-blue-400">{item.role}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>

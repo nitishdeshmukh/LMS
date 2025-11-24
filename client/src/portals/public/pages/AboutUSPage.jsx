@@ -22,14 +22,12 @@ import {
   CarouselPrevious,
 } from '@/common/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-
-const AboutUs = () => {
-  const [api, setApi] = useState(null);
-  const [current, setCurrent] = useState(0);
 import Counter from '../components/Counter';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
 
 const AboutUs = () => {
+  const [api, setApi] = useState(null);
+  const [current, setCurrent] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
    const navigateAndStore = useNavigateWithRedux();
 
