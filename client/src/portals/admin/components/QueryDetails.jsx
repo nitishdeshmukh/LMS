@@ -60,7 +60,7 @@ const QueryDetails = ({ query, onBack }) => {
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6 shadow-lg">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
                 {query.name.charAt(0)}
               </div>
               <div>
@@ -77,7 +77,7 @@ const QueryDetails = ({ query, onBack }) => {
           {/* Student Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
+              <Mail className="w-5 h-5 text-blue-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">Email</p>
                 <p className="text-sm text-zinc-200 truncate">{query.email}</p>
@@ -85,7 +85,7 @@ const QueryDetails = ({ query, onBack }) => {
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <Phone className="w-5 h-5 text-green-400 flex-shrink-0" />
+              <Phone className="w-5 h-5 text-green-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">Phone</p>
                 <p className="text-sm text-zinc-200">{query.phone}</p>
@@ -93,7 +93,7 @@ const QueryDetails = ({ query, onBack }) => {
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <Hash className="w-5 h-5 text-purple-400 flex-shrink-0" />
+              <Hash className="w-5 h-5 text-purple-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">Student ID</p>
                 <p className="text-sm text-zinc-200">{query.studentId}</p>
@@ -101,7 +101,7 @@ const QueryDetails = ({ query, onBack }) => {
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <GraduationCap className="w-5 h-5 text-amber-400 flex-shrink-0" />
+              <GraduationCap className="w-5 h-5 text-amber-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">College</p>
                 <p className="text-sm text-zinc-200 truncate">{query.college}</p>
@@ -109,7 +109,7 @@ const QueryDetails = ({ query, onBack }) => {
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <Calendar className="w-5 h-5 text-cyan-400 flex-shrink-0" />
+              <Calendar className="w-5 h-5 text-cyan-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">Year</p>
                 <p className="text-sm text-zinc-200">{query.year}</p>
@@ -117,7 +117,7 @@ const QueryDetails = ({ query, onBack }) => {
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-800 p-4 rounded-lg border border-zinc-700">
-              <User className="w-5 h-5 text-pink-400 flex-shrink-0" />
+              <User className="w-5 h-5 text-pink-400 shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-zinc-500 mb-1">Category</p>
                 <p className="text-sm text-zinc-200">{query.category}</p>

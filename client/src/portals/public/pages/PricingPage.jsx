@@ -6,6 +6,39 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
+      {/* --- NAVBAR (Reused) --- */}
+      {/* <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <a href="/" className="shrink-0 font-bold text-2xl tracking-tighter">
+              LMS<span className="text-blue-500">PORTAL</span>
+            </a>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-8">
+                <a href="/" className="hover:text-blue-400 transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                <a href="/browse" className="hover:text-blue-400 transition-colors px-3 py-2 rounded-md text-sm font-medium">Browse Streams</a>
+                <a href="/pricing" className="text-blue-400 transition-colors px-3 py-2 rounded-md text-sm font-medium">Pricing</a>
+                <a href="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-medium transition-all transform hover:scale-105">Login</a>
+              </div>
+            </div>
+            <div className="-mr-2 flex md:hidden">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+        {isMenuOpen && (
+            <div className="md:hidden bg-gray-900 border-b border-gray-800">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">Home</a>
+                <a href="/pricing" className="block px-3 py-2 rounded-md text-base font-medium text-blue-400">Pricing</a>
+                <a href="/login" className="block px-3 py-2 rounded-md text-base font-medium text-blue-400">Login</a>
+            </div>
+            </div>
+        )}
+      </nav> */}
+
       <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6">

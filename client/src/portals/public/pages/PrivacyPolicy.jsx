@@ -88,9 +88,9 @@ const PrivacyPolicy = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-20">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pt-20">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 px-4 sm:px-6 lg:px-8">
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
           <div className="flex items-center gap-2 text-blue-100">
@@ -148,7 +148,7 @@ const PrivacyPolicy = () => {
                   <div key={idx}>
                     {typeof item === 'string' ? (
                       <div className="flex items-start gap-3">
-                        <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-600" />
+                        <span className="shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-600" />
                         <p className="text-gray-700 leading-relaxed flex-1">{item}</p>
                       </div>
                     ) : (
@@ -167,7 +167,7 @@ const PrivacyPolicy = () => {
         {/* Grievance Officer Section */}
         <div
           id="grievance-officer"
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-8 mb-8 border border-blue-200 scroll-mt-20"
+          className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-8 mb-8 border border-blue-200 scroll-mt-20"
         >
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold">
@@ -182,7 +182,7 @@ const PrivacyPolicy = () => {
 
           <div className="bg-white rounded-lg p-6 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                 <span className="text-blue-600 font-bold text-lg">
                   {grievanceOfficer.name.charAt(0)}
                 </span>
@@ -194,7 +194,7 @@ const PrivacyPolicy = () => {
             </div>
 
             <div className="flex items-center gap-3 text-gray-700">
-              <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <Mail className="w-5 h-5 text-blue-600 shrink-0" />
               <a
                 href={`mailto:${grievanceOfficer.email}`}
                 className="hover:text-blue-600 transition-colors underline"
@@ -204,7 +204,7 @@ const PrivacyPolicy = () => {
             </div>
 
             <div className="flex items-center gap-3 text-gray-700">
-              <Phone className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <Phone className="w-5 h-5 text-blue-600 shrink-0" />
               <a
                 href={`tel:+91${grievanceOfficer.phone}`}
                 className="hover:text-blue-600 transition-colors"
@@ -214,7 +214,7 @@ const PrivacyPolicy = () => {
             </div>
 
             <div className="flex items-start gap-3 text-gray-700">
-              <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+              <MapPin className="w-5 h-5 text-blue-600 shrink-0 mt-1" />
               <div>
                 {grievanceOfficer.address.map((line, idx) => (
                   <p key={idx}>{line}</p>

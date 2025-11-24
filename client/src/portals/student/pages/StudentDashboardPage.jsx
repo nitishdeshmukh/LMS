@@ -35,7 +35,7 @@ const StudentDashboardPage = () => {
     title: 'Full Stack Web Development',
     progress: 65,
     nextLesson: 'React Hooks: useEffect & Custom Hooks',
-    thumbnail: 'bg-gradient-to-r from-blue-900 to-slate-900',
+    thumbnail: 'bg-linear-to-r from-blue-900 to-slate-900',
   };
 
   const upcomingDeadlines = [

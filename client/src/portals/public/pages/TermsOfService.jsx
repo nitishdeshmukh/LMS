@@ -47,9 +47,9 @@ const TermsOfService = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-20">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pt-20">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-16 px-4 sm:px-6 lg:px-8">
+      <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-4">
             <Scale className="w-12 h-12" />
@@ -85,7 +85,7 @@ const TermsOfService = () => {
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                     >
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
                         {item.icon}
                       </span>
                       {item.title}
@@ -101,7 +101,7 @@ const TermsOfService = () => {
             {/* Introduction */}
             <div className="bg-white rounded-lg shadow-md p-8 mb-8">
               <div className="flex items-start gap-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg mb-6">
-                <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+                <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-2">Important Notice</h3>
                   <p className="text-gray-700 leading-relaxed">
@@ -191,7 +191,7 @@ const TermsOfService = () => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
+                  <span className="shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
                   <div>
                     <span className="font-semibold text-gray-900">Pricing:</span>
                     <span className="text-gray-700">
@@ -202,7 +202,7 @@ const TermsOfService = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
+                  <span className="shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
                   <div>
                     <span className="font-semibold text-gray-900">Payment Processing:</span>
                     <span className="text-gray-700">
@@ -213,7 +213,7 @@ const TermsOfService = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
+                  <span className="shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-600" />
                   <div>
                     <span className="font-semibold text-gray-900">Refund Policy:</span>
                     <span className="text-gray-700">
@@ -301,7 +301,7 @@ const TermsOfService = () => {
                   'Harass mentors, staff, or other students.',
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-red-600" />
+                    <span className="shrink-0 w-2 h-2 mt-2 rounded-full bg-red-600" />
                     <p className="text-gray-700 leading-relaxed flex-1">{item}</p>
                   </div>
                 ))}
@@ -312,7 +312,7 @@ const TermsOfService = () => {
             <section
               id="liability"
               data-section="liability"
-              className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg shadow-md p-8 mb-8 border border-red-200 scroll-mt-20"
+              className="bg-linear-to-br from-red-50 to-orange-50 rounded-lg shadow-md p-8 mb-8 border border-red-200 scroll-mt-20"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 text-white font-bold">
@@ -373,7 +373,7 @@ const TermsOfService = () => {
             <section
               id="contact"
               data-section="contact"
-              className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-8 border border-blue-200 scroll-mt-20"
+              className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-8 border border-blue-200 scroll-mt-20"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 text-white font-bold">
@@ -387,7 +387,7 @@ const TermsOfService = () => {
 
               <div className="bg-white rounded-lg p-6 space-y-4">
                 <div className="flex items-center gap-3 text-gray-700">
-                  <Mail className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                  <Mail className="w-5 h-5 text-indigo-600 shrink-0" />
                   <a
                     href="mailto:info@code2dbug.com"
                     className="hover:text-indigo-600 transition-colors underline"
@@ -397,7 +397,7 @@ const TermsOfService = () => {
                 </div>
 
                 <div className="flex items-start gap-3 text-gray-700">
-                  <MapPin className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-1" />
+                  <MapPin className="w-5 h-5 text-indigo-600 shrink-0 mt-1" />
                   <div>
                     <p>House No C-17,</p>
                     <p>Behind 80 LIG Dhancha Bhawan,</p>
@@ -410,7 +410,7 @@ const TermsOfService = () => {
             </section>
 
             {/* Acceptance Footer */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white rounded-lg shadow-lg p-8 text-center mt-10">
+            <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white rounded-lg shadow-lg p-8 text-center mt-10">
               <p className="text-lg font-semibold mb-2">
                 By using Code2dbug, you acknowledge that you have read, understood, and agree to be
                 bound by these Terms of Service.

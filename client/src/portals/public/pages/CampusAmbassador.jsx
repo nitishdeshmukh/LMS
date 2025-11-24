@@ -39,7 +39,7 @@ function CampusAmbassador() {
           <h1 className="text-4xl md:text-7xl  font-extrabold text-center ">
             {' '}
             Be the{' '}
-            <span className=" bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-red-400">
+            <span className=" bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-red-400">
               {' '}
               Campus CEO{' '}
             </span>{' '}

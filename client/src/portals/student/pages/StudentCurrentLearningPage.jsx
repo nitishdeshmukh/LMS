@@ -106,7 +106,7 @@ const StudentCurrentLearningPage = () => {
       return (
         <div className="space-y-6">
           <div className="aspect-video bg-black rounded-xl border border-zinc-800 flex items-center justify-center relative group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent"></div>
             <PlayCircle
               size={80}
               className="text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all z-10"

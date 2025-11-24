@@ -202,7 +202,7 @@ export default function Settings() {
                           <PopoverContent
                             side="top"
                             align="start"
-                            className="w-80 p-0 bg-gradient-to-br from-zinc-800 to-zinc-900 border-zinc-700"
+                            className="w-80 p-0 bg-linear-to-br from-zinc-800 to-zinc-900 border-zinc-700"
                             onOpenAutoFocus={e => e.preventDefault()}
                           >
                             <div className="p-5">
@@ -233,12 +233,9 @@ export default function Settings() {
                               <div className="space-y-2.5">
                                 <div className="flex items-center gap-2.5">
                                   {newPassword.length >= 8 ? (
-                                    <CircleCheckBig
-                                      size={16}
-                                      className="text-green-500 flex-shrink-0"
-                                    />
+                                    <CircleCheckBig size={16} className="text-green-500 shrink-0" />
                                   ) : (
-                                    <Circle size={16} className="text-zinc-600 flex-shrink-0" />
+                                    <Circle size={16} className="text-zinc-600 shrink-0" />
                                   )}
                                   <span
                                     className={`text-xs ${newPassword.length >= 8 ? 'text-zinc-200 font-medium' : 'text-zinc-500'}`}
@@ -249,12 +246,9 @@ export default function Settings() {
 
                                 <div className="flex items-center gap-2.5">
                                   {/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) ? (
-                                    <CircleCheckBig
-                                      size={16}
-                                      className="text-green-500 flex-shrink-0"
-                                    />
+                                    <CircleCheckBig size={16} className="text-green-500 shrink-0" />
                                   ) : (
-                                    <Circle size={16} className="text-zinc-600 flex-shrink-0" />
+                                    <Circle size={16} className="text-zinc-600 shrink-0" />
                                   )}
                                   <span
                                     className={`text-xs ${/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) ? 'text-zinc-200 font-medium' : 'text-zinc-500'}`}
@@ -265,12 +259,9 @@ export default function Settings() {
 
                                 <div className="flex items-center gap-2.5">
                                   {/\d/.test(newPassword) ? (
-                                    <CircleCheckBig
-                                      size={16}
-                                      className="text-green-500 flex-shrink-0"
-                                    />
+                                    <CircleCheckBig size={16} className="text-green-500 shrink-0" />
                                   ) : (
-                                    <Circle size={16} className="text-zinc-600 flex-shrink-0" />
+                                    <Circle size={16} className="text-zinc-600 shrink-0" />
                                   )}
                                   <span
                                     className={`text-xs ${/\d/.test(newPassword) ? 'text-zinc-200 font-medium' : 'text-zinc-500'}`}
@@ -281,12 +272,9 @@ export default function Settings() {
 
                                 <div className="flex items-center gap-2.5">
                                   {/[^a-zA-Z0-9]/.test(newPassword) ? (
-                                    <CircleCheckBig
-                                      size={16}
-                                      className="text-green-500 flex-shrink-0"
-                                    />
+                                    <CircleCheckBig size={16} className="text-green-500 shrink-0" />
                                   ) : (
-                                    <Circle size={16} className="text-zinc-600 flex-shrink-0" />
+                                    <Circle size={16} className="text-zinc-600 shrink-0" />
                                   )}
                                   <span
                                     className={`text-xs ${/[^a-zA-Z0-9]/.test(newPassword) ? 'text-zinc-200 font-medium' : 'text-zinc-500'}`}

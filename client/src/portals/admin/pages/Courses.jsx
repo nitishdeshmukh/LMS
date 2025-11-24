@@ -229,7 +229,7 @@ const Courses = () => {
               className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all group"
             >
               {/* Course Thumbnail */}
-              <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
+              <div className="relative h-40 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden">
                 <img
                   src={course.thumbnail}
                   alt={course.title}

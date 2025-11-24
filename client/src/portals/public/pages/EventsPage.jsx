@@ -12,7 +12,7 @@ const Events = () => {
       time: '5:00 PM IST',
       type: 'Webinar',
       status: 'Upcoming',
-      image: 'bg-gradient-to-br from-purple-900 to-black',
+      image: 'bg-linear-to-br from-purple-900 to-black',
     },
     {
       id: 2,
@@ -21,7 +21,7 @@ const Events = () => {
       time: '48 Hours',
       type: 'Contest',
       status: 'Registering',
-      image: 'bg-gradient-to-br from-blue-900 to-black',
+      image: 'bg-linear-to-br from-blue-900 to-black',
     },
     {
       id: 3,
@@ -30,7 +30,7 @@ const Events = () => {
       time: '11:00 AM',
       type: 'In-Person',
       status: 'Completed',
-      image: 'bg-gradient-to-br from-zinc-800 to-black',
+      image: 'bg-linear-to-br from-zinc-800 to-black',
     },
   ];
 
@@ -40,7 +40,7 @@ const Events = () => {
       {/* <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <a href="/" className="flex-shrink-0 font-bold text-2xl tracking-tighter">
+            <a href="/" className="shrink-0 font-bold text-2xl tracking-tighter">
               LMS<span className="text-blue-500">PORTAL</span>
             </a>
             <div className="hidden md:block">
