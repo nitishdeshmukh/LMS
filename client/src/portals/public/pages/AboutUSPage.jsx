@@ -23,7 +23,7 @@ const AboutUs = () => {
     {
       name: 'Pravin R. Nair',
       role: 'Chief Executive Officer',
-      image: './src/assets/images/founder.png',
+      image: 'images/testimonials/founder.png',
       message:
         "We aren't building another ed-tech giant. We are building a bridge. A bridge between the raw potential of Indian students and the practical demands of the global industry.",
         link:'https://www.linkedin.com/in/pravin-r-nair-964847318/'
@@ -31,7 +31,7 @@ const AboutUs = () => {
     {
       name: 'Deepak Agrawal',
       role: 'Chief Technology Officer',
-      image: './src/assets/images/team02.jpeg',
+      image: 'images/testimonials/team02.jpeg',
       message:
         "Technology changes every day, but our curriculum was stuck in the past. We decided to democratize access to 'real' engineering work through open-source intelligence.",
         
@@ -43,7 +43,7 @@ const AboutUs = () => {
     {
       name: 'Rupesh Kumar Sahu',
       role: 'Senior Frontend Developer',
-      image: './src/assets/images/team03.jpeg',
+      image: 'images/testimonials/team03.jpeg',
       tech: <Code size={18} className="text-blue-400" />,
       message:
         'Crafting pixels into experiences. I wanted to build a platform that feels as premium as the skills we teach.',
@@ -52,7 +52,7 @@ const AboutUs = () => {
     {
       name: 'Nitish Deshmukh',
       role: 'Backend Developer',
-      image: './src/assets/images/team04.jpeg',
+      image: 'images/testimonials/team04.jpeg',
       tech: <Server size={18} className="text-green-400" />,
       message:
         "Scalability isn't just for servers, it's for careers. I built the engine that powers thousands of student journeys.",
@@ -61,7 +61,7 @@ const AboutUs = () => {
     {
       name: 'Mayank Kushwaha',
       role: 'Full Stack Intern',
-      image: './src/assets/images/team01.jpeg',
+      image: 'images/testimonials/team01.jpeg',
       tech: <Cpu size={18} className="text-purple-400" />,
       message:
         "From a student to a builder. This platform gave me my first break, and now I'm helping build it for others.",
