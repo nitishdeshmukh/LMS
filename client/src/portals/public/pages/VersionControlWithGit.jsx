@@ -193,7 +193,7 @@ const Github = () => {
 
                             {/* Course Content */}
                             <div>
-                                <h2 className="text-2xl font-bold mb-6">Internship Roadmap</h2>
+                                <h2 className="text-2xl font-bold mb-6">Internships Roadmap</h2>
                                 <div className="flex justify-between text-sm text-zinc-400 mb-4">
                                     <span>30-Day Plan • 4 Modules</span>
                                 </div>
