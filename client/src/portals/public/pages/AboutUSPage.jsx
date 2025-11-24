@@ -1,9 +1,31 @@
-import React, { useState } from 'react';
-import { Users, Target, Globe, Code, Server, Cpu, Menu, X, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Users,
+  Target,
+  Globe,
+  Code,
+  Server,
+  Cpu,
+  Menu,
+  X,
+  ChevronDown,
+  Play,
+  Quote,
+  ArrowRight,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/common/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 const AboutUs = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [api, setApi] = useState(null);
+  const [current, setCurrent] = useState(0);
 
   const leadership = [
     {
@@ -48,6 +70,52 @@ const AboutUs = () => {
         "From a student to a builder. This platform gave me my first break, and now I'm helping build it for others.",
     },
   ];
+
+  // Video testimonials data
+  const videoTestimonials = [
+    {
+      id: 1,
+      name: 'Rahul Verma',
+      role: 'Software Engineer',
+      company: 'Google',
+      // Placeholder for a working, generic video URL:
+      videoUrl: 'https://www.youtube.com/embed/eizmCZv3aKI?si=O59LRJbKmHp7sLVS',
+      thumbnail: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul',
+    },
+    {
+      id: 2,
+      name: 'Sneha Patel',
+      role: 'Full Stack Developer',
+      company: 'Microsoft',
+      // Rick Roll - working URL
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      thumbnail: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sneha',
+    },
+    {
+      id: 3,
+      name: 'Arjun Singh',
+      role: 'DevOps Engineer',
+      company: 'Amazon',
+      // Rick Roll - working URL
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      thumbnail: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun',
+    },
+  ];
+
+  const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
+
+  // Track carousel current slide
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap());
+
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
@@ -233,11 +301,97 @@ const AboutUs = () => {
                 </div>
                 <div className="relative">
                   <span className="absolute -top-2 -left-2 text-4xl text-zinc-700 font-serif leading-none">
-                    “
+                    "
                   </span>
                   <p className="text-zinc-400 text-sm leading-relaxed pl-4">{dev.message}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- VIDEO TESTIMONIALS CAROUSEL (WITH FUNCTIONAL INDICATORS) --- */}
+      <section className="py-20 bg-zinc-900 border-y border-zinc-800 relative overflow-hidden">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Watch Their Journey</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Real stories from students who transformed their careers
+            </p>
+          </div>
+
+          <Carousel
+            setApi={setApi}
+            plugins={[plugin.current]}
+            className="w-full max-w-3xl mx-auto"
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
+            opts={{
+              align: 'center',
+              loop: true,
+            }}
+          >
+            <CarouselContent>
+              {videoTestimonials.map(testimonial => (
+                <CarouselItem key={testimonial.id} className="basis-full">
+                  <div className="p-2">
+                    <div className="bg-zinc-900/80 backdrop-blur-sm border-2 border-zinc-800/50 rounded-xl overflow-hidden hover:border-blue-500/40 transition-all duration-300">
+                      {/* Video Embed - Reduced Height */}
+                      <div className="relative w-full" style={{ paddingBottom: '45%' }}>
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full"
+                          src={testimonial.videoUrl}
+                          title={`${testimonial.name} testimonial`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+
+                      {/* Testimonial Info */}
+                      <div className="p-6 bg-gradient-to-b from-zinc-900 to-black">
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={testimonial.thumbnail}
+                            alt={testimonial.name}
+                            className="w-16 h-16 rounded-full border-2 border-zinc-700/50"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-bold text-white text-lg">{testimonial.name}</h4>
+                            <p className="text-sm text-blue-400">{testimonial.role}</p>
+                            <p className="text-xs text-zinc-500 flex items-center gap-2 mt-1">
+                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                              {testimonial.company}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-14 bg-zinc-900/90 border-2 border-zinc-700/50 hover:bg-zinc-800 hover:border-blue-500/50 text-white h-10 w-10 backdrop-blur-sm" />
+            <CarouselNext className="hidden md:flex -right-14 bg-zinc-900/90 border-2 border-zinc-700/50 hover:bg-zinc-800 hover:border-blue-500/50 text-white h-10 w-10 backdrop-blur-sm" />
+          </Carousel>
+
+          {/* Functional Carousel Indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {videoTestimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => api?.scrollTo(index)}
+                className={`rounded-full transition-all ${
+                  current === index
+                    ? 'w-8 h-2 bg-blue-500'
+                    : 'w-2 h-2 bg-zinc-700 hover:bg-blue-400'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
             ))}
           </div>
         </div>
@@ -247,3 +401,4 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
+

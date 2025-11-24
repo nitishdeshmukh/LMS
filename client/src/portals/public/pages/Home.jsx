@@ -10,6 +10,7 @@ import {
   Award,
   Users,
   Rocket,
+  ArrowRight,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProgramsGrid from '../components/ProgramGrid';
@@ -208,6 +209,34 @@ function Home() {
     },
   ];
 
+  // IBM-style testimonials
+  const testimonial = [
+    {
+      id: 1,
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop',
+      quote:
+        'You need to understand that you will make mistakes. I made so many when I first started ... But the more mistakes you make, and the more you fail initially, the stronger you become later on.',
+      name: 'Yash',
+      role: 'Consultant',
+    },
+    // {
+    //   id: 2,
+    //   image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop',
+    //   quote:
+    //     'Coming from a non-CS background, Code2Debug gave me the structured learning path I needed. The community support was incredible.',
+    //   name: 'Priya',
+    //   role: 'Software Engineer',
+    // },
+    // {
+    //   id: 3,
+    //   image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=800&fit=crop',
+    //   quote:
+    //     'The hands-on projects helped me build a portfolio that impressed recruiters. I landed my dream job within 3 months of completing the program.',
+    //   name: 'Arjun',
+    //   role: 'Full Stack Developer',
+    // },
+  ];
+
   const scrollRef = useRef(null);
 
   const scroll = direction => {
@@ -368,64 +397,115 @@ function Home() {
           </div>
         </section>
 
-        {/* TESTIMONIAL CAROUSEL */}
-        <section className="py-24 max-w-7xl mx-auto px-4 relative">
-          <h2 className="text-3xl font-bold text-center mb-12">Student Stories</h2>
+        <section className="py-16 bg-black relative overflow-hidden">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold">Title</h2>
+            </div>
 
-          <div className="relative group">
-            <button
-              onClick={() => scroll('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={() => scroll('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            <div
-              ref={scrollRef}
-              className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 scrollbar-none"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {testimonials.map(item => (
+            <div className="space-y-4">
+              {testimonial.map(testimonial => (
                 <div
-                  key={item.id}
-                  className="min-w-[85vw] md:min-w-[calc(33%-1rem)] snap-center bg-zinc-900 p-8 rounded-2xl border border-zinc-800 flex flex-col justify-between hover:border-blue-500/50 transition"
+                  key={testimonial.id}
+                  className="bg-gradient-to-r from-zinc-900/50 to-transparent group overflow-hidden"
                 >
-                  <div>
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, star) => (
-                        <span key={star} className="text-yellow-500 text-sm">
-                          ★
-                        </span>
-                      ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0 items-stretch">
+                    {/* Left: Image - 50% */}
+                    <div className="relative h-full min-h-[280px] md:min-h-[400px]">
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      {/* Gradient overlay for better text visibility on mobile */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
                     </div>
 
-                    <p className="text-gray-400 italic mb-6">"{item.text}"</p>
-                  </div>
+                    {/* Right: Content - 50% */}
+                    <div className="flex flex-col justify-center p-6 md:p-8 bg-gradient-to-r from-zinc-900/80 to-zinc-900/40">
+                      <div className="relative mb-6">
+                        <p className="text-base md:text-lg lg:text-xl text-zinc-100 leading-relaxed font-light">
+                          "{testimonial.quote}"
+                        </p>
+                      </div>
 
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={item.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
-                    >
-                      {item.name.charAt(0)}
-                    </a>
-
-                    <div>
-                      <div className="font-bold text-sm">{item.name}</div>
-                      <div className="text-xs text-blue-400">{item.role}</div>
+                      <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-1">
+                            {testimonial.name}
+                          </h3>
+                          <p className="text-xs text-zinc-400">{testimonial.role}</p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-blue-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIAL CAROUSEL */}
+        <section className="bg-zinc-900 border border-zinc-700">
+          <div className='py-24 max-w-7xl mx-auto px-4 relative'>
+            <h2 className="text-3xl font-bold text-center mb-12">Student Stories</h2>
+
+            <div className="relative group">
+              <button
+                onClick={() => scroll('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+
+              <button
+                onClick={() => scroll('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-zinc-800 border border-zinc-700 text-white hover:bg-blue-600 hover:border-blue-500 transition opacity-0 group-hover:opacity-100 hidden md:block"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              <div
+                ref={scrollRef}
+                className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 scrollbar-none"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {testimonials.map(item => (
+                  <div
+                    key={item.id}
+                    className="min-w-[85vw] md:min-w-[calc(33%-1rem)] snap-center bg-zinc-950 p-8 rounded-2xl border border-zinc-800 flex flex-col justify-between hover:border-blue-500/50 transition"
+                  >
+                    <div>
+                      <div className="flex gap-1 mb-4">
+                        {[...Array(5)].map((_, star) => (
+                          <span key={star} className="text-yellow-500 text-sm">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+
+                      <p className="text-gray-400 italic mb-6">"{item.text}"</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <a
+                        href={item.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold hover:scale-110 transition`}
+                      >
+                        {item.name.charAt(0)}
+                      </a>
+
+                      <div>
+                        <div className="font-bold text-sm">{item.name}</div>
+                        <div className="text-xs text-blue-400">{item.role}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -435,3 +515,4 @@ function Home() {
 }
 
 export default Home;
+
