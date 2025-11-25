@@ -1,38 +1,45 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-// This links a student, a course, and a task to a submitted file
-const submissionSchema = new mongoose.Schema({
-  student: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  course: {
-    type: mongoose.Schena.Types.ObjectId,
-    ref: 'Course',
-    required: true,
-  },
-  task: {
-    // We might need a more robust way, but this is a start
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  fileUrl: {
-    type: String,
-    required: true, // This will be the path from /public/uploads/
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending',
-  },
-  // (From your notes)
-  adminFeedback: {
-    type: String,
-  },
-}, {
-  timestamps: true,
-});
+const submissionSchema = new mongoose.Schema(
+  {
+    enrollment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Enrollment",
+      required: true,
+    },
 
-const Submission = mongoose.model('Submission', submissionSchema);
-export default Submission;
+    student: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
+
+    lessonId: { type: mongoose.Schema.Types.ObjectId, required: true },
+
+    type: { type: String, enum: ["assignment", "quiz"], required: true },
+
+    fileUrl: { type: String },
+    githubLink: { type: String },
+
+    quizScore: { type: Number },
+    totalQuestions: { type: Number },
+
+    status: {
+      type: String,
+      enum: ["submitted", "graded", "rejected"],
+      default: "submitted",
+    },
+
+    grade: { type: String },
+    feedback: { type: String },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Submission", submissionSchema);
