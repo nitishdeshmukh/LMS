@@ -5,7 +5,7 @@ import { Users, BookOpen, TrendingUp, Award, Clock, Target } from 'lucide-react'
 import DoughnutChart from '@/portals/admin/components/DoughnutChart';
 import ColumnWithRotatedLabels from '@/portals/admin/components/ColumnChart';
 import LineChart from '@/portals/admin/components/LineChart';
-import RadarChart from '@/portals/admin/components/Overall Performance Metrics';
+import RadarChart from '@/portals/admin/components/OverallPerformanceMetrics';
 import SmoothLineChart from '@/portals/admin/components/EnrollmentCompletion&RevenueTrend';
 import StackedBarChart from '@/portals/admin/components/StackedBarChart';
 
