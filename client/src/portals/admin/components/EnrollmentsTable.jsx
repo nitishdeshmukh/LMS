@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useId, useMemo, useState } from 'react';
-import { SearchIcon } from 'lucide-react';
+import { SearchIcon, MoreVertical } from 'lucide-react';
 import {
   flexRender,
   getCoreRowModel,
@@ -31,8 +31,25 @@ import {
   TableHeader,
   TableRow,
 } from '../../../common/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../common/components/ui/dropdown-menu';
+import { Button } from '../../../common/components/ui/button';
 
 import TablePagination from '@/common/components/TablePagination';
+// Line 57 - Change from RevokeSuccess to RevokeAccess
+import RevokeAccess from "./RevokeAccess.jsx";
+import StudentDetail from './StudentDetail.jsx';
+
+// Line 58 - StudentDetail.jsx exists, so this should work
+
+import PasswordModal from './PasswordModal';
+
+import { Toaster } from '@/common/components/ui/sonner';
+
 
 const columns = [
   {
@@ -65,8 +82,42 @@ const columns = [
   {
     accessorKey: 'email',
     header: 'Email',
-    meta: { filterVariant: 'text' }, // normal text search filter (no sorting)
+    meta: { filterVariant: 'text' },
     cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row, table }) => {
+      const student = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700">
+            <DropdownMenuItem
+              onClick={() => table.options.meta?.handleRevoke(student)}
+              className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+            >
+              Revoke
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => table.options.meta?.handleViewDetails(student)}
+              className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+            >
+              View Details
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];
 
@@ -212,6 +263,35 @@ const EnrollmentsTable = () => {
     pageSize: defaultPageSize,
   });
 
+  // State for modals
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showRevokeModal, setShowRevokeModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
+  // Handler functions
+  const handleRevoke = (student) => {
+    setSelectedStudent(student);
+    setShowPasswordModal(true); // Show password modal first
+  };
+
+  const handlePasswordSubmit = (password) => {
+    // Verify password here (replace with your actual password verification logic)
+    const correctPassword = "admin123"; // This should come from your backend
+
+    if (password === correctPassword) {
+      setShowPasswordModal(false);
+      setShowRevokeModal(true); // Open revoke modal after correct password
+    } else {
+      alert("Incorrect password!"); // Or show error message
+    }
+  };
+
+  const handleViewDetails = (student) => {
+    setSelectedStudent(student);
+    setShowDetailsModal(true);
+  };
+
   const table = useReactTable({
     data: enrollments,
     columns,
@@ -227,79 +307,111 @@ const EnrollmentsTable = () => {
     onPaginationChange: setPagination,
     state: { sorting, pagination, columnFilters },
     enableSortingRemoval: false,
+    meta: {
+      handleRevoke,
+      handleViewDetails,
+    },
   });
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden w-full space-y-4">
-      <div className="flex flex-wrap gap-3 px-2 py-6">
-        <div className="w-44">
-          <Filter column={table.getColumn('studentName')} />
+    <>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden w-full space-y-4">
+        <Toaster position="top-center" />
+        <div className="flex flex-wrap gap-3 px-2 py-6">
+          <div className="w-44">
+            <Filter column={table.getColumn('studentName')} />
+          </div>
+          <div className="w-44">
+            <Filter column={table.getColumn('course')} />
+          </div>
+          <div className="w-44">
+            <Filter column={table.getColumn('college')} />
+          </div>
+          <div className="w-36">
+            <Filter column={table.getColumn('date')} />
+          </div>
+          <div className="w-44">
+            <Filter column={table.getColumn('email')} />
+          </div>
         </div>
-        <div className="w-44">
-          <Filter column={table.getColumn('course')} />
-        </div>
-        <div className="w-44">
-          <Filter column={table.getColumn('college')} />
-        </div>
-        <div className="w-36">
-          <Filter column={table.getColumn('date')} />
-        </div>
-        <div className="w-44">
-          <Filter column={table.getColumn('email')} />
-        </div>
-      </div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id} className="bg-zinc-800 border-zinc-700">
-              {headerGroup.headers.map(header => (
-                <TableHead key={header.id} className="text-zinc-300 border-zinc-700 select-none">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map(row => (
-              <TableRow
-                key={row.id}
-                className="transition-colors hover:bg-zinc-800 data-[state=selected]:bg-zinc-700"
-                data-state={row.getIsSelected() ? 'selected' : undefined}
-              >
-                {row.getVisibleCells().map(cell => (
-                  <TableCell key={cell.id} className="text-zinc-200">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id} className="bg-zinc-800 border-zinc-700">
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id} className="text-zinc-300 border-zinc-700 select-none">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-300">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map(row => (
+                <TableRow
+                  key={row.id}
+                  className="transition-colors hover:bg-zinc-800 data-[state=selected]:bg-zinc-700"
+                  data-state={row.getIsSelected() ? 'selected' : undefined}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell key={cell.id} className="text-zinc-200">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-300">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
 
-      <TablePagination
-        pageIndex={table.getState().pagination.pageIndex}
-        pageCount={table.getPageCount()}
-        pageSize={table.getState().pagination.pageSize}
-        setPageIndex={table.setPageIndex}
-        setPageSize={table.setPageSize}
-        canPreviousPage={table.getCanPreviousPage()}
-        canNextPage={table.getCanNextPage()}
-        previousPage={table.previousPage}
-        nextPage={table.nextPage}
-        paginationItemsToDisplay={5}
-      />
-    </div>
+        <TablePagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageCount={table.getPageCount()}
+          pageSize={table.getState().pagination.pageSize}
+          setPageIndex={table.setPageIndex}
+          setPageSize={table.setPageSize}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+          previousPage={table.previousPage}
+          nextPage={table.nextPage}
+          paginationItemsToDisplay={5}
+        />
+      </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <PasswordModal
+          onSubmit={handlePasswordSubmit}
+          onClose={() => setShowPasswordModal(false)}
+        />
+      )}
+
+      {/* Revoke Modal - Only shows after password verification */}
+      {showRevokeModal && (
+        <RevokeAccess
+          student={selectedStudent}
+          studentName={selectedStudent?.studentName}
+          onClose={() => setShowRevokeModal(false)}
+        />
+      )}
+
+
+      {showDetailsModal && (
+        <StudentDetail
+          student={selectedStudent}
+          onClose={() => setShowDetailsModal(false)}
+        />
+      )}
+    </>
   );
 };
 
