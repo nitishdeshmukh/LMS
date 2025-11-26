@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../common/components/ui/dropdown-menu';
-import { ChevronDown, Download } from 'lucide-react';
+import { ChevronDown, Download, Pencil, DollarSign } from 'lucide-react';
 import { Button } from '@/common/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/common/components/ui/popover';
 import { toast } from 'sonner';
@@ -28,17 +28,168 @@ const StudentsTable = ({ data = [] }) => {
     return 'bg-zinc-500';
   };
 
-  const getStatusBadgeVariant = status => {
-    switch (status) {
-      case 'Graded':
-        return 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border-green-500/20';
-      case 'Submitted':
-        return 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border-yellow-500/20';
-      case 'In Progress':
-        return 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20';
-      default:
-        return 'bg-zinc-500/10 text-zinc-400 hover:bg-zinc-500/20 border-zinc-500/20';
-    }
+  const CapstoneStatusCell = ({ student, onStatusUpdate }) => {
+    const [currentStatus, setCurrentStatus] = useState(student.capstoneStatus);
+
+    const getStatusBadgeVariant = status => {
+      switch (status) {
+        case 'Graded':
+          return 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border-green-500/20';
+        case 'Submitted':
+          return 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border-yellow-500/20';
+        case 'In Progress':
+          return 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20';
+        default:
+          return 'bg-zinc-500/10 text-zinc-400 hover:bg-zinc-500/20 border-zinc-500/20';
+      }
+    };
+
+    const handleStatusChange = (newStatus) => {
+      setCurrentStatus(newStatus);
+      toast.success(`Capstone status updated to ${newStatus} for ${student.studentName}`);
+
+      // Call your API or parent component handler
+      if (onStatusUpdate) {
+        onStatusUpdate(student.id, newStatus);
+      }
+    };
+
+    return (
+      <div className="flex items-center gap-2">
+        <Badge
+          variant="secondary"
+          className={`${getStatusBadgeVariant(currentStatus)} font-medium border`}
+        >
+          {currentStatus}
+        </Badge>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 w-40">
+            <DropdownMenuItem
+              onClick={() => handleStatusChange('Graded')}
+              className="text-green-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'Graded'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                Graded
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleStatusChange('Submitted')}
+              className="text-yellow-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'Submitted'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                Submitted
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleStatusChange('In Progress')}
+              className="text-blue-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'In Progress'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                In Progress
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  };
+
+  const PaymentStatusCell = ({ student, onPaymentStatusUpdate }) => {
+    const [currentStatus, setCurrentStatus] = useState(student.paymentStatus);
+
+    const getPaymentStatusVariant = status => {
+      switch (status) {
+        case 'Full Paid':
+          return 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border-green-500/20';
+        case 'Half Paid':
+          return 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 border-orange-500/20';
+        case 'Unpaid':
+          return 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20';
+        default:
+          return 'bg-zinc-500/10 text-zinc-400 hover:bg-zinc-500/20 border-zinc-500/20';
+      }
+    };
+
+    const handlePaymentStatusChange = (newStatus) => {
+      setCurrentStatus(newStatus);
+      toast.success(`Payment status updated to ${newStatus} for ${student.studentName}`);
+
+      // Call your API or parent component handler
+      if (onPaymentStatusUpdate) {
+        onPaymentStatusUpdate(student.id, newStatus);
+      }
+    };
+
+    return (
+      <div className="flex items-center gap-2">
+        <Badge
+          variant="secondary"
+          className={`${getPaymentStatusVariant(currentStatus)} font-medium border`}
+        >
+          {currentStatus}
+        </Badge>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 w-40">
+            <DropdownMenuItem
+              onClick={() => handlePaymentStatusChange('Full Paid')}
+              className="text-green-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'Full Paid'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                Full Paid
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handlePaymentStatusChange('Half Paid')}
+              className="text-orange-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'Half Paid'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+                Half Paid
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handlePaymentStatusChange('Unpaid')}
+              className="text-red-400 hover:bg-zinc-700 cursor-pointer"
+              disabled={currentStatus === 'Unpaid'}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                Unpaid
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
   };
 
   const handleExportCSV = () => {
@@ -153,7 +304,7 @@ const StudentsTable = ({ data = [] }) => {
               <TableHead className="font-semibold text-zinc-300">EMAIL</TableHead>
               <TableHead className="font-semibold text-zinc-300">COLLEGE</TableHead>
               <TableHead className="font-semibold text-zinc-300">YEAR</TableHead>
-              <TableHead className="font-semibold text-zinc-300">CURRENT PROGRESS %</TableHead>
+              <TableHead className="font-semibold text-zinc-300">PAYMENT STATUS ₹</TableHead>
               <TableHead className="font-semibold text-zinc-300">CAPSTONE STATUS</TableHead>
               <TableHead className="font-semibold text-zinc-300">ACTION</TableHead>
             </TableRow>
@@ -167,29 +318,22 @@ const StudentsTable = ({ data = [] }) => {
                   <TableCell className="text-zinc-200">{student.college}</TableCell>
                   <TableCell className="text-zinc-200">{student.year}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 max-w-[100px]">
-                        <div className="h-2 w-full bg-zinc-700 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full ${getProgressColor(
-                              student.currentProgress,
-                            )} transition-all`}
-                            style={{ width: `${student.currentProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-sm font-medium text-zinc-200">
-                        {student.currentProgress}%
-                      </span>
-                    </div>
+                    <PaymentStatusCell
+                      student={student}
+                      onPaymentStatusUpdate={(studentId, newStatus) => {
+                        // Your API call or state update logic
+                        console.log(`Update student ${studentId} payment to ${newStatus}`);
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={`${getStatusBadgeVariant(student.capstoneStatus)} font-medium border`}
-                    >
-                      {student.capstoneStatus}
-                    </Badge>
+                    <CapstoneStatusCell
+                      student={student}
+                      onStatusUpdate={(studentId, newStatus) => {
+                        // Your API call or state update logic
+                        console.log(`Update student ${studentId} to ${newStatus}`);
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
                     <Popover
@@ -263,6 +407,26 @@ const StudentsTable = ({ data = [] }) => {
                                 </svg>
                                 {student.liveLink}
                               </a>
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-xs text-zinc-500 uppercase font-bold">Payment ID</span>
+                              <div className="flex flex-row items-center gap-2">
+                                <div className="flex items-center gap-2 text-blue-400 text-sm font-mono">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                  </svg>
+                                  {student.paymentId || "TXN_123456789"}
+                                </div>
+                                <button
+                                  onClick={() => navigator.clipboard.writeText(student.paymentId || "TXN_123456789")}
+                                  className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                                  title="Copy Payment ID"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
                           </div>
 

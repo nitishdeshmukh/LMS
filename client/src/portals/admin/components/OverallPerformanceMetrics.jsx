@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import * as am5radar from '@amcharts/amcharts5/radar';
@@ -7,17 +7,36 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 /**
  * Usage:
  * <RadarChart
- *   data={[
- *     { category: "Research", value: 80, full: 100 },
- *     { category: "Marketing", value: 35, full: 100 }
- *   ]}
- *   height={500}
+ * data={[]} // Optional: Pass calculated data here
+ * onDateChange={(start, end) => fetchNewData(start, end)} // Callback to refetch data
+ * height={500}
  * />
  */
 
-export default function RadarChart({ data, height = 500 }) {
+export default function RadarChart({ data, height = 500, onDateChange }) {
   const chartDivRef = useRef(null);
   const rootRef = useRef(null);
+
+  // Default to current month for the filter
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().setDate(1)).toISOString().split('T')[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+
+  const handleDateChange = (type, value) => {
+    if (type === 'start') setStartDate(value);
+    else setEndDate(value);
+
+    // Trigger parent callback to reload data based on new range
+    if (onDateChange) {
+      onDateChange(
+        type === 'start' ? value : startDate,
+        type === 'end' ? value : endDate
+      );
+    }
+  };
 
   useLayoutEffect(() => {
     if (rootRef.current) {
@@ -39,7 +58,7 @@ export default function RadarChart({ data, height = 500 }) {
     if (root._logo) {
       try {
         root._logo.dispose();
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Create chart
@@ -52,20 +71,44 @@ export default function RadarChart({ data, height = 500 }) {
         innerRadius: am5.percent(20),
         startAngle: -90,
         endAngle: 180,
-      }),
+      })
     );
 
-    // Sample data
-    const chartData =
-      data && data.length > 0
-        ? data
-        : [
-            { category: 'Course Completion', value: 85, full: 100 },
-            { category: 'Student Engagement', value: 72, full: 100 },
-            { category: 'Assessment Scores', value: 91, full: 100 },
-            { category: 'Attendance Rate', value: 78, full: 100 },
-            { category: 'Assignment Submission', value: 88, full: 100 },
-          ];
+    // -------------------------------------------------------------------------
+    // METRICS CONFIGURATION (Based on Mongoose Schemas & Date Filter)
+    // -------------------------------------------------------------------------
+    // 1. Avg Revenue Earned [Payment.js / Analytics.js]:
+    //    - Filter: `createdAt` of payments between startDate and endDate.
+    //    - Calc: (Total Revenue / Revenue Target) * 100 (Normalized for Radar).
+    //
+    // 2. Average Quiz Score [Submission.js]:
+    //    - Filter: `createdAt` between startDate and endDate.
+    //    - Query: type: "quiz".
+    //    - Calc: Avg(quizScore / totalQuestions) * 100.
+    //
+    // 3. Assignment Submission Rate [Submission.js & Course.js]:
+    //    - Filter: `createdAt` between startDate and endDate.
+    //    - Numerator: Count of Submissions (type: "assignment").
+    //    - Denominator: Count of Tasks in enrolled modules.
+    //
+    // 4. Course Completion Rate [Enrollment.js]:
+    //    - Filter: `completionDate` between startDate and endDate.
+    //    - Calc: (Courses Completed / Total Courses Enrolled) * 100.
+    //
+    // 5. Course Progress Average [Enrollment.js]:
+    //    - Filter: `updatedAt` between startDate and endDate (active courses).
+    //    - Calc: Average of `progressPercentage` field.
+    // -------------------------------------------------------------------------
+
+    const defaultData = [
+      { category: 'Avg Revenue Earned', value: 85, full: 100 }, // Changed from Gamification XP
+      { category: 'Avg Quiz Score', value: 78, full: 100 },
+      { category: 'Assignment Rate', value: 65, full: 100 },
+      { category: 'Course Completion', value: 40, full: 100 },
+      { category: 'Progress Avg', value: 72, full: 100 },
+    ];
+
+    const chartData = data && data.length > 0 ? data : defaultData;
 
     // Color palette for dark theme
     const colorPalette = [
@@ -89,7 +132,7 @@ export default function RadarChart({ data, height = 500 }) {
       'cursor',
       am5radar.RadarCursor.new(root, {
         behavior: 'zoomX',
-      }),
+      })
     );
     cursor.lineY.set('visible', false);
 
@@ -120,7 +163,7 @@ export default function RadarChart({ data, height = 500 }) {
             stroke: am5.color(0x52525b), // zinc-600
           }),
         }),
-      }),
+      })
     );
 
     // Tooltip label styling
@@ -137,7 +180,7 @@ export default function RadarChart({ data, height = 500 }) {
     yRenderer.labels.template.setAll({
       centerX: am5.p100,
       fontWeight: '500',
-      fontSize: 14,
+      fontSize: 13,
       fill: am5.color(0xe5e7eb), // zinc-200
       templateField: 'columnSettings',
     });
@@ -151,7 +194,7 @@ export default function RadarChart({ data, height = 500 }) {
       am5xy.CategoryAxis.new(root, {
         categoryField: 'category',
         renderer: yRenderer,
-      }),
+      })
     );
 
     yAxis.data.setAll(dataWithColors);
@@ -165,7 +208,7 @@ export default function RadarChart({ data, height = 500 }) {
         valueXField: 'full',
         categoryYField: 'category',
         fill: am5.color(0x3f3f46), // zinc-700
-      }),
+      })
     );
 
     series1.columns.template.setAll({
@@ -185,7 +228,7 @@ export default function RadarChart({ data, height = 500 }) {
         clustered: false,
         valueXField: 'value',
         categoryYField: 'category',
-      }),
+      })
     );
 
     series2.columns.template.setAll({
@@ -206,7 +249,7 @@ export default function RadarChart({ data, height = 500 }) {
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      }),
+      })
     );
 
     series2.columns.template.get('tooltip').label.setAll({
@@ -225,19 +268,104 @@ export default function RadarChart({ data, height = 500 }) {
       root.dispose();
       rootRef.current = null;
     };
-  }, [data, height]);
+  }, [data, height]); // Re-render if data prop changes
 
   return (
     <div
       style={{
         width: '100%',
-        height: height,
         background: '#18181b', // bg-zinc-900
         borderRadius: 12,
-        padding: 16,
+        padding: 20,
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div ref={chartDivRef} style={{ width: '100%', height: '100%' }} />
+      {/* Header and Filter Controls */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 10,
+          flexWrap: 'wrap',
+          gap: 10,
+        }}
+      >
+        <h3
+          style={{
+            color: '#e5e7eb', // zinc-200
+            margin: 0,
+            fontSize: '1.1rem',
+            fontWeight: 600,
+          }}
+        >
+          Performance Radar
+        </h3>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '0.75rem',
+                color: '#a1a1aa', // zinc-400
+                marginBottom: 2,
+              }}
+            >
+              From
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => handleDateChange('start', e.target.value)}
+              style={{
+                background: '#27272a', // zinc-800
+                border: '1px solid #3f3f46', // zinc-700
+                color: '#e5e7eb', // zinc-200
+                padding: '4px 8px',
+                borderRadius: 6,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '0.75rem',
+                color: '#a1a1aa', // zinc-400
+                marginBottom: 2,
+              }}
+            >
+              To
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => handleDateChange('end', e.target.value)}
+              style={{
+                background: '#27272a', // zinc-800
+                border: '1px solid #3f3f46', // zinc-700
+                color: '#e5e7eb', // zinc-200
+                padding: '4px 8px',
+                borderRadius: 6,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Chart Container */}
+      <div
+        style={{
+          width: '100%',
+          height: height,
+        }}
+      >
+        <div ref={chartDivRef} style={{ width: '100%', height: '100%' }} />
+      </div>
     </div>
   );
 }

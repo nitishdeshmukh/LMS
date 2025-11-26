@@ -11,6 +11,7 @@ const ActiveStudents = () => {
       year: '3rd',
       currentProgress: 100,
       capstoneStatus: 'Graded',
+      paymentStatus: 'Full Paid', // Add this
     },
     {
       name: 'Cody Fisher',
@@ -19,6 +20,7 @@ const ActiveStudents = () => {
       year: '4th',
       currentProgress: 75,
       capstoneStatus: 'Submitted',
+      paymentStatus: 'Unpaid', // Add this
     },
     {
       name: 'Esther Howard',
@@ -27,6 +29,7 @@ const ActiveStudents = () => {
       year: '2nd',
       currentProgress: 50,
       capstoneStatus: 'In Progress',
+      paymentStatus: 'Half Paid', // Add this
     },
     {
       name: 'Esther Howard',
@@ -35,6 +38,7 @@ const ActiveStudents = () => {
       year: '2nd',
       currentProgress: 50,
       capstoneStatus: 'In Progress',
+      paymentStatus: 'Half Paid', // Add this
     },
     {
       name: 'Esther Howard',
@@ -43,6 +47,7 @@ const ActiveStudents = () => {
       year: '2nd',
       currentProgress: 50,
       capstoneStatus: 'In Progress',
+      paymentStatus: 'Unpaid', // Add this
     },
   ]);
 

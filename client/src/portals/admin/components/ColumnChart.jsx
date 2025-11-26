@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
@@ -6,17 +6,39 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 /**
  * Usage:
  * <ColumnChart
- *   data={[
- *     { category: 'Jan', value: 50 },
- *     { category: 'Feb', value: 78 }
- *   ]}
- *   height={400}
+ * data={[
+ * { category: 'Jan', value: 50 },
+ * { category: 'Feb', value: 78 }
+ * ]}
+ * height={400}
+ * onDateChange={(start, end) => console.log("Filter:", start, end)}
  * />
  */
 
-export default function ColumnChart({ data, height = 400 }) {
+export default function ColumnChart({ data, height = 400, onDateChange }) {
   const chartDivRef = useRef(null);
   const rootRef = useRef(null);
+
+  // Default to start of current year and today
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+
+  const handleDateChange = (type, value) => {
+    if (type === 'start') setStartDate(value);
+    else setEndDate(value);
+
+    // Trigger parent callback to reload/filter data based on new range
+    if (onDateChange) {
+      onDateChange(
+        type === 'start' ? value : startDate,
+        type === 'end' ? value : endDate
+      );
+    }
+  };
 
   useLayoutEffect(() => {
     if (rootRef.current) {
@@ -47,7 +69,7 @@ export default function ColumnChart({ data, height = 400 }) {
         panY: false,
         wheelX: 'none',
         wheelY: 'none',
-      }),
+      })
     );
 
     const chartData =
@@ -86,7 +108,7 @@ export default function ColumnChart({ data, height = 400 }) {
         maxDeviation: 0.3,
         categoryField: 'category',
         renderer: xRenderer,
-      }),
+      })
     );
 
     xAxis.data.setAll(chartData);
@@ -107,7 +129,7 @@ export default function ColumnChart({ data, height = 400 }) {
     const yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
-      }),
+      })
     );
 
     // Create column series
@@ -119,7 +141,7 @@ export default function ColumnChart({ data, height = 400 }) {
         valueYField: 'value',
         categoryXField: 'category',
         sequencedInterpolation: true,
-      }),
+      })
     );
 
     // Column styling
@@ -142,7 +164,7 @@ export default function ColumnChart({ data, height = 400 }) {
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      }),
+      })
     );
 
     series.get('tooltip').label.setAll({
@@ -150,7 +172,7 @@ export default function ColumnChart({ data, height = 400 }) {
       fontSize: 13,
     });
 
-    // Add labels above each column (not rotated for better readability)
+    // Add labels above each column
     series.bullets.push(function () {
       return am5.Bullet.new(root, {
         locationY: 1,
@@ -181,13 +203,98 @@ export default function ColumnChart({ data, height = 400 }) {
     <div
       style={{
         width: '100%',
-        height: height,
-        background: '#27272a', // zinc-800
+        background: '#18181b', // bg-zinc-900 (Container background)
         borderRadius: 12,
-        padding: 16,
+        padding: 20,
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div ref={chartDivRef} style={{ width: '100%', height: '100%' }} />
+      {/* Header and Filter Controls */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 10,
+          flexWrap: 'wrap',
+          gap: 10,
+        }}
+      >
+        <h3
+          style={{
+            color: '#e5e7eb', // zinc-200
+            margin: 0,
+            fontSize: '1.1rem',
+            fontWeight: 600,
+          }}
+        >
+          Performance Overview
+        </h3>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '0.75rem',
+                color: '#a1a1aa', // zinc-400
+                marginBottom: 2,
+              }}
+            >
+              From
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => handleDateChange('start', e.target.value)}
+              style={{
+                background: '#27272a', // zinc-800
+                border: '1px solid #3f3f46', // zinc-700
+                color: '#e5e7eb', // zinc-200
+                padding: '4px 8px',
+                borderRadius: 6,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '0.75rem',
+                color: '#a1a1aa', // zinc-400
+                marginBottom: 2,
+              }}
+            >
+              To
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => handleDateChange('end', e.target.value)}
+              style={{
+                background: '#27272a', // zinc-800
+                border: '1px solid #3f3f46', // zinc-700
+                color: '#e5e7eb', // zinc-200
+                padding: '4px 8px',
+                borderRadius: 6,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Chart Container */}
+      <div
+        style={{
+          width: '100%',
+          height: height,
+        }}
+      >
+        <div ref={chartDivRef} style={{ width: '100%', height: '100%' }} />
+      </div>
     </div>
   );
 }
