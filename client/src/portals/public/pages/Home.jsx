@@ -363,7 +363,7 @@ function Home() {
                 onClick={() => {
                   document.getElementById('programs').scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 font-bold text-lg transition shadow-[0_0_20px_rgba(37,99,235,0.5)]"
+                className="px-8 py-4 rounded-full cursor-pointer bg-blue-600 hover:bg-blue-700 font-bold text-lg transition shadow-[0_0_20px_rgba(37,99,235,0.5)]"
               >
                 Explore Programs
               </button>
