@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema(
   {
     // BASIC AUTH
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, select: false },
     googleId: { type: String, select: false },
     githubId: { type: String, select: false },
 
@@ -35,11 +34,7 @@ const userSchema = new mongoose.Schema(
 
     // GAMIFICATION
     xp: { type: Number, default: 0 },
-    streak: { type: Number, default: 0 },
-    lastStreakDate: { type: Date },
     hoursLearned: { type: Number, default: 0 },
-    quizzesCompleted: { type: Number, default: 0 },
-    assignmentsCompleted: { type: Number, default: 0 },
 
     // ROLES & ACCOUNT STATE
     role: {
