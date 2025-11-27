@@ -41,7 +41,7 @@ import { Button } from '../../../common/components/ui/button';
 
 import TablePagination from '@/common/components/TablePagination';
 // Line 57 - Change from RevokeSuccess to RevokeAccess
-import RevokeAccess from "./RevokeAccess.jsx";
+import RevokeAccess from './RevokeAccess.jsx';
 import StudentDetail from './StudentDetail.jsx';
 
 // Line 58 - StudentDetail.jsx exists, so this should work
@@ -49,7 +49,6 @@ import StudentDetail from './StudentDetail.jsx';
 import PasswordModal from './PasswordModal';
 
 import { Toaster } from '@/common/components/ui/sonner';
-
 
 const columns = [
   {
@@ -94,10 +93,7 @@ const columns = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500"
-            >
+            <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -270,24 +266,24 @@ const EnrollmentsTable = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   // Handler functions
-  const handleRevoke = (student) => {
+  const handleRevoke = student => {
     setSelectedStudent(student);
     setShowPasswordModal(true); // Show password modal first
   };
 
-  const handlePasswordSubmit = (password) => {
+  const handlePasswordSubmit = password => {
     // Verify password here (replace with your actual password verification logic)
-    const correctPassword = "admin123"; // This should come from your backend
+    const correctPassword = 'admin123'; // This should come from your backend
 
     if (password === correctPassword) {
       setShowPasswordModal(false);
       setShowRevokeModal(true); // Open revoke modal after correct password
     } else {
-      alert("Incorrect password!"); // Or show error message
+      alert('Incorrect password!'); // Or show error message
     }
   };
 
-  const handleViewDetails = (student) => {
+  const handleViewDetails = student => {
     setSelectedStudent(student);
     setShowDetailsModal(true);
   };
@@ -404,12 +400,8 @@ const EnrollmentsTable = () => {
         />
       )}
 
-
       {showDetailsModal && (
-        <StudentDetail
-          student={selectedStudent}
-          onClose={() => setShowDetailsModal(false)}
-        />
+        <StudentDetail student={selectedStudent} onClose={() => setShowDetailsModal(false)} />
       )}
     </>
   );
