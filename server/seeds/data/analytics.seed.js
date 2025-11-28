@@ -1,9 +1,11 @@
 import { faker } from "@faker-js/faker";
-import Analytics from "../../models/Analytics.js";
-import User from "../../models/User.js";
-import Enrollment from "../../models/Enrollment.js";
-import Payment from "../../models/Payment.js";
-import Course from "../../models/Course.js";
+import {
+    Analytics,
+    User,
+    Enrollment,
+    Payment,
+    Course,
+} from "../../models/index.js";
 
 export const seedAnalytics = async () => {
     const analyticsData = [];

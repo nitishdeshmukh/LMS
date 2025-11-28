@@ -21,11 +21,9 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
 
   // Default to start of current year and today
   const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
+    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
   );
-  const [endDate, setEndDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleDateChange = (type, value) => {
     if (type === 'start') setStartDate(value);
@@ -33,10 +31,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
 
     // Trigger parent callback to reload/filter data based on new range
     if (onDateChange) {
-      onDateChange(
-        type === 'start' ? value : startDate,
-        type === 'end' ? value : endDate
-      );
+      onDateChange(type === 'start' ? value : startDate, type === 'end' ? value : endDate);
     }
   };
 
@@ -69,7 +64,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
         panY: false,
         wheelX: 'none',
         wheelY: 'none',
-      })
+      }),
     );
 
     const chartData =
@@ -108,7 +103,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
         maxDeviation: 0.3,
         categoryField: 'category',
         renderer: xRenderer,
-      })
+      }),
     );
 
     xAxis.data.setAll(chartData);
@@ -129,7 +124,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
     const yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
-      })
+      }),
     );
 
     // Create column series
@@ -141,7 +136,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
         valueYField: 'value',
         categoryXField: 'category',
         sequencedInterpolation: true,
-      })
+      }),
     );
 
     // Column styling
@@ -164,7 +159,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      })
+      }),
     );
 
     series.get('tooltip').label.setAll({
@@ -204,13 +199,10 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
       style={{
         width: '100%',
         background: '#18181b', // bg-zinc-900 (Container background)
-        borderRadius: 12,
-        padding: 20,
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
       {/* Header and Filter Controls */}
-      <div
+      {/* <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -284,7 +276,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Chart Container */}
       <div
@@ -298,3 +290,4 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
     </div>
   );
 }
+

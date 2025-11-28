@@ -1,8 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Submission from "../../models/Submission.js";
-import User from "../../models/User.js";
-import Course from "../../models/Course.js";
-import Enrollment from "../../models/Enrollment.js";
+import { Submission, User, Course, Enrollment } from "../../models/index.js";
 
 // Sample lesson IDs (you can adjust based on your actual Course structure)
 const generateLessonId = () => faker.database.mongodbObjectId();

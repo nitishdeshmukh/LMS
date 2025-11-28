@@ -1,6 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Certificate from "../../models/Certificate.js";
-import Enrollment from "../../models/Enrollment.js";
+import { Certificate, Enrollment } from "../../models/index.js";
 import crypto from "crypto";
 
 // Generate certificate PDF URL

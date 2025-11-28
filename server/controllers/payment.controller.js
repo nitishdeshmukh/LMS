@@ -79,7 +79,7 @@ export const submitPaymentProof = async (req, res) => {
             screenshotUrl,
             amount: 500, // default or get from course
             currency: "INR",
-            status: "submitted",
+            status: "Submitted",
         });
 
         // Populate the response

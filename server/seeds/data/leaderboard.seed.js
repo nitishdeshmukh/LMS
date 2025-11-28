@@ -1,8 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Leaderboard from "../../models/Leaderboard.js";
-import User from "../../models/User.js";
-import Course from "../../models/Course.js";
-import Enrollment from "../../models/Enrollment.js";
+import { Leaderboard, User, Course, Enrollment } from "../../models/index.js";
 
 export const seedLeaderboard = async () => {
     const students = await User.find({

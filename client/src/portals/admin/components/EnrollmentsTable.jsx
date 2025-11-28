@@ -41,7 +41,7 @@ import { Button } from '../../../common/components/ui/button';
 
 import TablePagination from '@/common/components/TablePagination';
 // Line 57 - Change from RevokeSuccess to RevokeAccess
-import RevokeAccess from "./RevokeAccess.jsx";
+import RevokeAccess from './RevokeAccess.jsx';
 import StudentDetail from './StudentDetail.jsx';
 
 // Line 58 - StudentDetail.jsx exists, so this should work
@@ -49,7 +49,6 @@ import StudentDetail from './StudentDetail.jsx';
 import PasswordModal from './PasswordModal';
 
 import { Toaster } from '@/common/components/ui/sonner';
-
 
 const columns = [
   {
@@ -94,10 +93,7 @@ const columns = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500"
-            >
+            <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -270,24 +266,24 @@ const EnrollmentsTable = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   // Handler functions
-  const handleRevoke = (student) => {
+  const handleRevoke = student => {
     setSelectedStudent(student);
     setShowPasswordModal(true); // Show password modal first
   };
 
-  const handlePasswordSubmit = (password) => {
+  const handlePasswordSubmit = password => {
     // Verify password here (replace with your actual password verification logic)
-    const correctPassword = "admin123"; // This should come from your backend
+    const correctPassword = 'admin123'; // This should come from your backend
 
     if (password === correctPassword) {
       setShowPasswordModal(false);
       setShowRevokeModal(true); // Open revoke modal after correct password
     } else {
-      alert("Incorrect password!"); // Or show error message
+      alert('Incorrect password!'); // Or show error message
     }
   };
 
-  const handleViewDetails = (student) => {
+  const handleViewDetails = student => {
     setSelectedStudent(student);
     setShowDetailsModal(true);
   };
@@ -316,7 +312,15 @@ const EnrollmentsTable = () => {
   return (
     <>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden w-full space-y-4">
-        <Toaster position="top-center" />
+        <div className="w-full h-11 p-3">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-1">All Student Enrollments</h2>
+            <p className="text-sm text-zinc-400">
+              Displays a comprehensive list of all students, including both active and inactive
+              enrollments.
+            </p>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-3 px-2 py-6">
           <div className="w-44">
             <Filter column={table.getColumn('studentName')} />
@@ -404,15 +408,12 @@ const EnrollmentsTable = () => {
         />
       )}
 
-
       {showDetailsModal && (
-        <StudentDetail
-          student={selectedStudent}
-          onClose={() => setShowDetailsModal(false)}
-        />
+        <StudentDetail student={selectedStudent} onClose={() => setShowDetailsModal(false)} />
       )}
     </>
   );
 };
 
 export default EnrollmentsTable;
+

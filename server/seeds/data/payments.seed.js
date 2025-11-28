@@ -1,8 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Payment from "../../models/Payment.js";
-import User from "../../models/User.js";
-import Course from "../../models/Course.js";
-import Enrollment from "../../models/Enrollment.js";
+import { Payment, Enrollment } from "../../models/index.js";
 
 // Indian Banks
 const indianBanks = [

@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import "dotenv/config";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,13 +11,12 @@ import connectCloudinary from "./config/cloudinary.js";
 // --- Config ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-configurePassport();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // --- Database Connection ---
 connectDB();
+configurePassport();
 connectCloudinary();
 
 // --- Middlewares ---
@@ -34,5 +33,5 @@ app.use("/api", apiRoutes);
 
 // --- Basic Server Listen ---
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });

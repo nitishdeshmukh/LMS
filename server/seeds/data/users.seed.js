@@ -1,7 +1,6 @@
 import { faker } from "@faker-js/faker";
-import User from "../../models/User.js";
+import { User } from "../../models/index.js";
 
-// Helper to generate college names
 const colleges = [
     "IIT Delhi",
     "IIT Bombay",
@@ -26,15 +25,16 @@ const courses = [
     "M.Tech",
     "B.Tech ECE",
 ];
+
 const years = ["1st Year", "2nd Year", "3rd Year", "4th Year", "Final Year"];
 
 export const seedUsers = async () => {
     const users = [];
 
-    // Create 1 admin
+    // ⭐ ADMIN USER
     users.push({
         email: "admin@example.com",
-        password: "Admin@123", // Will be hashed by pre-save hook
+        password: "Admin@123",
         name: "Admin",
         middleName: faker.person.middleName(),
         lastName: "User",
@@ -62,13 +62,13 @@ export const seedUsers = async () => {
         role: "admin",
         accountStatus: "verified",
         lmsId: `LMS${faker.string.alphanumeric(8).toUpperCase()}`,
-        lmsPassword: "Lms@123", // Will be hashed
+        lmsPassword: "Lms@123",
         referralCount: faker.number.int({ min: 5, max: 30 }),
         isPremiumUnlocked: true,
         lastLogin: faker.date.recent({ days: 1 }),
     });
 
-    // Create 20-30 regular students with password auth
+    // ⭐ REGULAR STUDENTS
     const studentCount = faker.number.int({ min: 20, max: 30 });
 
     for (let i = 0; i < studentCount; i++) {
@@ -80,16 +80,16 @@ export const seedUsers = async () => {
             "verified",
             "verified",
             "blocked",
-        ]); // More verified
+        ]);
 
-        const user = {
+        users.push({
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
-            password: "Password@123", // Will be hashed
+            password: "Password@123",
             name: firstName,
             middleName: faker.helpers.maybe(() => faker.person.middleName(), {
                 probability: 0.4,
             }),
-            lastName: lastName,
+            lastName,
             phoneNumber: faker.phone.number("+91##########"),
             alternatePhone: faker.helpers.maybe(
                 () => faker.phone.number("+91##########"),
@@ -112,7 +112,7 @@ export const seedUsers = async () => {
             portfolio: faker.helpers.maybe(() => faker.internet.url(), {
                 probability: 0.3,
             }),
-            isProfileLocked: faker.datatype.boolean(0.1), // 10% locked
+            isProfileLocked: faker.datatype.boolean(0.1),
             xp: faker.number.int({ min: 0, max: 3000 }),
             streak: faker.number.int({ min: 0, max: 50 }),
             lastStreakDate: faker.helpers.maybe(
@@ -123,7 +123,7 @@ export const seedUsers = async () => {
             quizzesCompleted: faker.number.int({ min: 0, max: 50 }),
             assignmentsCompleted: faker.number.int({ min: 0, max: 30 }),
             role: "student",
-            accountStatus: accountStatus,
+            accountStatus,
             lmsId: faker.helpers.maybe(
                 () => `LMS${faker.string.alphanumeric(8).toUpperCase()}`,
                 { probability: 0.7 }
@@ -136,17 +136,15 @@ export const seedUsers = async () => {
                 { probability: 0.3 }
             ),
             referralCount: faker.number.int({ min: 0, max: 10 }),
-            isPremiumUnlocked: faker.datatype.boolean(0.2), // 20% premium
+            isPremiumUnlocked: faker.datatype.boolean(0.2),
             lastLogin:
                 accountStatus === "verified"
                     ? faker.date.recent({ days: 30 })
                     : undefined,
-        };
-
-        users.push(user);
+        });
     }
 
-    // Create 5-10 Google OAuth users (no password)
+    // ⭐ GOOGLE USERS
     const googleUserCount = faker.number.int({ min: 5, max: 10 });
 
     for (let i = 0; i < googleUserCount; i++) {
@@ -155,9 +153,9 @@ export const seedUsers = async () => {
 
         users.push({
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
-            googleId: faker.string.numeric(21), // Google IDs are typically numeric
+            googleId: faker.string.numeric(21),
             name: firstName,
-            lastName: lastName,
+            lastName,
             avatar: faker.image.avatar(),
             phoneNumber: faker.helpers.maybe(
                 () => faker.phone.number("+91##########"),
@@ -186,7 +184,7 @@ export const seedUsers = async () => {
         });
     }
 
-    // Create 3-5 GitHub OAuth users
+    // ⭐ GITHUB USERS
     const githubUserCount = faker.number.int({ min: 3, max: 5 });
 
     for (let i = 0; i < githubUserCount; i++) {
@@ -211,8 +209,16 @@ export const seedUsers = async () => {
         });
     }
 
-    await User.insertMany(users);
+    // ⭐ SAVE WITH MIDDLEWARE (IMPORTANT)
+    let savedCount = 0;
+
+    for (const data of users) {
+        const doc = new User(data);
+        await doc.save(); // runs hashing + referral code + validation
+        savedCount++;
+    }
+
     console.log(
-        `✅ ${users.length} users seeded (1 admin, ${studentCount} students, ${googleUserCount} Google users, ${githubUserCount} GitHub users)`
+        `✅ ${savedCount} users seeded (1 admin, ${studentCount} students, ${googleUserCount} Google users, ${githubUserCount} GitHub users)`
     );
 };
