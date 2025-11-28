@@ -19,18 +19,13 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
  * />
  */
 
-export default function SmoothLineChart({
-  data,
-  height = 400,
-  series = [],
-  onDateChange,
-}) {
+export default function SmoothLineChart({ data, height = 400, series = [], onDateChange }) {
   const chartDivRef = useRef(null);
   const rootRef = useRef(null);
 
   // Default to start of current year and today
   const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
+    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
   );
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -40,10 +35,7 @@ export default function SmoothLineChart({
 
     // Trigger parent callback to reload/filter data based on new range
     if (onDateChange) {
-      onDateChange(
-        type === 'start' ? value : startDate,
-        type === 'end' ? value : endDate
-      );
+      onDateChange(type === 'start' ? value : startDate, type === 'end' ? value : endDate);
     }
   };
 
@@ -78,7 +70,7 @@ export default function SmoothLineChart({
         wheelX: 'panX',
         wheelY: 'zoomX',
         layout: root.verticalLayout,
-      })
+      }),
     );
 
     // Sample data fallback
@@ -111,7 +103,7 @@ export default function SmoothLineChart({
         renderer: am5xy.AxisRendererX.new(root, {
           minGridDistance: 50,
         }),
-      })
+      }),
     );
 
     xAxis.get('renderer').labels.template.setAll({
@@ -128,7 +120,7 @@ export default function SmoothLineChart({
     const yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(root, {
         renderer: am5xy.AxisRendererY.new(root, {}),
-      })
+      }),
     );
 
     yAxis.get('renderer').labels.template.setAll({
@@ -142,7 +134,7 @@ export default function SmoothLineChart({
     });
 
     // Create series
-    seriesConfig.forEach((seriesItem) => {
+    seriesConfig.forEach(seriesItem => {
       const lineSeries = chart.series.push(
         am5xy.LineSeries.new(root, {
           name: seriesItem.name,
@@ -152,7 +144,7 @@ export default function SmoothLineChart({
           valueXField: 'date',
           stroke: am5.color(seriesItem.color),
           fill: am5.color(seriesItem.color),
-        })
+        }),
       );
 
       // Smooth curve
@@ -189,7 +181,7 @@ export default function SmoothLineChart({
             strokeWidth: 1,
             stroke: am5.color(0x52525b),
           }),
-        })
+        }),
       );
 
       lineSeries.get('tooltip').label.setAll({
@@ -207,7 +199,7 @@ export default function SmoothLineChart({
       am5xy.XYCursor.new(root, {
         behavior: 'none',
         xAxis: xAxis,
-      })
+      }),
     );
 
     cursor.lineY.setAll({
@@ -227,7 +219,7 @@ export default function SmoothLineChart({
       am5.Legend.new(root, {
         centerX: am5.p50,
         x: am5.p50,
-      })
+      }),
     );
 
     legend.labels.template.setAll({
@@ -303,7 +295,7 @@ export default function SmoothLineChart({
             <input
               type="date"
               value={startDate}
-              onChange={(e) => handleDateChange('start', e.target.value)}
+              onChange={e => handleDateChange('start', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700
@@ -329,7 +321,7 @@ export default function SmoothLineChart({
             <input
               type="date"
               value={endDate}
-              onChange={(e) => handleDateChange('end', e.target.value)}
+              onChange={e => handleDateChange('end', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700

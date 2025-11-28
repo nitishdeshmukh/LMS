@@ -109,7 +109,7 @@ export const getDashboard = async (req, res) => {
           avgQuizScore,
           certificates: certificatesCount,
         },
-        streak: user.streak || 0,
+        xp: user.xp || 0,
         activeCourse: activeEnrollment
           ? {
               id: activeEnrollment.course._id,

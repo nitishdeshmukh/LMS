@@ -3,7 +3,6 @@ import passport from "passport";
 import { isAuthenticated } from "../../middlewares/isAuthenticated.js";
 import {
   register,
-  login,
   lmsLogin,
   refreshAccessToken,
   logout,
@@ -22,7 +21,6 @@ const router = express.Router();
 // ============================================
 
 router.post("/register", register);
-router.post("/login", login);
 router.post("/lms-login", lmsLogin);
 router.post("/refresh-token", refreshAccessToken);
 router.post("/logout", logout);

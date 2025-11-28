@@ -1,43 +1,42 @@
 import React from 'react';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  GraduationCap, 
-  Calendar, 
-  CreditCard, 
-  BookOpen, 
+import {
+  User,
+  Mail,
+  Phone,
+  GraduationCap,
+  Calendar,
+  CreditCard,
+  BookOpen,
   CheckCircle,
-  X
+  X,
 } from 'lucide-react';
 
 const StudentDetail = ({ student, onClose }) => {
   // Mock Data (will be replaced by actual student prop from backend)
   const studentData = student || {
-    studentName: "Aditya Verma",
-    email: "aditya.v@example.com",
-    phone: "+91 98765 00000",
-    college: "Indian Institute of Technology",
-    course: "Full Stack Web Development",
-    degree: "B.Tech Computer Science",
-    year: "4th Year",
-    date: "2022-08-15"
+    studentName: 'Aditya Verma',
+    email: 'aditya.v@example.com',
+    phone: '+91 98765 00000',
+    college: 'Indian Institute of Technology',
+    course: 'Full Stack Web Development',
+    degree: 'B.Tech Computer Science',
+    year: '4th Year',
+    date: '2022-08-15',
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm text-zinc-200 p-4 md:p-8 flex justify-center items-start overflow-y-auto"
       onClick={onClose}
     >
-      <div 
+      <div
         className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-fadeIn my-8"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
-        
         {/* Header with Close Button */}
         <div className="bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 p-6 flex justify-between items-center">
           <h2 className="text-xl font-bold text-white">Student Details</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-zinc-400 hover:text-white transition-colors p-2 hover:bg-zinc-800 rounded-lg"
           >
@@ -46,7 +45,6 @@ const StudentDetail = ({ student, onClose }) => {
         </div>
 
         <div className="p-6 space-y-8">
-            
           {/* Profile Summary */}
           <div className="flex flex-col sm:flex-row items-start gap-6">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg shrink-0">
@@ -60,11 +58,15 @@ const StudentDetail = ({ student, onClose }) => {
                 <Mail size={14} /> {studentData.email}
               </p>
               <p className="text-zinc-400 flex items-center gap-2 text-sm">
-                <Phone size={14} /> {studentData.phone || "+91 98765 43210"}
+                <Phone size={14} /> {studentData.phone || '+91 98765 43210'}
               </p>
               <div className="mt-4 flex gap-2">
-                <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20">Active</span>
-                <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">Student</span>
+                <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20">
+                  Active
+                </span>
+                <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">
+                  Student
+                </span>
               </div>
             </div>
           </div>
@@ -77,20 +79,21 @@ const StudentDetail = ({ student, onClose }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4 text-sm">
               <div>
                 <p className="text-zinc-500 text-xs uppercase font-bold mb-1">College</p>
-                <p className="text-zinc-200">{studentData.college || "N/A"}</p>
+                <p className="text-zinc-200">{studentData.college || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-zinc-500 text-xs uppercase font-bold mb-1">Degree / Course</p>
-                <p className="text-zinc-200">{studentData.degree || "B.Tech CS"}</p>
+                <p className="text-zinc-200">{studentData.degree || 'B.Tech CS'}</p>
               </div>
               <div>
                 <p className="text-zinc-500 text-xs uppercase font-bold mb-1">Year</p>
-                <p className="text-zinc-200">{studentData.year || "3rd Year"}</p>
+                <p className="text-zinc-200">{studentData.year || '3rd Year'}</p>
               </div>
               <div>
                 <p className="text-zinc-500 text-xs uppercase font-bold mb-1">Joined On</p>
                 <p className="text-zinc-200 flex items-center gap-2">
-                  <Calendar size={14} /> {studentData.date || studentData.joinDate || "Oct 24, 2025"}
+                  <Calendar size={14} />{' '}
+                  {studentData.date || studentData.joinDate || 'Oct 24, 2025'}
                 </p>
               </div>
             </div>
@@ -104,17 +107,22 @@ const StudentDetail = ({ student, onClose }) => {
             <div className="space-y-4">
               {/* Mock Data Loop */}
               {[1].map((courseItem, i) => (
-                <div key={i} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div
+                  key={i}
+                  className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4"
+                >
                   <div>
                     <h4 className="font-bold text-zinc-200 text-sm">
-                      {studentData.course || "Full Stack Web Development"}
+                      {studentData.course || 'Full Stack Web Development'}
                     </h4>
                     <p className="text-xs text-zinc-500 mt-1">
-                      Enrolled: {studentData.date || "Oct 24, 2025"}
+                      Enrolled: {studentData.date || 'Oct 24, 2025'}
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
-                    <span className="inline-block text-xs font-bold text-green-400 bg-green-900/20 px-2 py-1 rounded">Active</span>
+                    <span className="inline-block text-xs font-bold text-green-400 bg-green-900/20 px-2 py-1 rounded">
+                      Active
+                    </span>
                     <p className="text-xs text-zinc-500 mt-1">Progress: 45%</p>
                   </div>
                 </div>
@@ -152,11 +160,10 @@ const StudentDetail = ({ student, onClose }) => {
               </table>
             </div>
           </section>
-
         </div>
       </div>
-      
-     <style>{`
+
+      <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }

@@ -1,27 +1,15 @@
-import axios from 'axios';
+import { authApi } from '@/services/global/authService';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
-// Create axios instance with auth header
-const api = axios.create({
-  baseURL: `${API_URL}/student`,
-});
-
-// Add auth token to requests dynamically
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Use authApi which has token refresh interceptor built-in
+// baseURL for student endpoints
+const STUDENT_BASE = '/student';
 
 // ============================================
 // DASHBOARD
 // ============================================
 
 export const getDashboard = async () => {
-  const response = await api.get('/dashboard');
+  const response = await authApi.get(`${STUDENT_BASE}/dashboard`);
   return response.data;
 };
 
@@ -30,17 +18,17 @@ export const getDashboard = async () => {
 // ============================================
 
 export const getProfile = async () => {
-  const response = await api.get('/profile');
+  const response = await authApi.get(`${STUDENT_BASE}/profile`);
   return response.data;
 };
 
 export const updateProfile = async profileData => {
-  const response = await api.put('/profile', profileData);
+  const response = await authApi.put(`${STUDENT_BASE}/profile`, profileData);
   return response.data;
 };
 
 export const updateAvatar = async avatarUrl => {
-  const response = await api.put('/profile/avatar', { avatar: avatarUrl });
+  const response = await authApi.put(`${STUDENT_BASE}/profile/avatar`, { avatar: avatarUrl });
   return response.data;
 };
 
@@ -49,12 +37,12 @@ export const updateAvatar = async avatarUrl => {
 // ============================================
 
 export const updatePrivacy = async isProfileLocked => {
-  const response = await api.put('/settings/privacy', { isProfileLocked });
+  const response = await authApi.put(`${STUDENT_BASE}/settings/privacy`, { isProfileLocked });
   return response.data;
 };
 
 export const changePassword = async passwordData => {
-  const response = await api.put('/settings/password', passwordData);
+  const response = await authApi.put(`${STUDENT_BASE}/settings/password`, passwordData);
   return response.data;
 };
 
@@ -63,17 +51,17 @@ export const changePassword = async passwordData => {
 // ============================================
 
 export const getMyCourses = async () => {
-  const response = await api.get('/courses');
+  const response = await authApi.get(`${STUDENT_BASE}/courses`);
   return response.data;
 };
 
 export const getCourseDetails = async slug => {
-  const response = await api.get(`/courses/${slug}`);
+  const response = await authApi.get(`${STUDENT_BASE}/courses/${slug}`);
   return response.data;
 };
 
 export const getCourseModules = async slug => {
-  const response = await api.get(`/courses/${slug}/modules`);
+  const response = await authApi.get(`${STUDENT_BASE}/courses/${slug}/modules`);
   return response.data;
 };
 
@@ -82,22 +70,22 @@ export const getCourseModules = async slug => {
 // ============================================
 
 export const getQuizzesByCourse = async () => {
-  const response = await api.get('/quizzes');
+  const response = await authApi.get(`${STUDENT_BASE}/quizzes`);
   return response.data;
 };
 
 export const getCourseQuizzes = async slug => {
-  const response = await api.get(`/courses/${slug}/quizzes`);
+  const response = await authApi.get(`${STUDENT_BASE}/courses/${slug}/quizzes`);
   return response.data;
 };
 
 export const getQuizQuestions = async (slug, quizId) => {
-  const response = await api.get(`/courses/${slug}/quizzes/${quizId}`);
+  const response = await authApi.get(`${STUDENT_BASE}/courses/${slug}/quizzes/${quizId}`);
   return response.data;
 };
 
 export const submitQuiz = async quizData => {
-  const response = await api.post('/quizzes/submit', quizData);
+  const response = await authApi.post(`${STUDENT_BASE}/quizzes/submit`, quizData);
   return response.data;
 };
 
@@ -106,17 +94,17 @@ export const submitQuiz = async quizData => {
 // ============================================
 
 export const getAssignmentsByCourse = async () => {
-  const response = await api.get('/assignments');
+  const response = await authApi.get(`${STUDENT_BASE}/assignments`);
   return response.data;
 };
 
 export const getCourseAssignments = async slug => {
-  const response = await api.get(`/courses/${slug}/assignments`);
+  const response = await authApi.get(`${STUDENT_BASE}/courses/${slug}/assignments`);
   return response.data;
 };
 
 export const submitAssignment = async assignmentData => {
-  const response = await api.post('/assignments/submit', assignmentData);
+  const response = await authApi.post(`${STUDENT_BASE}/assignments/submit`, assignmentData);
   return response.data;
 };
 
@@ -125,7 +113,7 @@ export const submitAssignment = async assignmentData => {
 // ============================================
 
 export const markLessonComplete = async lessonData => {
-  const response = await api.post('/lessons/complete', lessonData);
+  const response = await authApi.post(`${STUDENT_BASE}/lessons/complete`, lessonData);
   return response.data;
 };
 
@@ -134,12 +122,12 @@ export const markLessonComplete = async lessonData => {
 // ============================================
 
 export const getCertificates = async () => {
-  const response = await api.get('/certificates');
+  const response = await authApi.get(`${STUDENT_BASE}/certificates`);
   return response.data;
 };
 
 export const getCourseCertificate = async courseSlug => {
-  const response = await api.get(`/certificates/${courseSlug}`);
+  const response = await authApi.get(`${STUDENT_BASE}/certificates/${courseSlug}`);
   return response.data;
 };
 
@@ -148,7 +136,7 @@ export const getCourseCertificate = async courseSlug => {
 // ============================================
 
 export const getLeaderboard = async (params = {}) => {
-  const response = await api.get('/leaderboard', { params });
+  const response = await authApi.get(`${STUDENT_BASE}/leaderboard`, { params });
   return response.data;
 };
 
@@ -157,12 +145,12 @@ export const getLeaderboard = async (params = {}) => {
 // ============================================
 
 export const getReferralInfo = async () => {
-  const response = await api.get('/referral');
+  const response = await authApi.get(`${STUDENT_BASE}/referral`);
   return response.data;
 };
 
 export const applyReferralCode = async referralCode => {
-  const response = await api.post('/referral/apply', { referralCode });
+  const response = await authApi.post(`${STUDENT_BASE}/referral/apply`, { referralCode });
   return response.data;
 };
 
@@ -171,12 +159,12 @@ export const applyReferralCode = async referralCode => {
 // ============================================
 
 export const createSupportQuery = async queryData => {
-  const response = await api.post('/support', queryData);
+  const response = await authApi.post(`${STUDENT_BASE}/support`, queryData);
   return response.data;
 };
 
 export const getSupportQueries = async () => {
-  const response = await api.get('/support');
+  const response = await authApi.get(`${STUDENT_BASE}/support`);
   return response.data;
 };
 
@@ -185,8 +173,6 @@ export const getSupportQueries = async () => {
 // ============================================
 
 export const updateStreak = async () => {
-  const response = await api.post('/streak/update');
+  const response = await authApi.post(`${STUDENT_BASE}/streak/update`);
   return response.data;
 };
-
-export default api;

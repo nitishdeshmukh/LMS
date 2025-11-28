@@ -44,7 +44,7 @@ const StudentsTable = ({ data = [] }) => {
       }
     };
 
-    const handleStatusChange = (newStatus) => {
+    const handleStatusChange = newStatus => {
       setCurrentStatus(newStatus);
       toast.success(`Capstone status updated to ${newStatus} for ${student.studentName}`);
 
@@ -126,7 +126,7 @@ const StudentsTable = ({ data = [] }) => {
       }
     };
 
-    const handlePaymentStatusChange = (newStatus) => {
+    const handlePaymentStatusChange = newStatus => {
       setCurrentStatus(newStatus);
       toast.success(`Payment status updated to ${newStatus} for ${student.studentName}`);
 
@@ -204,10 +204,10 @@ const StudentsTable = ({ data = [] }) => {
   const [openCertificatePopoverId, setOpenCertificatePopoverId] = useState(null);
   const [openPopoverId, setOpenPopoverId] = useState(null); // For verify popover
 
-  const handleIssueCertificate = (student) => {
+  const handleIssueCertificate = student => {
     setOpenCertificatePopoverId(null);
 
-    toast.success("Certificate is being issued", {
+    toast.success('Certificate is being issued', {
       description: `The certificate is being issued to ${student.name}`,
       icon: (
         <svg
@@ -227,7 +227,6 @@ const StudentsTable = ({ data = [] }) => {
       duration: 5000,
     });
   };
-
 
   return (
     <div className="w-full ">
@@ -338,13 +337,10 @@ const StudentsTable = ({ data = [] }) => {
                   <TableCell>
                     <Popover
                       open={openCertificatePopoverId === index}
-                      onOpenChange={(open) => setOpenCertificatePopoverId(open ? index : null)}
+                      onOpenChange={open => setOpenCertificatePopoverId(open ? index : null)}
                     >
                       <PopoverTrigger asChild>
-                        <Button
-                          size="sm"
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                           Issue Certificate
                         </Button>
                       </PopoverTrigger>
@@ -375,12 +371,16 @@ const StudentsTable = ({ data = [] }) => {
 
                           <div className="space-y-3 py-3 border-y border-zinc-800">
                             <div className="space-y-1">
-                              <span className="text-xs text-zinc-500 uppercase font-bold">Student Name</span>
+                              <span className="text-xs text-zinc-500 uppercase font-bold">
+                                Student Name
+                              </span>
                               <p className="font-medium text-base">{student.name}</p>
                             </div>
 
                             <div className="space-y-1">
-                              <span className="text-xs text-zinc-500 uppercase font-bold">GitHub Repository</span>
+                              <span className="text-xs text-zinc-500 uppercase font-bold">
+                                GitHub Repository
+                              </span>
                               <a
                                 href={student.githubLink}
                                 target="_blank"
@@ -395,35 +395,73 @@ const StudentsTable = ({ data = [] }) => {
                             </div>
 
                             <div className="space-y-1">
-                              <span className="text-xs text-zinc-500 uppercase font-bold">Live Project Link</span>
+                              <span className="text-xs text-zinc-500 uppercase font-bold">
+                                Live Project Link
+                              </span>
                               <a
                                 href={student.liveLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 text-green-400 hover:text-green-300 text-sm hover:underline"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                  />
                                 </svg>
                                 {student.liveLink}
                               </a>
                             </div>
                             <div className="space-y-1">
-                              <span className="text-xs text-zinc-500 uppercase font-bold">Payment ID</span>
+                              <span className="text-xs text-zinc-500 uppercase font-bold">
+                                Payment ID
+                              </span>
                               <div className="flex flex-row items-center gap-2">
                                 <div className="flex items-center gap-2 text-blue-400 text-sm font-mono">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                    />
                                   </svg>
-                                  {student.paymentId || "TXN_123456789"}
+                                  {student.paymentId || 'TXN_123456789'}
                                 </div>
                                 <button
-                                  onClick={() => navigator.clipboard.writeText(student.paymentId || "TXN_123456789")}
+                                  onClick={() =>
+                                    navigator.clipboard.writeText(
+                                      student.paymentId || 'TXN_123456789',
+                                    )
+                                  }
                                   className="text-zinc-500 hover:text-zinc-300 transition-colors"
                                   title="Copy Payment ID"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                    />
                                   </svg>
                                 </button>
                               </div>

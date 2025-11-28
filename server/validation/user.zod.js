@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export const userSchema = z.object({
     // BASIC AUTH
-    email: z.string().email(),
-    password: z.string().min(8).optional(), 
-
+    email: z.email(),
     googleId: z.string().optional(),
     githubId: z.string().optional(),
 
@@ -32,11 +30,7 @@ export const userSchema = z.object({
 
   // GAMIFICATION
   xp: z.number().int().optional(),
-  streak: z.number().int().optional(),
-  lastStreakDate: z.date().optional(),
   hoursLearned: z.number().optional(),
-  quizzesCompleted: z.number().int().optional(),
-  assignmentsCompleted: z.number().int().optional(),
 
   // ROLES & ACCOUNT STATE
   role: z.enum(["student", "admin"]).optional(),

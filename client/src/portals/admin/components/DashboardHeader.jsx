@@ -22,28 +22,31 @@ const DashboardHeader = () => {
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setActiveFilter('today')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'today'
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              activeFilter === 'today'
                 ? 'bg-zinc-700 text-zinc-100 border border-zinc-600'
                 : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
+            }`}
           >
             Today
           </button>
           <button
             onClick={() => setActiveFilter('last7days')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'last7days'
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              activeFilter === 'last7days'
                 ? 'bg-blue-600 text-white'
                 : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
+            }`}
           >
             Last 7 Days
           </button>
           <button
             onClick={() => setActiveFilter('last30days')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'last30days'
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              activeFilter === 'last30days'
                 ? 'bg-zinc-700 text-zinc-100 border border-zinc-600'
                 : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
+            }`}
           >
             Last 30 Days
           </button>

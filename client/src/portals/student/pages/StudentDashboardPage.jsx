@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Clock, Award, TrendingUp, PlayCircle, Loader2 } from 'lucide-react';
+import { BookOpen, Clock, Award, TrendingUp, PlayCircle, Loader2, Zap } from 'lucide-react';
 
 import { getDashboard } from '@/services/student/studentService';
 
@@ -56,7 +56,7 @@ const StudentDashboardPage = () => {
     );
   }
 
-  const { stats, streak, activeCourse, upcomingDeadlines } = dashboardData || {};
+  const { stats, xp, activeCourse, upcomingDeadlines } = dashboardData || {};
 
   const statsConfig = [
     {
@@ -96,12 +96,12 @@ const StudentDashboardPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
           <h2 className="text-3xl font-bold mb-1">Welcome back, {studentName.split(' ')[0]}! 👋</h2>
-          <p className="text-zinc-400">Keep up your learning streak!</p>
+          <p className="text-zinc-400">Keep up your learning!</p>
         </div>
         <div className="hidden md:block text-right">
-          <p className="text-sm text-zinc-500 uppercase tracking-wider font-bold">Current Streak</p>
-          <div className="flex items-center gap-2 text-orange-500 font-bold text-xl">
-            <span className="animate-pulse">🔥</span> {streak || 0} Days
+          <p className="text-sm text-zinc-500 uppercase tracking-wider font-bold">Current XP</p>
+          <div className="flex items-center gap-2 text-blue-400 font-bold text-xl">
+            <Zap size={16} className="mr-2 opacity-70" /> {xp.toLocaleString()}
           </div>
         </div>
       </div>
@@ -182,39 +182,6 @@ const StudentDashboardPage = () => {
               </button>
             </div>
           )}
-
-          {/* Learning Activity Graph */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">Learning Activity</h3>
-              <select className="bg-black border border-zinc-700 text-xs text-white rounded-lg px-3 py-1 focus:outline-none cursor-pointer">
-                <option>This Week</option>
-                <option>This Month</option>
-              </select>
-            </div>
-            <div className="flex items-end justify-between h-32 gap-2 px-2">
-              {[40, 70, 35, 90, 60, 80, 50].map((h, i) => (
-                <div
-                  key={i}
-                  className="w-full bg-zinc-800 rounded-t-lg relative group hover:bg-blue-600/50 transition-colors cursor-pointer"
-                  style={{ height: `${h}%` }}
-                >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-black text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                    {h}m
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-zinc-500 px-2">
-              <span>Mon</span>
-              <span>Tue</span>
-              <span>Wed</span>
-              <span>Thu</span>
-              <span>Fri</span>
-              <span>Sat</span>
-              <span>Sun</span>
-            </div>
-          </div>
         </div>
 
         {/* Right Column */}
@@ -251,19 +218,6 @@ const StudentDashboardPage = () => {
             <button className="w-full mt-6 text-sm text-zinc-500 hover:text-white transition-colors">
               View All Tasks
             </button>
-          </div>
-
-          {/* Notice */}
-          <div className="bg-linear-to-br from-blue-900/50 to-purple-900/50 border border-blue-800/30 rounded-3xl p-6 relative overflow-hidden">
-            <div className="relative z-10">
-              <h3 className="text-lg font-bold mb-2 text-white">Live Masterclass</h3>
-              <p className="text-sm text-blue-100 mb-4">
-                "System Design Patterns" with an Ex-Google Engineer starts in 2 hours.
-              </p>
-              <button className="bg-white text-blue-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 w-full transition-colors">
-                Join Waiting Room
-              </button>
-            </div>
           </div>
         </div>
       </div>
