@@ -42,9 +42,9 @@ const StudentCertificatesPage = () => {
 
   // Transform API data to match LearningCard format
   const formattedCourses = certificates.map(cert => ({
-    id: cert.id,
-    title: cert.courseTitle || cert.title,
-    link: cert.courseSlug || cert.slug,
+    id: cert._id || cert.id,
+    title: cert.course?.title || cert.courseNameSnapshot,
+    link: cert.course?.slug,
     progress: 100,
     type: 'Certificate',
     total: 1,
@@ -52,7 +52,9 @@ const StudentCertificatesPage = () => {
     image: 'bg-linear-to-br from-yellow-900 to-slate-900',
     icon: <Award size={32} className="text-yellow-400" />,
     buttonText: 'View Certificate',
-    thumbnail: cert.thumbnail,
+    thumbnail: cert.course?.thumbnail,
+    certificateId: cert.certificateId,
+    issueDate: cert.issueDate,
   }));
 
   return (

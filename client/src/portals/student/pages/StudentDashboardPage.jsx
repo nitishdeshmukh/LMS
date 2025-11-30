@@ -116,103 +116,91 @@ const StudentDashboardPage = () => {
         ))}
       </div>
 
-      {/* Main Content Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Continue Learning Card */}
-          {activeCourse ? (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-1 overflow-hidden relative group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+      {/* Continue Learning Card */}
+      {activeCourse ? (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-1 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-              <div className="p-6 sm:p-8 relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <span className="text-blue-400 text-xs font-bold uppercase tracking-wider">
-                      In Progress
-                    </span>
-                    <h3 className="text-2xl font-bold mt-1">{activeCourse.title}</h3>
-                  </div>
-                  <div className="w-12 h-12 rounded-full border-4 border-zinc-800 flex items-center justify-center text-xs font-bold bg-zinc-900 text-white">
-                    {activeCourse.progress}%
-                  </div>
-                </div>
-
-                <div className="w-full bg-zinc-800 rounded-full h-2 mb-6 overflow-hidden">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
-                    style={{ width: `${activeCourse.progress}%` }}
-                  ></div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-black/30 rounded-xl p-4 border border-zinc-800/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                      <PlayCircle size={20} className="ml-1 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-zinc-500 uppercase font-bold">Up Next</p>
-                      <p className="text-sm font-medium text-white">{activeCourse.nextLesson}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigate(`/student/courses/${activeCourse.slug}`)}
-                    className="bg-white text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-50 transition-colors w-full sm:w-auto"
-                  >
-                    Resume
-                  </button>
-                </div>
+          <div className="p-6 sm:p-8 relative z-10">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <span className="text-blue-400 text-xs font-bold uppercase tracking-wider">
+                  In Progress
+                </span>
+                <h3 className="text-2xl font-bold mt-1">{activeCourse.title}</h3>
+              </div>
+              <div className="w-12 h-12 rounded-full border-4 border-zinc-800 flex items-center justify-center text-xs font-bold bg-zinc-900 text-white">
+                {activeCourse.progress}%
               </div>
             </div>
-          ) : (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 text-center">
-              <BookOpen size={48} className="mx-auto text-zinc-600 mb-4" />
-              <h3 className="text-xl font-bold mb-2">No Active Course</h3>
-              <p className="text-zinc-400 mb-4">Start learning by enrolling in a course</p>
+
+            <div className="w-full bg-zinc-800 rounded-full h-2 mb-6 overflow-hidden">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                style={{ width: `${activeCourse.progress}%` }}
+              ></div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-black/30 rounded-xl p-4 border border-zinc-800/50">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                  <PlayCircle size={20} className="ml-1 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase font-bold">Up Next</p>
+                  <p className="text-sm font-medium text-white">{activeCourse.nextLesson}</p>
+                </div>
+              </div>
               <button
-                onClick={() => navigate('/courses')}
-                className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-700 transition-colors"
+                onClick={() => navigate(`/student/courses/${activeCourse.slug}`)}
+                className="bg-white text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-50 transition-colors w-full sm:w-auto"
               >
-                Browse Courses
+                Resume
               </button>
             </div>
-          )}
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-8">
-          {/* Deadlines */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <Clock size={18} className="text-orange-500" /> Upcoming Deadlines
-            </h3>
-            <div className="space-y-4">
-              {pendingTasks.length > 0 ? (
-                pendingTasks.map(task => (
-                  <div
-                    key={task.id}
-                    className="p-4 rounded-2xl bg-black/40 border border-zinc-800/50 hover:border-zinc-700 transition-colors cursor-pointer"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded bg-zinc-800 ${task.type === 'Assignment' ? 'text-orange-400' : 'text-blue-400'}`}
-                      >
-                        {task.type}
-                      </span>
-                      <span className="text-xs text-zinc-500 font-mono">
-                        {formatDueDate(task.dueInDays)}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium leading-tight">{task.title}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-zinc-500 text-center py-4">No upcoming deadlines</p>
-              )}
-            </div>
-            <button className="w-full mt-6 text-sm text-zinc-500 hover:text-white transition-colors">
-              View All Tasks
-            </button>
           </div>
+        </div>
+      ) : (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 text-center">
+          <BookOpen size={48} className="mx-auto text-zinc-600 mb-4" />
+          <h3 className="text-xl font-bold mb-2">No Active Course</h3>
+          <p className="text-zinc-400 mb-4">Start learning by enrolling in a course</p>
+          <button
+            onClick={() => navigate('/courses')}
+            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-700 transition-colors"
+          >
+            Browse Courses
+          </button>
+        </div>
+      )}
+      {/* Deadlines */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+          <Clock size={18} className="text-orange-500" /> Upcoming Deadlines
+        </h3>
+        <div className="space-y-4">
+          {pendingTasks.length > 0 ? (
+            pendingTasks.map(task => (
+              <div
+                key={task.id}
+                className="p-4 rounded-2xl bg-black/40 border border-zinc-800/50 hover:border-zinc-700 transition-colors cursor-pointer"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded bg-zinc-800 ${task.type === 'Assignment' ? 'text-orange-400' : 'text-blue-400'}`}
+                  >
+                    {task.type}
+                  </span>
+                  <span className="text-xs text-zinc-500 font-mono">
+                    {formatDueDate(task.dueInDays)}
+                  </span>
+                </div>
+                <p className="text-sm font-medium leading-tight">{task.title}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-zinc-500 text-center py-4">No upcoming deadlines</p>
+          )}
         </div>
       </div>
     </div>

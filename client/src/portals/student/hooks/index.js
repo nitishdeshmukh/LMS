@@ -28,7 +28,7 @@ export {
 } from './useProfile';
 
 // Certificates Hook
-export { useCertificates } from './useCertificates';
+export { useCertificates, useCourseCertificate } from './useCertificates';
 
 // Support Hooks
 export { useSupportQueries, useCreateSupportQuery } from './useSupport';

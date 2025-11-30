@@ -80,6 +80,7 @@ export const getDashboard = async (req, res) => {
                             type: "Assignment",
                             courseName: enrollment.course.title,
                             moduleTitle: module.title,
+                            dueInDays: module.maxTimelineInDays,
                         });
                     }
                 });

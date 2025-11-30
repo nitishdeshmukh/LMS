@@ -1,7 +1,8 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { fetchCertificates, selectCertificates } from '@/redux/slices';
+import { getCourseCertificate } from '@/services/student/studentService';
 
 // Cache duration: 10 minutes for certificates (rarely updated)
 const CACHE_DURATION = 10 * 60 * 1000;
@@ -39,5 +40,41 @@ export const useCertificates = () => {
     loading,
     error,
     refetch: () => fetchCertificatesData(true),
+  };
+};
+
+/**
+ * Hook for fetching a single course certificate
+ */
+export const useCourseCertificate = courseSlug => {
+  const [certificate, setCertificate] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchCertificate = useCallback(async () => {
+    if (!courseSlug) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await getCourseCertificate(courseSlug);
+      setCertificate(response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch certificate');
+    } finally {
+      setLoading(false);
+    }
+  }, [courseSlug]);
+
+  useEffect(() => {
+    fetchCertificate();
+  }, [fetchCertificate]);
+
+  return {
+    certificate,
+    loading,
+    error,
+    refetch: fetchCertificate,
   };
 };
