@@ -17,12 +17,24 @@ export const isAuthenticated = async (req, res, next) => {
         jwt.verify(token, secret, async (err, decoded) => {
             if (err) {
                 if (err.name === "TokenExpiredError") {
-                    throw new errorHandler(401, "Access token has expired");
+                    return res.status(401).json({
+                        success: false,
+                        message: "Access token has expired",
+                        code: "TOKEN_EXPIRED",
+                    });
                 }
                 if (err.name === "JsonWebTokenError") {
-                    throw new errorHandler(401, "Invalid access token");
+                    return res.status(401).json({
+                        success: false,
+                        message: "Invalid access token",
+                        code: "INVALID_TOKEN",
+                    });
                 }
-                throw new errorHandler(401, "Token verification failed");
+                return res.status(401).json({
+                    success: false,
+                    message: "Token verification failed",
+                    code: "TOKEN_VERIFICATION_FAILED",
+                });
             }
 
             const { id, role } = decoded;
