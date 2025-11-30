@@ -1,5 +1,6 @@
 import { RefreshToken } from "../../models/index.js";
 import { setAuthCookies } from "./utils.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * Refreshes access and refresh tokens with automatic rotation and reuse detection.
@@ -26,6 +27,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Refresh token is required",
+                code: ERROR_CODES.REFRESH_TOKEN_INVALID,
             });
         }
 
@@ -39,7 +41,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Invalid refresh token",
-                code: "REFRESH_TOKEN_INVALID",
+                code: ERROR_CODES.REFRESH_TOKEN_INVALID,
             });
         }
 
@@ -58,7 +60,7 @@ export const refreshAccessToken = async (req, res) => {
                 success: false,
                 message:
                     "Token reuse detected. All sessions have been revoked for security. Please login again.",
-                code: "TOKEN_REUSE_DETECTED",
+                code: ERROR_CODES.TOKEN_REUSE_DETECTED,
             });
         }
 
@@ -67,7 +69,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Refresh token has been revoked",
-                code: "REFRESH_TOKEN_REVOKED",
+                code: ERROR_CODES.REFRESH_TOKEN_REVOKED,
             });
         }
 
@@ -77,7 +79,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Refresh token has expired",
-                code: "REFRESH_TOKEN_EXPIRED",
+                code: ERROR_CODES.REFRESH_TOKEN_EXPIRED,
             });
         }
 
@@ -89,7 +91,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "User not found",
-                code: "USER_NOT_FOUND",
+                code: ERROR_CODES.USER_NOT_FOUND,
             });
         }
 
@@ -99,7 +101,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "Your account has been blocked",
-                code: "ACCOUNT_BLOCKED",
+                code: ERROR_CODES.ACCOUNT_BLOCKED,
             });
         }
 
@@ -126,7 +128,7 @@ export const refreshAccessToken = async (req, res) => {
         // Set new tokens in httpOnly cookies
         setAuthCookies(res, accessToken, newRefreshToken);
 
-        res.json({
+        res.status(200).json({
             success: true,
             message: "Tokens refreshed successfully",
             data: {
@@ -140,7 +142,7 @@ export const refreshAccessToken = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Failed to refresh token",
-            error: error.message,
+            code: ERROR_CODES.INTERNAL_ERROR,
         });
     }
 };

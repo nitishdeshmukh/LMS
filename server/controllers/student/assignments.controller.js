@@ -1,6 +1,7 @@
 import { Student, Course, Enrollment, Submission } from "../../models/index.js";
 import { submitAssignmentSchema } from "../../validation/student.zod.js";
 import { updateLeaderboard } from "./leaderboard.controller.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * Helper function to calculate progress percentage
@@ -66,9 +67,14 @@ export const getAssignmentsByCourse = async (req, res) => {
             };
         });
 
-        res.json({ success: true, data: coursesWithAssignments });
+        res.status(200).json({ success: true, data: coursesWithAssignments });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get assignments by course error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch assignments",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -82,9 +88,11 @@ export const getCourseAssignments = async (req, res) => {
 
         const course = await Course.findOne({ slug }).select("title modules");
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -97,6 +105,7 @@ export const getCourseAssignments = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -134,7 +143,7 @@ export const getCourseAssignments = async (req, res) => {
             });
         });
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 courseId: course._id,
@@ -143,7 +152,12 @@ export const getCourseAssignments = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get course assignments error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch assignments",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -157,6 +171,8 @@ export const submitAssignment = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -166,9 +182,11 @@ export const submitAssignment = async (req, res) => {
 
         const course = await Course.findById(courseId);
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -181,6 +199,7 @@ export const submitAssignment = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -241,7 +260,7 @@ export const submitAssignment = async (req, res) => {
             });
         }
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: submission,
             message: isFirstSubmission
@@ -249,6 +268,11 @@ export const submitAssignment = async (req, res) => {
                 : "Assignment updated successfully",
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Submit assignment error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to submit assignment",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

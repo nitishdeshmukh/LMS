@@ -3,6 +3,7 @@ import {
     updatePrivacySchema,
     changePasswordSchema,
 } from "../../validation/student.zod.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * PUT /api/student/settings/privacy
@@ -14,6 +15,8 @@ export const updatePrivacy = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -24,13 +27,18 @@ export const updatePrivacy = async (req, res) => {
             { new: true }
         ).select("isProfileLocked");
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: student,
             message: "Privacy settings updated",
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Update privacy error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update privacy settings",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -44,6 +52,8 @@ export const changePassword = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -56,6 +66,7 @@ export const changePassword = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Password change not available for OAuth users",
+                code: ERROR_CODES.BAD_REQUEST,
             });
         }
 
@@ -66,14 +77,23 @@ export const changePassword = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Current password is incorrect",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
         student.lmsPassword = validation.data.newPassword;
         await student.save();
 
-        res.json({ success: true, message: "Password changed successfully" });
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Change password error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to change password",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

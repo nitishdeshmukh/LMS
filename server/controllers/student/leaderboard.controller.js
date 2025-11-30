@@ -1,5 +1,7 @@
 import { leaderboardQuerySchema } from "../../validation/student.zod.js";
 import { Leaderboard } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
+
 /**
  * GET /api/student/leaderboard
  * Get leaderboard
@@ -10,6 +12,8 @@ export const getLeaderboard = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -96,7 +100,12 @@ export const getLeaderboard = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get leaderboard error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch leaderboard",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 

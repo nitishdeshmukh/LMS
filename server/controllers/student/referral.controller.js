@@ -1,5 +1,7 @@
 import { applyReferralCodeSchema } from "../../validation/student.zod.js";
 import { Student, Referral } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
+
 /**
  * GET /api/student/referral
  * Get referral info
@@ -10,11 +12,19 @@ export const getReferralInfo = async (req, res) => {
             "myReferralCode referralCount isPremiumUnlocked"
         );
 
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+                code: ERROR_CODES.USER_NOT_FOUND,
+            });
+        }
+
         const referrals = await Referral.find({ referrer: req.userId })
             .populate("referee", "name createdAt")
             .sort({ createdAt: -1 });
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 referralCode: student.myReferralCode,
@@ -28,7 +38,12 @@ export const getReferralInfo = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get referral info error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch referral info",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -42,6 +57,8 @@ export const applyReferralCode = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -54,6 +71,7 @@ export const applyReferralCode = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "You have already used a referral code",
+                code: ERROR_CODES.BAD_REQUEST,
             });
         }
 
@@ -65,6 +83,7 @@ export const applyReferralCode = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Invalid referral code",
+                code: ERROR_CODES.RESOURCE_NOT_FOUND,
             });
         }
 
@@ -73,6 +92,7 @@ export const applyReferralCode = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "You cannot use your own referral code",
+                code: ERROR_CODES.BAD_REQUEST,
             });
         }
 
@@ -98,13 +118,18 @@ export const applyReferralCode = async (req, res) => {
         student.isPremiumUnlocked = true;
         await student.save();
 
-        res.json({
+        res.status(200).json({
             success: true,
             message:
                 "Referral code applied successfully! Premium benefits unlocked.",
             data: { isPremiumUnlocked: true },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Apply referral code error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to apply referral code",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

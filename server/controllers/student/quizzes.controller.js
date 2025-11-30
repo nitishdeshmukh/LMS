@@ -1,6 +1,7 @@
 import { submitQuizSchema } from "../../validation/student.zod.js";
 import { updateLeaderboard } from "./leaderboard.controller.js";
 import { Student, Course, Enrollment, Submission } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * Helper function to calculate progress percentage
@@ -64,9 +65,14 @@ export const getQuizzesByCourse = async (req, res) => {
             };
         });
 
-        res.json({ success: true, data: coursesWithQuizzes });
+        res.status(200).json({ success: true, data: coursesWithQuizzes });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get quizzes by course error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch quizzes",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -80,9 +86,11 @@ export const getCourseQuizzes = async (req, res) => {
 
         const course = await Course.findOne({ slug }).select("title modules");
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -95,6 +103,7 @@ export const getCourseQuizzes = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -130,7 +139,7 @@ export const getCourseQuizzes = async (req, res) => {
             });
         });
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 courseId: course._id,
@@ -139,7 +148,12 @@ export const getCourseQuizzes = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get course quizzes error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch course quizzes",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -153,9 +167,11 @@ export const getQuizQuestions = async (req, res) => {
 
         const course = await Course.findOne({ slug });
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         // Check enrollment
@@ -169,6 +185,7 @@ export const getQuizQuestions = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -187,9 +204,11 @@ export const getQuizQuestions = async (req, res) => {
         }
 
         if (!quiz) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Quiz not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Quiz not found",
+                code: ERROR_CODES.RESOURCE_NOT_FOUND,
+            });
         }
 
         // Return questions without correct answers
@@ -199,7 +218,7 @@ export const getQuizQuestions = async (req, res) => {
             options: q.options,
         }));
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 title: quiz.title,
@@ -209,7 +228,12 @@ export const getQuizQuestions = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get quiz questions error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch quiz questions",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -223,6 +247,8 @@ export const submitQuiz = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -231,9 +257,11 @@ export const submitQuiz = async (req, res) => {
 
         const course = await Course.findById(courseId);
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -246,6 +274,7 @@ export const submitQuiz = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -262,9 +291,11 @@ export const submitQuiz = async (req, res) => {
         }
 
         if (!quiz) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Quiz not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Quiz not found",
+                code: ERROR_CODES.RESOURCE_NOT_FOUND,
+            });
         }
 
         // Calculate score
@@ -341,7 +372,7 @@ export const submitQuiz = async (req, res) => {
             });
         }
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 score,
@@ -355,6 +386,11 @@ export const submitQuiz = async (req, res) => {
                 : `Quiz submitted! You scored ${score}/${quiz.questions.length}`,
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Submit quiz error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to submit quiz",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

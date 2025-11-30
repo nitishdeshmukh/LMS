@@ -7,12 +7,14 @@
  *
  * @param {number} statusCode - HTTP status code representing the error type.
  * @param {string} [message="Something went wrong"] - Human-readable error message.
+ * @param {string} [code=""] - Error code for client-side handling (e.g., "TOKEN_EXPIRED").
  * @param {Array} [errors=[]] - Optional array containing additional error details.
  * @param {string} [stack=""] - Optional stack trace. If not provided, it's captured automatically.
  *
  * @property {number} statusCode - HTTP status code.
  * @property {null} data - Set to null to indicate absence of successful data.
  * @property {boolean} success - Always false to indicate failure.
+ * @property {string} code - Error code for programmatic handling.
  * @property {Array} errors - Additional error details.
  * @property {string} stack - Stack trace for debugging.
  */
@@ -21,6 +23,7 @@ class errorHandler extends Error {
     constructor(
         statusCode,
         message = "Something went wrong",
+        code = "",
         errors = [],
         stack = ""
     ) {
@@ -29,6 +32,7 @@ class errorHandler extends Error {
         this.statusCode = statusCode;
         this.data = null;
         this.success = false;
+        this.code = code;
         this.errors = errors;
 
         if (stack) {

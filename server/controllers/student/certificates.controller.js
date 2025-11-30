@@ -1,4 +1,6 @@
 import { Certificate, Course, Enrollment } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
+
 /**
  * GET /api/student/certificates
  * Get all student certificates
@@ -9,9 +11,14 @@ export const getCertificates = async (req, res) => {
             .populate("course", "title slug thumbnail")
             .sort({ issueDate: -1 });
 
-        res.json({ success: true, data: certificates });
+        res.status(200).json({ success: true, data: certificates });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get certificates error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch certificates",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -25,9 +32,11 @@ export const getCourseCertificate = async (req, res) => {
 
         const course = await Course.findOne({ slug: courseSlug });
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const certificate = await Certificate.findOne({
@@ -47,17 +56,24 @@ export const getCourseCertificate = async (req, res) => {
                 return res.status(404).json({
                     success: false,
                     message: "Complete the course to earn a certificate",
+                    code: ERROR_CODES.RESOURCE_NOT_FOUND,
                 });
             }
 
             return res.status(404).json({
                 success: false,
                 message: "Certificate not yet issued. Please contact support.",
+                code: ERROR_CODES.RESOURCE_NOT_FOUND,
             });
         }
 
-        res.json({ success: true, data: certificate });
+        res.status(200).json({ success: true, data: certificate });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get course certificate error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch certificate",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

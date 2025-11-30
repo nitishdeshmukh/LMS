@@ -4,6 +4,7 @@ import {
     formatUserResponse,
     formatStudentResponse,
 } from "./utils.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * Authenticates an admin with email and password credentials.
@@ -21,6 +22,7 @@ export const login = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Invalid email or password",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
@@ -29,6 +31,7 @@ export const login = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Password not set for this account",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
@@ -38,6 +41,7 @@ export const login = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Invalid email or password",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
@@ -60,11 +64,14 @@ export const login = async (req, res) => {
         // Set tokens in httpOnly cookies
         setAuthCookies(res, accessToken, refreshToken);
 
-        res.json({
+        res.status(200).json({
             success: true,
             message: "Login successful",
             data: {
                 user: formatUserResponse(admin),
+                accessToken,
+                refreshToken,
+                expiresIn: 15 * 60,
             },
         });
     } catch (error) {
@@ -72,7 +79,7 @@ export const login = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Login failed",
-            error: error.message,
+            code: ERROR_CODES.INTERNAL_ERROR,
         });
     }
 };
@@ -90,6 +97,7 @@ export const lmsLogin = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Invalid LMS ID or password",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
@@ -99,6 +107,7 @@ export const lmsLogin = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: "Invalid LMS ID or password",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
             });
         }
 
@@ -108,6 +117,7 @@ export const lmsLogin = async (req, res) => {
                 success: false,
                 message:
                     "Your account has been blocked. Please contact support.",
+                code: ERROR_CODES.ACCOUNT_BLOCKED,
             });
         }
 
@@ -130,7 +140,7 @@ export const lmsLogin = async (req, res) => {
         // Set tokens in httpOnly cookies
         setAuthCookies(res, accessToken, refreshToken);
 
-        res.json({
+        res.status(200).json({
             success: true,
             message: "LMS Login successful",
             data: {
@@ -145,7 +155,7 @@ export const lmsLogin = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Login failed",
-            error: error.message,
+            code: ERROR_CODES.INTERNAL_ERROR,
         });
     }
 };

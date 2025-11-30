@@ -1,4 +1,5 @@
 import { Course, Enrollment } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * Helper function to calculate module completion
@@ -94,7 +95,12 @@ export const getMyCourses = async (req, res) => {
 
         res.json({ success: true, data: courses });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get courses error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch courses",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -108,9 +114,11 @@ export const getCourseDetails = async (req, res) => {
 
         const course = await Course.findOne({ slug, isPublished: true });
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -123,6 +131,7 @@ export const getCourseDetails = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -214,7 +223,12 @@ export const getCourseDetails = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get course details error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch course details",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -230,9 +244,11 @@ export const getCourseModules = async (req, res) => {
             "title modules"
         );
         if (!course) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Course not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                code: ERROR_CODES.COURSE_NOT_FOUND,
+            });
         }
 
         const enrollment = await Enrollment.findOne({
@@ -245,6 +261,7 @@ export const getCourseModules = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
             });
         }
 
@@ -322,6 +339,11 @@ export const getCourseModules = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get course modules error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch course modules",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

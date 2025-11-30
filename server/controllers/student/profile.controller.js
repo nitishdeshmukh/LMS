@@ -3,6 +3,7 @@ import {
     updateProfileSchema,
     updateAvatarSchema,
 } from "../../validation/student.zod.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
 
 /**
  * GET /api/student/profile
@@ -14,6 +15,14 @@ export const getProfile = async (req, res) => {
             .select("+googleId +githubId")
             .select("-lmsPassword -resetPasswordToken -resetPasswordExpire");
 
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+                code: ERROR_CODES.USER_NOT_FOUND,
+            });
+        }
+
         // Transform to include isOAuthUser flag
         const studentObj = student.toObject();
         const isOAuthUser = !!(studentObj.googleId || studentObj.githubId);
@@ -22,7 +31,7 @@ export const getProfile = async (req, res) => {
         delete studentObj.googleId;
         delete studentObj.githubId;
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 ...studentObj,
@@ -30,7 +39,12 @@ export const getProfile = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Get profile error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch profile",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -44,6 +58,8 @@ export const updateProfile = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -54,13 +70,18 @@ export const updateProfile = async (req, res) => {
             { new: true, runValidators: true }
         ).select("-lmsPassword -resetPasswordToken -resetPasswordExpire");
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: student,
             message: "Profile updated successfully",
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Update profile error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update profile",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
@@ -74,6 +95,8 @@ export const updateAvatar = async (req, res) => {
         if (!validation.success) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
+                code: ERROR_CODES.VALIDATION_ERROR,
                 errors: validation.error.errors,
             });
         }
@@ -84,12 +107,17 @@ export const updateAvatar = async (req, res) => {
             { new: true }
         ).select("avatar");
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: student,
             message: "Avatar updated successfully",
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Update avatar error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update avatar",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };

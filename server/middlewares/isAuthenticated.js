@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Student, Admin } from "../models/index.js";
-import errorHandler from "../utils/errorHandler.js";
+import { ERROR_CODES } from "./globalErrorHandler.js";
 
 export const isAuthenticated = async (req, res, next) => {
     try {
@@ -9,7 +9,11 @@ export const isAuthenticated = async (req, res, next) => {
             req.header("Authorization")?.replace("Bearer ", "");
 
         if (!token) {
-            throw new errorHandler(401, "Unauthorized request");
+            return res.status(401).json({
+                success: false,
+                message: "Access token is required",
+                code: ERROR_CODES.UNAUTHORIZED,
+            });
         }
 
         const secret = process.env.ACCESS_TOKEN_SECRET;
@@ -20,20 +24,20 @@ export const isAuthenticated = async (req, res, next) => {
                     return res.status(401).json({
                         success: false,
                         message: "Access token has expired",
-                        code: "TOKEN_EXPIRED",
+                        code: ERROR_CODES.TOKEN_EXPIRED,
                     });
                 }
                 if (err.name === "JsonWebTokenError") {
                     return res.status(401).json({
                         success: false,
                         message: "Invalid access token",
-                        code: "INVALID_TOKEN",
+                        code: ERROR_CODES.INVALID_TOKEN,
                     });
                 }
                 return res.status(401).json({
                     success: false,
                     message: "Token verification failed",
-                    code: "TOKEN_VERIFICATION_FAILED",
+                    code: ERROR_CODES.TOKEN_VERIFICATION_FAILED,
                 });
             }
 
@@ -51,10 +55,10 @@ export const isAuthenticated = async (req, res, next) => {
             }
 
             if (!user) {
-                return res.status(404).json({
+                return res.status(401).json({
                     success: false,
                     message: "User not found",
-                    code: "USER_NOT_FOUND",
+                    code: ERROR_CODES.USER_NOT_FOUND,
                 });
             }
 
@@ -64,7 +68,7 @@ export const isAuthenticated = async (req, res, next) => {
                     success: false,
                     message:
                         "Your account has been blocked. Please contact support.",
-                    code: "ACCOUNT_BLOCKED",
+                    code: ERROR_CODES.ACCOUNT_BLOCKED,
                 });
             }
 
@@ -78,7 +82,7 @@ export const isAuthenticated = async (req, res, next) => {
         return res.status(500).json({
             success: false,
             message: "Authentication failed",
-            error: error.message,
+            code: ERROR_CODES.INTERNAL_ERROR,
         });
     }
 };
@@ -93,7 +97,7 @@ export const authorizeRoles = (...roles) => {
             return res.status(403).json({
                 success: false,
                 message: `Access denied. Required role: ${roles.join(" or ")}`,
-                code: "INSUFFICIENT_PERMISSIONS",
+                code: ERROR_CODES.INSUFFICIENT_PERMISSIONS,
             });
         }
         next();
@@ -116,10 +120,7 @@ export const optionalAuth = async (req, res, next) => {
         }
 
         const token = authHeader.split(" ")[1];
-        const secret =
-            process.env.JWT_ACCESS_SECRET ||
-            process.env.OAUTH_SECRET ||
-            process.env.SECRET_KEY;
+        const secret = process.env.ACCESS_TOKEN_SECRET;
 
         jwt.verify(token, secret, async (err, decoded) => {
             if (err) {

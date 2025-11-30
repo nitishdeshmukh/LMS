@@ -4,6 +4,8 @@ import {
     Enrollment,
     Submission,
 } from "../../models/index.js";
+import { ERROR_CODES } from "../../middlewares/globalErrorHandler.js";
+
 /**
  * GET /api/student/dashboard
  * Get student dashboard data
@@ -21,6 +23,7 @@ export const getDashboard = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Student not found",
+                code: ERROR_CODES.USER_NOT_FOUND,
             });
         }
 
@@ -107,7 +110,11 @@ export const getDashboard = async (req, res) => {
         });
     } catch (error) {
         console.error("Dashboard error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch dashboard data",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
     }
 };
 
