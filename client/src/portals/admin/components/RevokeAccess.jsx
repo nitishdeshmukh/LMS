@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 const RevokeAccess = ({ studentName, onConfirm, student, onClose }) => {
   const handleCancel = () => {
     onClose(); // Close the popup
-    toast.info(`Access revocation cancelled for ${student?.studentName || studentName}`);
+    toast.info(`Access revocation cancelled for ${student?.studentName}`);
   };
 
   const handleConfirm = () => {
     onClose(); // Close the popup
-    toast.success(`${student?.studentName || studentName} has been revoked successfully`);
+    toast.success(`${student?.studentName} has been revoked successfully`);
     // Add your revoke logic here (API call, etc.)
     if (onConfirm) {
       onConfirm();
@@ -69,3 +69,4 @@ const RevokeAccess = ({ studentName, onConfirm, student, onClose }) => {
 };
 
 export default RevokeAccess;
+

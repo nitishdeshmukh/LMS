@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import { User, RefreshToken } from "../../models/index.js";
 
 export const createEnrollment = async (req, res) => {
     try {
@@ -107,44 +107,59 @@ export const createEnrollment = async (req, res) => {
     }
 };
 
-export const getEnrollmentDetails = async (req, res) => {
+// ============================================
+// GET CURRENT USER PROFILE
+// ============================================
+export const getCurrentUser = async (req, res) => {
     try {
-        const { userId } = req.params;
-
-        const user = await User.findById(userId).select(
-            "-password -resetPasswordToken -googleId -githubId -lmsPassword"
+        const user = await User.findById(req.userId).select(
+            "-password -lmsPassword -resetPasswordToken -resetPasswordExpire -googleId -githubId"
         );
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "Enrollment not found",
+                message: "User not found",
             });
         }
 
-        res.status(200).json({
+        res.json({
             success: true,
-            data: {
-                fullName: `${user.name} ${user.middleName || ""} ${
-                    user.lastName
-                }`.trim(),
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                alternatePhone: user.alternatePhone,
-                collegeName: user.collegeName,
-                courseName: user.courseName,
-                yearOfStudy: user.yearOfStudy,
-                accountStatus: user.accountStatus,
-                myReferralCode: user.myReferralCode,
-                referralCount: user.referralCount,
-                createdAt: user.createdAt,
-            },
+            data: { user },
         });
     } catch (error) {
-        console.error("Get enrollment error:", error);
+        console.error("Get current user error:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to fetch enrollment details",
+            message: "Failed to get user",
+            error: error.message,
+        });
+    }
+};
+
+// ============================================
+// GET ACTIVE SESSIONS
+// ============================================
+export const getActiveSessions = async (req, res) => {
+    try {
+        const sessions = await RefreshToken.find({
+            user: req.userId,
+            isRevoked: false,
+            isUsed: false,
+            expiresAt: { $gt: new Date() },
+        })
+            .select("userAgent ipAddress createdAt family")
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            data: { sessions },
+        });
+    } catch (error) {
+        console.error("Get sessions error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to get sessions",
         });
     }
 };

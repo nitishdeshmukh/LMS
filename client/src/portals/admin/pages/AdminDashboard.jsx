@@ -18,8 +18,6 @@ function AdminDashboard() {
   const donutData = [
     { category: 'Direct', value: 45, color: '#145efc' },
     { category: 'Referral', value: 25, color: '#FFB84D' },
-    { category: 'Organic', value: 20, color: '#4DFF88' },
-    { category: 'Ads', value: 10, color: '#B84DFF' },
   ];
   return (
     <main className="flex-1 overflow-y-auto p-8">
@@ -31,10 +29,26 @@ function AdminDashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-2 gap-5 mb-5 ">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-2">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-1">
+              Total Enrollments by Course
+            </h2>
+            <p className="text-sm text-zinc-400">
+              Total number of students enrolled in each active course
+            </p>
+          </div>
           <ColumnChart data={chartData} height={350} />
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-2">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-1">
+              Referral vs Direct Enrollments
+            </h2>
+            <p className="text-sm text-zinc-400">
+              Displays the split between enrollments via direct sign-up and referrals.
+            </p>
+          </div>
           <DoughnutChart data={donutData} height={360} innerRadiusPercent={60} />
         </div>
       </div>
@@ -46,3 +60,5 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
+
+

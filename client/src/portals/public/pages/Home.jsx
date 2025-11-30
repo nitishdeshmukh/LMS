@@ -30,54 +30,52 @@ function Home() {
   const [current, setCurrent] = useState(0);
   const [testimonialApi, setTestimonialApi] = React.useState();
   const [currentTestimonial, setCurrentTestimonial] = React.useState(0);
-  const testimonialPlugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
+  const testimonialPlugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  );
 
   React.useEffect(() => {
     if (!testimonialApi) return;
 
     setCurrentTestimonial(testimonialApi.selectedScrollSnap());
 
-    testimonialApi.on('select', () => {
+    testimonialApi.on("select", () => {
       setCurrentTestimonial(testimonialApi.selectedScrollSnap());
     });
   }, [testimonialApi]);
   const textTestimonials = [
     {
       id: 1,
-      quote:
-        'The internship model helped me build a real portfolio. I got my certificate immediately after my Capstone review.',
-      name: 'Deepak Agrawal',
-      cohort: 'Web Dev Cohort',
+      quote: "The internship model helped me build a real portfolio. I got my certificate immediately after my Capstone review.",
+      name: "Deepak Agrawal",
+      cohort: "Web Dev Cohort",
       linkedin: 'https://www.linkedin.com/in/agrawaldeepak05/',
-      initial: 'D',
+      initial: "D"
     },
     {
       id: 2,
-      quote:
-        'Machine Learning concepts were explained so clearly. The project-based approach really cemented my understanding.',
-      name: 'Rupesh Kumar Sahu',
-      cohort: 'Data Science Cohort',
+      quote: "Machine Learning concepts were explained so clearly. The project-based approach really cemented my understanding.",
+      name: "Rupesh Kumar Sahu",
+      cohort: "Data Science Cohort",
       linkedin: 'https://www.linkedin.com/in/rupesh-kumar-sahu-80bb51304/',
-      initial: 'R',
+      initial: "R"
     },
     {
       id: 3,
-      quote:
-        'Building a Flutter app from scratch gave me confidence to apply for jobs. Mentor feedback was crucial.',
-      name: 'Mayank Kushvaha',
-      cohort: 'Mobile App Dev',
+      quote: "Building a Flutter app from scratch gave me confidence to apply for jobs. Mentor feedback was crucial.",
+      name: "Mayank Kushvaha",
+      cohort: "Mobile App Dev",
       linkedin: 'https://www.linkedin.com/in/mayankleo/',
-      initial: 'M',
+      initial: "M"
     },
     {
       id: 4,
       name: 'Nitish Deshmukh',
       cohort: 'UI/UX Design',
-      quote:
-        'I finally mastered auto-layout. The design challenges feel exactly like real-world client tasks.',
+      quote: 'I finally mastered auto-layout. The design challenges feel exactly like real-world client tasks.',
       color: 'from-pink-400 to-rose-500',
       linkedin: 'https://www.linkedin.com/in/nitish-deshmukh-a9093b25a/',
-      initial: 'N',
+      initial: "N"
     },
     {
       id: 5,
@@ -86,7 +84,7 @@ function Home() {
       quote: 'Node.js architecture and DB optimization changed how I write code!',
       color: 'from-purple-400 to-indigo-500',
       linkedin: 'https://www.linkedin.com/in/agrawaldeepak05/',
-      initial: 'T',
+      initial: "T"
     },
     {
       id: 6,
@@ -95,7 +93,7 @@ function Home() {
       quote: '24/7 mentor support actually helped me debug real issues. Best learning platform!',
       color: 'from-yellow-400 to-orange-500',
       linkedin: 'https://www.linkedin.com/in/nainshi-roy-2b8310256/',
-      initial: 'N',
+      initial: "N"
     },
     {
       id: 7,
@@ -104,7 +102,7 @@ function Home() {
       quote: 'The automation scripts we built saved me hours at my internship.',
       color: 'from-teal-400 to-emerald-500',
       linkedin: 'https://www.linkedin.com/in/nawazish-niyazi/',
-      initial: 'N',
+      initial: "N"
     },
     {
       id: 8,
@@ -113,7 +111,7 @@ function Home() {
       quote: 'Tableau & PowerBI dashboards are now the strongest part of my resume.',
       color: 'from-blue-500 to-cyan-400',
       linkedin: 'https://www.linkedin.com/in/antra-sharma15/',
-      initial: 'A',
+      initial: "A"
     },
     {
       id: 9,
@@ -122,7 +120,7 @@ function Home() {
       quote: 'Complex SQL joins now feel extremely easy.',
       color: 'from-indigo-400 to-purple-500',
       linkedin: 'https://www.linkedin.com/in/piyush-bramhankar-a041b638b/',
-      initial: 'P',
+      initial: "P"
     },
     {
       id: 10,
@@ -131,7 +129,7 @@ function Home() {
       quote: 'React Hooks finally make sense! Loved the structured curriculum.',
       color: 'from-red-400 to-pink-500',
       linkedin: 'https://in.linkedin.com/in/mebishnusahu05',
-      initial: 'B',
+      initial: "B"
     },
   ];
 
@@ -244,6 +242,7 @@ function Home() {
       icon: <Award />,
     },
   ];
+
 
   // IBM-style testimonials
   const testimonial = [
@@ -576,54 +575,58 @@ function Home() {
                 loop: true,
               }}
             >
-              <CarouselContent className="-ml-4">
-                {textTestimonials.map(testimonial => (
-                  <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="h-full">
-                      <Link to={testimonial.linkedin} target="_blank" className="block h-full">
-                        <div className="relative bg-black border-2 border-zinc-800 rounded-xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all duration-300 shadow-lg h-full flex flex-col group">
-                          {/* Gradient border effect on hover */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"></div>
+                <CarouselContent className="-ml-4">
+                  {textTestimonials.map(testimonial => (
+                    <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                      <div className="h-full">
+                        <Link
+                          to={testimonial.linkedin}
+                          target="_blank"
+                          className="block h-full"
+                        >
+                          <div className="relative bg-black border-2 border-zinc-800 rounded-xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all duration-300 shadow-lg h-full flex flex-col group">
+                            {/* Gradient border effect on hover */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"></div>
 
-                          {/* Testimonial Content */}
-                          <div className="relative p-6 flex-1 flex flex-col">
-                            {/* Star Rating */}
-                            <div className="flex gap-1 mb-4">
-                              {[...Array(5)].map((_, i) => (
-                                <svg
-                                  key={i}
-                                  className="w-5 h-5 fill-yellow-500"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                              ))}
+                            {/* Testimonial Content */}
+                            <div className="relative p-6 flex-1 flex flex-col">
+                              {/* Star Rating */}
+                              <div className="flex gap-1 mb-4">
+                                {[...Array(5)].map((_, i) => (
+                                  <svg
+                                    key={i}
+                                    className="w-5 h-5 fill-yellow-500"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                ))}
+                              </div>
+
+                              {/* Testimonial Text */}
+                              <blockquote className="text-gray-300 text-sm leading-relaxed italic flex-1">
+                                "{testimonial.quote}"
+                              </blockquote>
                             </div>
 
-                            {/* Testimonial Text */}
-                            <blockquote className="text-gray-300 text-sm leading-relaxed italic flex-1">
-                              "{testimonial.quote}"
-                            </blockquote>
-                          </div>
-
-                          {/* User Info */}
-                          <div className="relative p-4 bg-black border-t border-zinc-800/50">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold border-2 border-zinc-700 group-hover:border-blue-500 transition-colors shadow-lg">
-                                {testimonial.initial}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-white text-sm">{testimonial.name}</h4>
-                                <p className="text-xs text-blue-400">{testimonial.cohort}</p>
+                            {/* User Info */}
+                            <div className="relative p-4 bg-black border-t border-zinc-800/50">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold border-2 border-zinc-700 group-hover:border-blue-500 transition-colors shadow-lg">
+                                  {testimonial.initial}
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-white text-sm">{testimonial.name}</h4>
+                                  <p className="text-xs text-blue-400">{testimonial.cohort}</p>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+                        </Link>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
 
               {/* Enhanced Previous Button */}
               <CarouselPrevious className="hidden lg:flex -left-12 bg-zinc-900 border-2 border-zinc-700 hover:bg-zinc-800 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] text-white h-12 w-12 backdrop-blur-sm transition-all duration-300 hover:scale-110" />
@@ -638,11 +641,10 @@ function Home() {
                 <button
                   key={index}
                   onClick={() => testimonialApi?.scrollTo(index)}
-                  className={`rounded-full transition-all duration-300 ${
-                    currentTestimonial === index
-                      ? 'w-8 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]'
-                      : 'w-2 h-2 bg-zinc-700 hover:bg-blue-400 hover:shadow-[0_0_8px_rgba(96,165,250,0.4)] hover:scale-125'
-                  }`}
+                  className={`rounded-full transition-all duration-300 ${currentTestimonial === index
+                    ? 'w-8 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]'
+                    : 'w-2 h-2 bg-zinc-700 hover:bg-blue-400 hover:shadow-[0_0_8px_rgba(96,165,250,0.4)] hover:scale-125'
+                    }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
@@ -731,11 +733,10 @@ function Home() {
                 <button
                   key={index}
                   onClick={() => api?.scrollTo(index)}
-                  className={`rounded-full transition-all duration-300 ${
-                    current === index
-                      ? 'w-8 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]'
-                      : 'w-2 h-2 bg-zinc-700 hover:bg-blue-400 hover:shadow-[0_0_8px_rgba(96,165,250,0.4)] hover:scale-125'
-                  }`}
+                  className={`rounded-full transition-all duration-300 ${current === index
+                    ? 'w-8 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]'
+                    : 'w-2 h-2 bg-zinc-700 hover:bg-blue-400 hover:shadow-[0_0_8px_rgba(96,165,250,0.4)] hover:scale-125'
+                    }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}

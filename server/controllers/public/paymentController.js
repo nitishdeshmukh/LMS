@@ -1,7 +1,4 @@
-import Payment from "../models/Payment.js";
-import User from "../models/User.js";
-import Course from "../models/Course.js";
-import Enrollment from "../models/Enrollment.js";
+import { Payment, User, Course, Enrollment } from "../../models/index.js";
 
 export const submitPaymentProof = async (req, res) => {
     try {
@@ -79,7 +76,7 @@ export const submitPaymentProof = async (req, res) => {
             screenshotUrl,
             amount: 500, // default or get from course
             currency: "INR",
-            status: "submitted",
+            status: "Submitted",
         });
 
         // Populate the response

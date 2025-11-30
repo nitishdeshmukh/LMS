@@ -1,5 +1,5 @@
 import express from "express";
-import { UserController } from "../../controllers/index.js";
+import { userController } from "../../controllers/public/index.js";
 import { StudentEnrollmentValidation } from "../../validation/index.js";
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 router.post(
     "/student-enrollment",
     StudentEnrollmentValidation.validateEnrollment,
-    UserController.createEnrollment
+    userController.createEnrollment
 );
 
 export default router;

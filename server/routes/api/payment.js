@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../../middlewares/uploadMiddleware.js";
-import { PaymentController } from "../../controllers/index.js";
+import { PaymentController } from "../../controllers/public/index.js";
 import { PaymentProofValidation } from "../../validation/index.js";
 
 const router = express.Router();

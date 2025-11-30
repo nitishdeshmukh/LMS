@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import connectDB from "../config/db.js";
 
 // Import all seed functions
-import { seedUsers, cleanUsers } from "./data/users.seed.js";
+import { seedUsers } from "./data/users.seed.js";
 import { seedCourses } from "./data/courses.seed.js";
 import { seedEnrollments } from "./data/enrollments.seed.js";
 import { seedReferrals } from "./data/referrals.seed.js";
@@ -15,17 +13,7 @@ import { seedLeaderboard } from "./data/leaderboard.seed.js";
 import { seedCertificates } from "./data/certificates.seed.js";
 import { seedAnalytics } from "./data/analytics.seed.js";
 
-// Load .env from root directory (parent of server folder)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
-
-// Clean entire database
-const cleanDatabase = async () => {
-    console.log("🗑️  Clearing entire database...");
-    await mongoose.connection.dropDatabase();
-    console.log("✅ Database cleared\n");
-};
+dotenv.config();
 
 const seedDatabase = async () => {
     try {
@@ -33,8 +21,36 @@ const seedDatabase = async () => {
         await connectDB();
         console.log("🔗 Connected to MongoDB\n");
 
-        // Always clear database before seeding
-        await cleanDatabase();
+        // Check if database should be cleared
+        const shouldClearDatabase =
+            process.env.CLEAR_DB === "true" ||
+            process.argv.includes("--clear") ||
+            process.argv.includes("-c") ||
+            true;
+
+        if (shouldClearDatabase) {
+            console.log("🗑️  Clearing existing data...");
+            await mongoose.connection.dropDatabase();
+            console.log("✅ Database cleared\n");
+        } else {
+            // Check if data already exists
+            const User = mongoose.model("User");
+            const existingUsers = await User.countDocuments();
+
+            if (existingUsers > 0) {
+                console.log("⚠️  WARNING: Database already contains data!");
+                console.log(`   Found ${existingUsers} users in the database.`);
+                console.log("\n   Options:");
+                console.log(
+                    "   1. Run with --clear flag: npm run seed -- --clear"
+                );
+                console.log("   2. Set CLEAR_DB=true in .env file");
+                console.log(
+                    "   3. Manually drop database in MongoDB Compass\n"
+                );
+                process.exit(1);
+            }
+        }
 
         console.log("🌱 Starting database seeding...\n");
 
@@ -151,13 +167,8 @@ const seedDatabase = async () => {
 
         console.log("🎯 You can now start your application with real data!");
         console.log("💡 Test credentials:");
-        console.log("   Admin Email: admin@example.com");
-        console.log("   Admin Password: Admin@123");
-        console.log("");
-        console.log("🔐 LMS Login Test Credentials:");
-        console.log("   LMS ID: LMS001 | Password: Lms@123");
-        console.log("   LMS ID: LMS002 | Password: Lms@123");
-        console.log("   LMS ID: LMS003 | Password: Lms@123");
+        console.log("   Email: admin@example.com");
+        console.log("   Password: Admin@123\n");
 
         process.exit(0);
     } catch (error) {

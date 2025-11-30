@@ -198,14 +198,12 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
     <div
       style={{
         width: '100%',
-        background: '#18181b', // bg-zinc-900 (Container background)
-        borderRadius: 12,
-        padding: 20,
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        background: '#18181b',
+        borderRadius: '20px', // bg-zinc-900 (Container background)
       }}
     >
       {/* Header and Filter Controls */}
-      <div
+      {/* <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -240,7 +238,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
             <input
               type="date"
               value={startDate}
-              onChange={e => handleDateChange('start', e.target.value)}
+              onChange={(e) => handleDateChange('start', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700
@@ -266,7 +264,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
             <input
               type="date"
               value={endDate}
-              onChange={e => handleDateChange('end', e.target.value)}
+              onChange={(e) => handleDateChange('end', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700
@@ -279,7 +277,7 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Chart Container */}
       <div
@@ -293,3 +291,4 @@ export default function ColumnChart({ data, height = 400, onDateChange }) {
     </div>
   );
 }
+

@@ -1,7 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Enrollment from "../../models/Enrollment.js";
-import User from "../../models/User.js";
-import Course from "../../models/Course.js";
+import { Enrollment, User, Course } from "../../models/index.js";
 
 // Sample colleges and courses (reuse from users seed)
 const colleges = [

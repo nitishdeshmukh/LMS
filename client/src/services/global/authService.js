@@ -170,6 +170,18 @@ const authService = {
     return response.data;
   },
 
+  // Login with email/password
+  login: async (email, password) => {
+    const response = await authApi.post('/auth/login', { email, password });
+    console.log('response :>> ', response);
+    if (response.data.success) {
+      const { accessToken, refreshToken, user } = response.data.data;
+      setTokens(accessToken, refreshToken);
+      setUser(user);
+    }
+    return response.data;
+  },
+
   // Login with LMS credentials
   lmsLogin: async (lmsId, lmsPassword) => {
     const response = await authApi.post('/auth/lms-login', { lmsId, lmsPassword });

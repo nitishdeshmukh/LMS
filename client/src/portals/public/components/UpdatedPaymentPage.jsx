@@ -10,8 +10,8 @@ import {
   Building,
   Hash,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Toaster } from '@/common/components/ui/sonner';
+import { toast } from "sonner"
+import { Toaster } from "@/common/components/ui/sonner"
 
 const EnrollmentPayment = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -61,14 +61,13 @@ const EnrollmentPayment = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
-
+    
     // Simulate API submission
     console.log('Submitting Payment Proof:', paymentData);
-
+    
     // Show success toast
-    toast.success('Thank you for the payment!', {
-      description:
-        'Your payment is being verified and your login credentials will be sent to your email within 24 hours.',
+    toast.success("Thank you for the payment!", {
+      description: "Your payment is being verified and your login credentials will be sent to your email within 24 hours.",
       icon: (
         <svg
           className="w-5 h-5 text-green-500"
@@ -103,8 +102,7 @@ const EnrollmentPayment = () => {
           <h2 className="text-3xl font-bold mb-4">Proof Submitted!</h2>
           <p className="text-zinc-400 mb-8">
             We have received your payment details. Our team will verify the transaction ID{' '}
-            <strong>{paymentData.transactionId}</strong> and send you the login credentials within
-            24 hours.
+            <strong>{paymentData.transactionId}</strong> and send you the login credentials within 24 hours.
           </p>
           <button
             onClick={() => (window.location.href = '/')}
@@ -121,7 +119,7 @@ const EnrollmentPayment = () => {
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white flex flex-col">
       {/* Add Toaster component here */}
       <Toaster position="top-center" duration={8000} />
-
+      
       <header className="h-20 border-b border-zinc-800 flex items-center px-8 bg-zinc-900/50 backdrop-blur-md">
         <span className="text-2xl font-bold tracking-tighter">
           LMS<span className="text-blue-500">PORTAL</span>

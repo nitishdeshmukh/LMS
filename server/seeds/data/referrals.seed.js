@@ -1,6 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Referral from "../../models/Referral.js";
-import User from "../../models/User.js";
+import { Referral, User } from "../../models/index.js";
 
 export const seedReferrals = async () => {
     // Get users who can be referrers (verified accounts with referral codes)

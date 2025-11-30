@@ -20,18 +20,19 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/common/components/ui/
 import { toast } from 'sonner';
 import { Toaster } from '@/common/components/ui/sonner';
 
+
 const PendingVerifications = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isVerifyPopoverOpen, setIsVerifyPopoverOpen] = useState(false);
   const [openPopoverId, setOpenPopoverId] = useState(null);
 
-  const handleVerifyStudent = studentData => {
+  const handleVerifyStudent = (studentData) => {
     // Close the popover
     setIsVerifyPopoverOpen(false);
     setOpenPopoverId(null);
 
     // Show toast notification
-    toast.success('Sending email to the student', {
+    toast.success("Sending email to the student", {
       description: `Verification email is being sent to ${studentData.email}`,
       icon: (
         <svg
@@ -311,10 +312,13 @@ const PendingVerifications = () => {
                   <TableCell>
                     <Popover
                       open={openPopoverId === student.id}
-                      onOpenChange={open => setOpenPopoverId(open ? student.id : null)}
+                      onOpenChange={(open) => setOpenPopoverId(open ? student.id : null)}
                     >
                       <PopoverTrigger asChild>
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
                           Verify
                         </Button>
                       </PopoverTrigger>
@@ -393,11 +397,10 @@ const PendingVerifications = () => {
                     variant={currentPage === page ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                    }`}
+                    className={`px-4 py-2 ${currentPage === page
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
+                      }`}
                   >
                     {page}
                   </Button>

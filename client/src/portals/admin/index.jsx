@@ -8,14 +8,12 @@ import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
 import Support from './pages/Support';
 import Courses from './pages/Courses';
-import AdminLogin from './pages/AdminLogin';
 
 const AdminPortal = () => {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
         <Route path="/" element={<AdminDashboard />} />
-        <Route path="/login" element={<AdminLogin />} />
         <Route path="/announcements" element={<Announcements />} />
         <Route path="/students" element={<Students />} />
         <Route path="/certificate" element={<CertificateManagement />} />

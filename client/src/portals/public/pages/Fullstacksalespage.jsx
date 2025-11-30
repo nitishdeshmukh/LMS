@@ -21,8 +21,9 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
-import { toast } from 'sonner';
-import { Toaster } from '@/common/components/ui/sonner';
+import { toast } from "sonner"
+import { Toaster } from "@/common/components/ui/sonner"
+
 
 const Fullstack = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,13 +34,13 @@ const Fullstack = () => {
 
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) {
-      toast.error('Please enter a coupon code', {
+      toast.error("Please enter a coupon code", {
         duration: 3000,
       });
       return;
     }
 
-    toast.success('You have applied the coupon code!', {
+    toast.success("You have applied the coupon code!", {
       description: `Coupon "${couponCode}" has been applied successfully.`,
       icon: (
         <svg
@@ -59,6 +60,7 @@ const Fullstack = () => {
       duration: 5000,
     });
   };
+
 
   // --- UPDATED DATA FOR FULL STACK ROADMAP ---
   const courseDetails = {
@@ -229,7 +231,7 @@ const Fullstack = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
       {/* --- NAVBAR --- */}
-      <Toaster position="top-center" duration={5000} />
+       <Toaster position="top-center" duration={5000} />
 
       {/* --- MAIN CONTAINER --- */}
       <div className="pt-20 pb-20">
@@ -445,8 +447,8 @@ const Fullstack = () => {
                       <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                         <input
                           type="text"
-                          value={couponCode} // Add this
-                          onChange={e => setCouponCode(e.target.value)} // Add this
+                          value={couponCode}  // Add this
+                          onChange={(e) => setCouponCode(e.target.value)}  // Add this
                           placeholder="Enter code"
                           className="bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm w-full focus:outline-none focus:border-blue-500 transition-colors"
                         />

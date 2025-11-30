@@ -88,7 +88,8 @@ const TermsOfService = () => {
                       <span className="shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
                         {item.icon}
                       </span>
-                      {item.title}
+                       {item.title } 
+                      
                     </button>
                   </li>
                 ))}
@@ -318,7 +319,7 @@ const TermsOfService = () => {
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 text-white font-bold">
                   7
                 </span>
-                <span className="text-white"> Limitation of Liability </span>
+                 <span className='text-white' > Limitation of Liability </span> 
               </h2>
               <div className="bg-zinc-900 rounded-lg p-6 space-y-4">
                 <p className="text-gray-300 leading-relaxed">

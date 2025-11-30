@@ -1,8 +1,6 @@
 import { faker } from "@faker-js/faker";
-import User from "../../models/User.js";
-import bcrypt from "bcryptjs";
+import { User } from "../../models/index.js";
 
-// Helper to generate college names
 const colleges = [
     "IIT Delhi",
     "IIT Bombay",
@@ -27,89 +25,50 @@ const courses = [
     "M.Tech",
     "B.Tech ECE",
 ];
+
 const years = ["1st Year", "2nd Year", "3rd Year", "4th Year", "Final Year"];
-
-// Helper to hash password (since insertMany doesn't trigger pre-save hooks)
-const hashPassword = async (password) => {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
-};
-
-// Clean all users from database
-export const cleanUsers = async () => {
-    const result = await User.deleteMany({});
-    console.log(`🗑️  Cleaned ${result.deletedCount} users from database`);
-    return result.deletedCount;
-};
 
 export const seedUsers = async () => {
     const users = [];
 
-    const hashedLmsPassword = await hashPassword("Lms@123");
-
-    // Create 1 admin
+    // ⭐ ADMIN USER
     users.push({
         email: "admin@example.com",
-        lmsId: "ADMIN001",
-        lmsPassword: hashedLmsPassword,
+        password: "Admin@123",
         name: "Admin",
-        middleName: "",
+        middleName: faker.person.middleName(),
         lastName: "User",
         phoneNumber: faker.phone.number("+91##########"),
         alternatePhone: faker.helpers.maybe(
             () => faker.phone.number("+91##########"),
             { probability: 0.3 }
         ),
+        collegeName: faker.helpers.arrayElement(colleges),
+        courseName: faker.helpers.arrayElement(courses),
+        yearOfStudy: faker.helpers.arrayElement(years),
         avatar: faker.image.avatar(),
+        linkedin: `https://linkedin.com/in/${faker.internet.username()}`,
+        github: `https://github.com/${faker.internet.username()}`,
+        portfolio: faker.helpers.maybe(() => faker.internet.url(), {
+            probability: 0.5,
+        }),
+        isProfileLocked: false,
+        xp: faker.number.int({ min: 1000, max: 5000 }),
+        streak: faker.number.int({ min: 0, max: 100 }),
+        lastStreakDate: faker.date.recent({ days: 7 }),
+        hoursLearned: faker.number.int({ min: 50, max: 500 }),
+        quizzesCompleted: faker.number.int({ min: 10, max: 100 }),
+        assignmentsCompleted: faker.number.int({ min: 5, max: 50 }),
         role: "admin",
+        accountStatus: "verified",
+        lmsId: `LMS${faker.string.alphanumeric(8).toUpperCase()}`,
+        lmsPassword: "Lms@123",
+        referralCount: faker.number.int({ min: 5, max: 30 }),
+        isPremiumUnlocked: true,
         lastLogin: faker.date.recent({ days: 1 }),
     });
 
-    // Create 3 test students with predictable LMS credentials for testing
-    const testStudents = [
-        {
-            email: "student1@example.com",
-            name: "Test",
-            lastName: "Student1",
-            lmsId: "LMS001",
-        },
-        {
-            email: "student2@example.com",
-            name: "Test",
-            lastName: "Student2",
-            lmsId: "LMS002",
-        },
-        {
-            email: "student3@example.com",
-            name: "Test",
-            lastName: "Student3",
-            lmsId: "LMS003",
-        },
-    ];
-
-    for (const testStudent of testStudents) {
-        users.push({
-            email: testStudent.email,
-            name: testStudent.name,
-            lastName: testStudent.lastName,
-            phoneNumber: faker.phone.number("+91##########"),
-            collegeName: faker.helpers.arrayElement(colleges),
-            courseName: faker.helpers.arrayElement(courses),
-            yearOfStudy: faker.helpers.arrayElement(years),
-            avatar: faker.image.avatar(),
-            xp: faker.number.int({ min: 500, max: 5000 }),
-            hoursLearned: faker.number.int({ min: 20, max: 100 }),
-            role: "student",
-            accountStatus: "verified",
-            lmsId: testStudent.lmsId,
-            lmsPassword: hashedLmsPassword,
-            referralCount: faker.number.int({ min: 0, max: 5 }),
-            isPremiumUnlocked: true,
-            lastLogin: faker.date.recent({ days: 3 }),
-        });
-    }
-
-    // Create 20-30 regular students with password auth
+    // ⭐ REGULAR STUDENTS
     const studentCount = faker.number.int({ min: 20, max: 30 });
 
     for (let i = 0; i < studentCount; i++) {
@@ -121,17 +80,16 @@ export const seedUsers = async () => {
             "verified",
             "verified",
             "blocked",
-        ]); // More verified
+        ]);
 
-        const hasLmsAccess = faker.datatype.boolean(0.7); // 70% have LMS access
-
-        const user = {
+        users.push({
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+            password: "Password@123",
             name: firstName,
             middleName: faker.helpers.maybe(() => faker.person.middleName(), {
                 probability: 0.4,
             }),
-            lastName: lastName,
+            lastName,
             phoneNumber: faker.phone.number("+91##########"),
             alternatePhone: faker.helpers.maybe(
                 () => faker.phone.number("+91##########"),
@@ -154,31 +112,39 @@ export const seedUsers = async () => {
             portfolio: faker.helpers.maybe(() => faker.internet.url(), {
                 probability: 0.3,
             }),
-            isProfileLocked: faker.datatype.boolean(0.1), // 10% locked
+            isProfileLocked: faker.datatype.boolean(0.1),
             xp: faker.number.int({ min: 0, max: 3000 }),
+            streak: faker.number.int({ min: 0, max: 50 }),
+            lastStreakDate: faker.helpers.maybe(
+                () => faker.date.recent({ days: 30 }),
+                { probability: 0.8 }
+            ),
             hoursLearned: faker.number.int({ min: 0, max: 200 }),
+            quizzesCompleted: faker.number.int({ min: 0, max: 50 }),
+            assignmentsCompleted: faker.number.int({ min: 0, max: 30 }),
             role: "student",
-            accountStatus: accountStatus,
-            lmsId: hasLmsAccess
-                ? `LMS${faker.string.alphanumeric(8).toUpperCase()}`
-                : undefined,
-            lmsPassword: hasLmsAccess ? hashedLmsPassword : undefined,
+            accountStatus,
+            lmsId: faker.helpers.maybe(
+                () => `LMS${faker.string.alphanumeric(8).toUpperCase()}`,
+                { probability: 0.7 }
+            ),
+            lmsPassword: faker.helpers.maybe(() => "Lms@123", {
+                probability: 0.7,
+            }),
             referredBy: faker.helpers.maybe(
                 () => `REFER-${faker.string.alphanumeric(4).toUpperCase()}`,
                 { probability: 0.3 }
             ),
             referralCount: faker.number.int({ min: 0, max: 10 }),
-            isPremiumUnlocked: faker.datatype.boolean(0.2), // 20% premium
+            isPremiumUnlocked: faker.datatype.boolean(0.2),
             lastLogin:
                 accountStatus === "verified"
                     ? faker.date.recent({ days: 30 })
                     : undefined,
-        };
-
-        users.push(user);
+        });
     }
 
-    // Create 5-10 Google OAuth users (no password)
+    // ⭐ GOOGLE USERS
     const googleUserCount = faker.number.int({ min: 5, max: 10 });
 
     for (let i = 0; i < googleUserCount; i++) {
@@ -187,9 +153,9 @@ export const seedUsers = async () => {
 
         users.push({
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
-            googleId: faker.string.numeric(21), // Google IDs are typically numeric
+            googleId: faker.string.numeric(21),
             name: firstName,
-            lastName: lastName,
+            lastName,
             avatar: faker.image.avatar(),
             phoneNumber: faker.helpers.maybe(
                 () => faker.phone.number("+91##########"),
@@ -207,7 +173,10 @@ export const seedUsers = async () => {
                 { probability: 0.4 }
             ),
             xp: faker.number.int({ min: 0, max: 2000 }),
+            streak: faker.number.int({ min: 0, max: 30 }),
             hoursLearned: faker.number.int({ min: 0, max: 150 }),
+            quizzesCompleted: faker.number.int({ min: 0, max: 40 }),
+            assignmentsCompleted: faker.number.int({ min: 0, max: 25 }),
             role: "student",
             accountStatus: "verified",
             isPremiumUnlocked: faker.datatype.boolean(0.15),
@@ -215,7 +184,7 @@ export const seedUsers = async () => {
         });
     }
 
-    // Create 3-5 GitHub OAuth users
+    // ⭐ GITHUB USERS
     const githubUserCount = faker.number.int({ min: 3, max: 5 });
 
     for (let i = 0; i < githubUserCount; i++) {
@@ -232,6 +201,7 @@ export const seedUsers = async () => {
             courseName: faker.helpers.arrayElement(courses),
             yearOfStudy: faker.helpers.arrayElement(years),
             xp: faker.number.int({ min: 0, max: 1500 }),
+            streak: faker.number.int({ min: 0, max: 25 }),
             hoursLearned: faker.number.int({ min: 0, max: 100 }),
             role: "student",
             accountStatus: "verified",
@@ -239,10 +209,16 @@ export const seedUsers = async () => {
         });
     }
 
-    await User.insertMany(users);
-    console.log(
-        `✅ ${users.length} users seeded (1 admin, ${testStudents.length} test students, ${studentCount} random students, ${googleUserCount} Google users, ${githubUserCount} GitHub users)`
-    );
+    // ⭐ SAVE WITH MIDDLEWARE (IMPORTANT)
+    let savedCount = 0;
 
-    return users;
+    for (const data of users) {
+        const doc = new User(data);
+        await doc.save(); // runs hashing + referral code + validation
+        savedCount++;
+    }
+
+    console.log(
+        `✅ ${savedCount} users seeded (1 admin, ${studentCount} students, ${googleUserCount} Google users, ${githubUserCount} GitHub users)`
+    );
 };

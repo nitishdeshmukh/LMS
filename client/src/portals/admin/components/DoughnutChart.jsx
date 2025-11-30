@@ -28,9 +28,11 @@ export default function DoughnutChart({
 
   // Default to start of current year and today
   const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
   );
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
 
   const handleDateChange = (type, value) => {
     if (type === 'start') setStartDate(value);
@@ -38,7 +40,10 @@ export default function DoughnutChart({
 
     // Trigger parent callback to reload/filter data based on new range
     if (onDateChange) {
-      onDateChange(type === 'start' ? value : startDate, type === 'end' ? value : endDate);
+      onDateChange(
+        type === 'start' ? value : startDate,
+        type === 'end' ? value : endDate
+      );
     }
   };
 
@@ -70,7 +75,7 @@ export default function DoughnutChart({
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
-      }),
+      })
     );
 
     // Create series
@@ -79,7 +84,7 @@ export default function DoughnutChart({
         valueField: 'value',
         categoryField: 'category',
         alignLabels: true,
-      }),
+      })
     );
 
     series.set('innerRadius', am5.percent(innerRadiusPercent));
@@ -103,7 +108,7 @@ export default function DoughnutChart({
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      }),
+      })
     );
 
     // Tooltip label styling
@@ -159,7 +164,7 @@ export default function DoughnutChart({
           x: am5.p50,
           layout: root.horizontalLayout,
           marginTop: 15,
-        }),
+        })
       );
 
       // Legend labels - light text
@@ -251,7 +256,7 @@ export default function DoughnutChart({
             <input
               type="date"
               value={startDate}
-              onChange={e => handleDateChange('start', e.target.value)}
+              onChange={(e) => handleDateChange('start', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700
@@ -277,7 +282,7 @@ export default function DoughnutChart({
             <input
               type="date"
               value={endDate}
-              onChange={e => handleDateChange('end', e.target.value)}
+              onChange={(e) => handleDateChange('end', e.target.value)}
               style={{
                 background: '#27272a', // zinc-800
                 border: '1px solid #3f3f46', // zinc-700

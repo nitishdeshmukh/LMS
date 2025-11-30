@@ -46,14 +46,7 @@ export const enrollmentSchema = z.object({
             message: "Please select a valid year of study",
         }),
 
-    // Contact Info
-    email: z
-        .string()
-        .trim()
-        .toLowerCase()
-        .min(5, "Email is required")
-        .max(100, "Email must not exceed 100 characters")
-        .email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
 
     phoneNumber: z
         .string()
@@ -62,7 +55,7 @@ export const enrollmentSchema = z.object({
         .max(15, "Phone number must not exceed 15 digits")
         .regex(
             /^\+?[1-9]\d{9,14}$/,
-            "Please enter a valid phone number (e.g., +919876543210)"
+            "Please enter a valid phone number (e.g., +91XXXXXXXXXX)"
         ),
 
     alternatePhone: z
@@ -101,35 +94,5 @@ export const validateEnrollment = (req, res, next) => {
             message: "An unexpected error occurred during validation",
             error: error?.message || "Unknown error",
         });
-    }
-};
-
-// Optional: Separate schema for updating enrollment (partial fields)
-export const updateEnrollmentSchema = enrollmentSchema.partial();
-
-export const validateUpdateEnrollment = (req, res, next) => {
-    try {
-        const validatedData = updateEnrollmentSchema.parse(req.body);
-        req.validatedData = validatedData;
-        next();
-    } catch (error) {
-        console.error("Update validation error:", error);
-
-        if (error instanceof z.ZodError) {
-            return res.status(400).json({
-                success: false,
-                message: "Validation failed",
-                errors: error.issues.map((issue) => ({
-                    field: issue.path.join("."),
-                    message: issue.message,
-                })),
-            });
-        }
-
-        // return res.status(500).json({
-        //     success: false,
-        //     message: "An unexpected error occurred during validation",
-        //     error: error?.message || "Unknown error",
-        // });
     }
 };

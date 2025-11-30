@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 // Quiz questions
 const questionSchema = new mongoose.Schema(
@@ -78,37 +79,40 @@ const capstoneSchema = new mongoose.Schema(
 );
 
 const courseSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true, unique: true },
-    slug: { type: String, lowercase: true, index: true },
-    description: { type: String, required: true },
-    thumbnail: { type: String },
+    {
+        title: { type: String, required: true, unique: true },
+        slug: { type: String, lowercase: true, index: true },
+        description: { type: String, required: true },
+        thumbnail: { type: String },
 
-    stream: { type: String, required: true, index: true },
-    level: {
-      type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
-      default: "Beginner",
+        stream: { type: String, required: true, index: true },
+        level: {
+            type: String,
+            enum: ["Beginner", "Intermediate", "Advanced"],
+            default: "Beginner",
+        },
+
+        price: { type: Number, default: 500 },
+        discountedPrice: { type: Number },
+
+        modules: [moduleSchema],
+        capstoneProjects: [capstoneSchema],
+
+        totalDuration: { type: String },
+        enrolledCount: { type: Number, default: 0, index: true },
+        isPublished: { type: Boolean, default: false, index: true },
+
+        courseVersion: { type: String, default: "1.0.0" },
+        tags: [{ type: String }],
+        difficultyIndex: { type: Number, default: 1, min: 0, max: 5 },
+
+        instructor: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },
-
-    price: { type: Number, default: 500 },
-    discountedPrice: { type: Number },
-
-    modules: [moduleSchema],
-    capstoneProjects: [capstoneSchema],
-
-    totalDuration: { type: String },
-    enrolledCount: { type: Number, default: 0, index: true },
-    isPublished: { type: Boolean, default: false, index: true },
-
-    courseVersion: { type: String, default: "1.0.0" },
-    tags: [{ type: String }],
-    difficultyIndex: { type: Number, default: 1, min: 0, max: 5 },
-
-    instructor: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
+
+
+courseSchema.plugin(aggregatePaginate);
 
 // Auto slug if missing
 courseSchema.pre("validate", function (next) {

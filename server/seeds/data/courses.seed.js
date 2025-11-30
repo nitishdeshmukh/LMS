@@ -1,6 +1,5 @@
 import { faker } from "@faker-js/faker";
-import Course from "../../models/Course.js";
-import User from "../../models/User.js";
+import { Course, User } from "../../models/index.js";
 
 // Streams and their related tags
 const streams = {

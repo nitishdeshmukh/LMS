@@ -312,7 +312,15 @@ const EnrollmentsTable = () => {
   return (
     <>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden w-full space-y-4">
-        <Toaster position="top-center" />
+        <div className="w-full h-11 p-3">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-1">All Student Enrollments</h2>
+            <p className="text-sm text-zinc-400">
+              Displays a comprehensive list of all students, including both active and inactive
+              enrollments.
+            </p>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-3 px-2 py-6">
           <div className="w-44">
             <Filter column={table.getColumn('studentName')} />
@@ -408,3 +416,4 @@ const EnrollmentsTable = () => {
 };
 
 export default EnrollmentsTable;
+
