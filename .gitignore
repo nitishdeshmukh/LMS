@@ -18,3 +18,4 @@ client/dist/
 client/.env.local
 .env
 postman
+/server/seeds/data/courses

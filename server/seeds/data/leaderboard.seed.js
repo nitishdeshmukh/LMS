@@ -20,16 +20,29 @@ export const seedLeaderboard = async () => {
     const leaderboardEntries = [];
 
     // ==================== GLOBAL LEADERBOARD ====================
-    // Use student's XP from Student model as the global score
-    const globalEntries = students.map((student) => ({
-        student: student._id,
-        score: student.xp || faker.number.int({ min: 0, max: 5000 }),
-        type: "global",
-        createdAt: faker.date.past({ years: 1 }),
-    }));
+    // Use student's XP from Student model as the global xp
+    // Model uses: xp, streak, hoursLearned, quizzesCompleted, assignmentsCompleted
+    const globalEntries = students.map((student) => {
+        const xpValue = student.xp || faker.number.int({ min: 100, max: 5000 });
+        const streakValue = faker.number.int({ min: 0, max: 30 });
+        const hoursValue = faker.number.float({ min: 1, max: 100, fractionDigits: 1 });
+        const quizzesValue = faker.number.int({ min: 0, max: 50 });
+        const assignmentsValue = faker.number.int({ min: 0, max: 30 });
 
-    // Sort by score descending and assign ranks
-    globalEntries.sort((a, b) => b.score - a.score);
+        return {
+            student: student._id,
+            xp: xpValue,
+            streak: streakValue,
+            hoursLearned: hoursValue,
+            quizzesCompleted: quizzesValue,
+            assignmentsCompleted: assignmentsValue,
+            type: "global",
+            createdAt: faker.date.past({ years: 1 }),
+        };
+    });
+
+    // Sort by xp descending and assign ranks
+    globalEntries.sort((a, b) => b.xp - a.xp);
     globalEntries.forEach((entry, index) => {
         entry.rank = index + 1;
     });
@@ -50,17 +63,20 @@ export const seedLeaderboard = async () => {
             const courseEntries = enrollments.map((enrollment) => {
                 const student = enrollment.student;
 
-                // Calculate course score based on student's activity
-                // Combine various metrics for a realistic score
-                const baseScore = faker.number.int({ min: 0, max: 1000 });
-                const quizBonus = (student.quizzesCompleted || 0) * 10;
-                const assignmentBonus =
-                    (student.assignmentsCompleted || 0) * 15;
-                const hoursBonus = Math.floor((student.hoursLearned || 0) * 2);
-                const streakBonus = (student.streak || 0) * 5;
+                // Calculate course xp based on student's activity
+                // Combine various metrics for a realistic xp
+                const baseXp = faker.number.int({ min: 100, max: 1000 });
+                const quizzesValue = faker.number.int({ min: 0, max: 20 });
+                const assignmentsValue = faker.number.int({ min: 0, max: 10 });
+                const quizBonus = quizzesValue * 10;
+                const assignmentBonus = assignmentsValue * 50;
+                const streakValue = faker.number.int({ min: 0, max: 15 });
+                const hoursValue = faker.number.float({ min: 0.5, max: 40, fractionDigits: 1 });
+                const hoursBonus = Math.floor(hoursValue * 2);
+                const streakBonus = streakValue * 5;
 
-                const totalScore =
-                    baseScore +
+                const totalXp =
+                    baseXp +
                     quizBonus +
                     assignmentBonus +
                     hoursBonus +
@@ -69,7 +85,11 @@ export const seedLeaderboard = async () => {
                 return {
                     student: student._id,
                     course: course._id,
-                    score: totalScore,
+                    xp: totalXp,
+                    streak: streakValue,
+                    hoursLearned: hoursValue,
+                    quizzesCompleted: quizzesValue,
+                    assignmentsCompleted: assignmentsValue,
                     type: "course",
                     createdAt: faker.date.between({
                         from:
@@ -80,8 +100,8 @@ export const seedLeaderboard = async () => {
                 };
             });
 
-            // Sort by score descending and assign ranks for this course
-            courseEntries.sort((a, b) => b.score - a.score);
+            // Sort by xp descending and assign ranks for this course
+            courseEntries.sort((a, b) => b.xp - a.xp);
             courseEntries.forEach((entry, index) => {
                 entry.rank = index + 1;
             });
@@ -121,7 +141,7 @@ export const seedLeaderboard = async () => {
         const entries = leaderboardEntries.filter(
             (e) => e.course?.toString() === courseId
         );
-        entries.sort((a, b) => b.score - a.score);
+        entries.sort((a, b) => b.xp - a.xp);
         entries.forEach((entry, index) => {
             entry.rank = index + 1;
         });
@@ -151,7 +171,7 @@ export const seedLeaderboard = async () => {
     console.log("   🏆 Top 3 Global Leaders:");
     top3.forEach((entry, idx) => {
         console.log(
-            `      ${idx + 1}. ${entry.student.name} - ${entry.score} XP`
+            `      ${idx + 1}. ${entry.student.name} - ${entry.xp} XP`
         );
     });
 };

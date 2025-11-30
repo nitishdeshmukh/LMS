@@ -1,9 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Submission, Student, Course, Enrollment } from "../../models/index.js";
 
-// Sample lesson IDs (you can adjust based on your actual Course structure)
-const generateLessonId = () => faker.database.mongodbObjectId();
-
 // Sample feedback messages
 const feedbackMessages = [
     "Great work! Your solution is well-structured and efficient.",
@@ -20,6 +17,36 @@ const feedbackMessages = [
 
 // Grade options
 const grades = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "D", "F"];
+
+// Helper to get all quizzes and tasks from a course
+const getQuizzesAndTasks = (course) => {
+    const quizzes = [];
+    const tasks = [];
+
+    course.modules.forEach((module) => {
+        if (module.quizzes) {
+            module.quizzes.forEach((quiz) => {
+                quizzes.push({
+                    id: quiz._id,
+                    title: quiz.title,
+                    moduleId: module._id,
+                    questionCount: quiz.questions?.length || 5
+                });
+            });
+        }
+        if (module.tasks) {
+            module.tasks.forEach((task) => {
+                tasks.push({
+                    id: task._id,
+                    title: task.title,
+                    moduleId: module._id
+                });
+            });
+        }
+    });
+
+    return { quizzes, tasks };
+};
 
 export const seedSubmissions = async () => {
     // Get all students, courses, and enrollments
@@ -44,25 +71,94 @@ export const seedSubmissions = async () => {
 
     // Create submissions for each enrollment
     for (const enrollment of enrollments) {
-        const submissionCount = faker.number.int({ min: 3, max: 12 });
+        // Get the actual quizzes and tasks from the course
+        const { quizzes, tasks } = getQuizzesAndTasks(enrollment.course);
+        
+        if (quizzes.length === 0 && tasks.length === 0) continue;
 
-        for (let i = 0; i < submissionCount; i++) {
-            const isAssignment = faker.datatype.boolean(0.6); // 60% assignments, 40% quizzes
+        // Create submissions for some quizzes (60-100% of available)
+        const quizSubmissionCount = Math.floor(quizzes.length * faker.number.float({ min: 0.6, max: 1 }));
+        const selectedQuizzes = faker.helpers.arrayElements(quizzes, quizSubmissionCount);
+
+        for (const quiz of selectedQuizzes) {
             const status = faker.helpers.arrayElement([
                 "submitted",
                 "graded",
                 "graded",
                 "graded",
                 "graded",
-                "rejected",
             ]); // More graded submissions
 
             const submission = {
                 enrollment: enrollment._id,
                 student: enrollment.student._id,
                 course: enrollment.course._id,
-                lessonId: generateLessonId(),
-                type: isAssignment ? "assignment" : "quiz",
+                quizId: quiz.id,
+                moduleId: quiz.moduleId,
+                type: "quiz",
+                status: status,
+                createdAt: faker.date.between({
+                    from:
+                        enrollment.createdAt ||
+                        new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+                    to: new Date(),
+                }),
+            };
+
+            // Quiz-specific fields
+            const totalQuestions = quiz.questionCount || faker.helpers.arrayElement([5, 10, 15]);
+            const scorePercentage = faker.number.float({
+                min: 0.4,
+                max: 1,
+                fractionDigits: 2,
+            });
+
+            submission.totalQuestions = totalQuestions;
+            submission.quizScore = Math.floor(totalQuestions * scorePercentage);
+
+            // Graded submissions have grade and feedback
+            if (status === "graded") {
+                const percentage = (submission.quizScore / submission.totalQuestions) * 100;
+                if (percentage >= 90)
+                    submission.grade = faker.helpers.arrayElement(["A+", "A"]);
+                else if (percentage >= 80)
+                    submission.grade = faker.helpers.arrayElement(["A-", "B+"]);
+                else if (percentage >= 70)
+                    submission.grade = faker.helpers.arrayElement(["B", "B-"]);
+                else if (percentage >= 60)
+                    submission.grade = faker.helpers.arrayElement(["C+", "C"]);
+                else
+                    submission.grade = faker.helpers.arrayElement(["D", "F"]);
+
+                submission.feedback = faker.helpers.maybe(
+                    () => faker.helpers.arrayElement(feedbackMessages),
+                    { probability: 0.6 }
+                );
+            }
+
+            submissions.push(submission);
+        }
+
+        // Create submissions for some tasks (50-100% of available)
+        const taskSubmissionCount = Math.floor(tasks.length * faker.number.float({ min: 0.5, max: 1 }));
+        const selectedTasks = faker.helpers.arrayElements(tasks, taskSubmissionCount);
+
+        for (const task of selectedTasks) {
+            const status = faker.helpers.arrayElement([
+                "submitted",
+                "graded",
+                "graded",
+                "graded",
+                "rejected",
+            ]);
+
+            const submission = {
+                enrollment: enrollment._id,
+                student: enrollment.student._id,
+                course: enrollment.course._id,
+                taskId: task.id,
+                moduleId: task.moduleId,
+                type: "assignment",
                 status: status,
                 createdAt: faker.date.between({
                     from:
@@ -73,85 +169,21 @@ export const seedSubmissions = async () => {
             };
 
             // Assignment-specific fields
-            if (isAssignment) {
-                submission.fileUrl = faker.helpers.maybe(
-                    () =>
-                        `https://storage.example.com/assignments/${faker.string.uuid()}.pdf`,
-                    { probability: 0.7 }
-                );
-                submission.githubLink = faker.helpers.maybe(
-                    () =>
-                        `https://github.com/${faker.internet.username()}/${faker.word.noun()}-${faker.word.verb()}`,
-                    { probability: 0.5 }
-                );
-            }
-
-            // Quiz-specific fields
-            if (!isAssignment) {
-                const totalQuestions = faker.helpers.arrayElement([
-                    10, 15, 20, 25, 30,
-                ]);
-                const scorePercentage =
-                    status === "graded"
-                        ? faker.number.float({
-                              min: 0.3,
-                              max: 1,
-                              fractionDigits: 2,
-                          })
-                        : faker.number.float({
-                              min: 0.5,
-                              max: 1,
-                              fractionDigits: 2,
-                          });
-
-                submission.totalQuestions = totalQuestions;
-                submission.quizScore = Math.floor(
-                    totalQuestions * scorePercentage
-                );
-            }
+            submission.fileUrl = faker.helpers.maybe(
+                () =>
+                    `https://storage.example.com/assignments/${faker.string.uuid()}.pdf`,
+                { probability: 0.7 }
+            );
+            submission.githubLink = faker.helpers.maybe(
+                () =>
+                    `https://github.com/${faker.internet.username()}/${faker.word.noun()}-${faker.word.verb()}`,
+                { probability: 0.5 }
+            );
 
             // Graded submissions have grade and feedback
             if (status === "graded") {
-                if (isAssignment) {
-                    submission.grade = faker.helpers.arrayElement(grades);
-                    submission.feedback =
-                        faker.helpers.arrayElement(feedbackMessages);
-                } else {
-                    // Quiz grade based on score
-                    const percentage =
-                        (submission.quizScore / submission.totalQuestions) *
-                        100;
-                    if (percentage >= 90)
-                        submission.grade = faker.helpers.arrayElement([
-                            "A+",
-                            "A",
-                        ]);
-                    else if (percentage >= 80)
-                        submission.grade = faker.helpers.arrayElement([
-                            "A-",
-                            "B+",
-                        ]);
-                    else if (percentage >= 70)
-                        submission.grade = faker.helpers.arrayElement([
-                            "B",
-                            "B-",
-                        ]);
-                    else if (percentage >= 60)
-                        submission.grade = faker.helpers.arrayElement([
-                            "C+",
-                            "C",
-                        ]);
-                    else
-                        submission.grade = faker.helpers.arrayElement([
-                            "D",
-                            "F",
-                        ]);
-
-                    submission.feedback = faker.helpers.maybe(
-                        () => faker.helpers.arrayElement(feedbackMessages),
-                        { probability: 0.6 }
-                    );
-                }
+                submission.grade = faker.helpers.arrayElement(grades);
+                submission.feedback = faker.helpers.arrayElement(feedbackMessages);
             }
 
             // Rejected submissions might have feedback
@@ -169,26 +201,13 @@ export const seedSubmissions = async () => {
         }
     }
 
-    // Add some submissions without all optional fields (edge cases)
-    const incompleteSubmissions = faker.number.int({ min: 5, max: 10 });
-
-    for (let i = 0; i < incompleteSubmissions && i < enrollments.length; i++) {
-        const enrollment = faker.helpers.arrayElement(enrollments);
-
-        submissions.push({
-            enrollment: enrollment._id,
-            student: enrollment.student._id,
-            course: enrollment.course._id,
-            lessonId: generateLessonId(),
-            type: "assignment",
-            status: "submitted",
-            // No fileUrl or githubLink (incomplete)
-            createdAt: faker.date.recent({ days: 7 }),
-        });
-    }
-
     await Submission.insertMany(submissions);
-    console.log(
-        `✅ ${submissions.length} submissions seeded (assignments and quizzes)`
-    );
+    
+    const quizSubmissions = submissions.filter(s => s.type === "quiz").length;
+    const assignmentSubmissions = submissions.filter(s => s.type === "assignment").length;
+    const gradedSubmissions = submissions.filter(s => s.status === "graded").length;
+    
+    console.log(`✅ ${submissions.length} submissions seeded`);
+    console.log(`   📝 Quizzes: ${quizSubmissions}, Assignments: ${assignmentSubmissions}`);
+    console.log(`   ✅ Graded: ${gradedSubmissions}`);
 };

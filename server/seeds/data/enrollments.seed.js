@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Enrollment, Student, Course } from "../../models/index.js";
+import mongoose from "mongoose";
 
 // Sample colleges and courses (reuse from users seed)
 const colleges = [
@@ -37,11 +38,39 @@ const generateLmsPassword = () =>
 const generateCertificateId = () =>
     `CERT-${faker.string.alphanumeric(12).toUpperCase()}`;
 
-// Generate fake lesson ObjectIds
-const generateLessonIds = (count) => {
-    return Array.from({ length: count }, () =>
-        faker.database.mongodbObjectId()
+// Helper to get quiz IDs, task IDs, and module IDs from a course
+const getCourseProgress = (course, progressPercentage) => {
+    const allQuizIds = [];
+    const allTaskIds = [];
+    const allModuleIds = [];
+
+    // Collect all IDs from course modules
+    course.modules.forEach((module) => {
+        allModuleIds.push(module._id);
+        if (module.quizzes) {
+            module.quizzes.forEach((quiz) => allQuizIds.push(quiz._id));
+        }
+        if (module.tasks) {
+            module.tasks.forEach((task) => allTaskIds.push(task._id));
+        }
+    });
+
+    // Calculate how many are completed based on progress
+    const completedQuizCount = Math.floor(
+        (progressPercentage / 100) * allQuizIds.length
     );
+    const completedTaskCount = Math.floor(
+        (progressPercentage / 100) * allTaskIds.length
+    );
+    const completedModuleCount = Math.floor(
+        (progressPercentage / 100) * allModuleIds.length
+    );
+
+    return {
+        completedQuizzes: allQuizIds.slice(0, completedQuizCount),
+        completedTasks: allTaskIds.slice(0, completedTaskCount),
+        completedModules: allModuleIds.slice(0, completedModuleCount),
+    };
 };
 
 export const seedEnrollments = async () => {
@@ -132,6 +161,7 @@ export const seedEnrollments = async () => {
                 },
                 paymentStatus: paymentStatus,
                 enrollmentDate: enrollmentDate,
+                status: paymentStatus === "paid" ? "active" : "pending",
             };
 
             // Add transaction details for paid/refunded enrollments
@@ -162,11 +192,8 @@ export const seedEnrollments = async () => {
             }
 
             // Progress tracking for paid enrollments
+            // Uses completedQuizzes, completedTasks, completedModules (ObjectId arrays)
             if (paymentStatus === "paid" && daysSinceEnrollment > 7) {
-                // Assume course has 10-30 lessons
-                const totalLessons = faker.number.int({ min: 10, max: 30 });
-                const allLessonIds = generateLessonIds(totalLessons);
-
                 // Progress based on days since enrollment
                 let progressPercentage;
                 if (daysSinceEnrollment > 180) {
@@ -182,25 +209,16 @@ export const seedEnrollments = async () => {
                     progressPercentage = faker.number.int({ min: 0, max: 30 });
                 }
 
-                const completedCount = Math.floor(
-                    (progressPercentage / 100) * totalLessons
-                );
-                enrollment.completedLessons = allLessonIds.slice(
-                    0,
-                    completedCount
-                );
+                // Get completed items based on actual course structure
+                const progress = getCourseProgress(course, progressPercentage);
+                enrollment.completedQuizzes = progress.completedQuizzes;
+                enrollment.completedTasks = progress.completedTasks;
+                enrollment.completedModules = progress.completedModules;
                 enrollment.progressPercentage = progressPercentage;
-
-                // Set last accessed lesson
-                if (completedCount > 0) {
-                    enrollment.lastAccessedLesson =
-                        allLessonIds[
-                            Math.min(completedCount, totalLessons - 1)
-                        ];
-                }
 
                 // Mark as completed if 100% progress
                 if (progressPercentage === 100) {
+                    enrollment.status = "completed";
                     enrollment.isCompleted = true;
                     enrollment.completionDate = faker.date.between({
                         from: enrollmentDate,
@@ -208,6 +226,12 @@ export const seedEnrollments = async () => {
                     });
                     enrollment.certificateId = generateCertificateId();
                 }
+            } else {
+                // Initialize empty arrays for new enrollments
+                enrollment.completedQuizzes = [];
+                enrollment.completedTasks = [];
+                enrollment.completedModules = [];
+                enrollment.progressPercentage = 0;
             }
 
             enrollments.push(enrollment);
@@ -246,8 +270,12 @@ export const seedEnrollments = async () => {
                 phoneNumber: phoneNumber, // FIXED: Always has a value
             },
             paymentStatus: "pending",
+            status: "pending",
             enrollmentDate: faker.date.recent({ days: 30 }),
             progressPercentage: 0,
+            completedQuizzes: [],
+            completedTasks: [],
+            completedModules: [],
         });
     }
 

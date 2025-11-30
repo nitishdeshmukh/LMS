@@ -20,7 +20,14 @@ const submissionSchema = new mongoose.Schema(
             required: true,
         },
 
-        lessonId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        // Reference to the module containing the quiz/task
+        moduleId: { type: mongoose.Schema.Types.ObjectId, required: true },
+
+        // For quiz submissions
+        quizId: { type: mongoose.Schema.Types.ObjectId },
+
+        // For task/assignment submissions
+        taskId: { type: mongoose.Schema.Types.ObjectId },
 
         type: { type: String, enum: ["assignment", "quiz"], required: true },
 

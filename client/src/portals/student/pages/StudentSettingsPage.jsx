@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Shield, Lock, LogOut, User, Loader2 } from 'lucide-react';
-import { useProfile, useUpdatePrivacy, useChangePassword } from '../hooks';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+
+import { useProfile, useUpdatePrivacy, useChangePassword } from '../hooks';
+
 import { logout } from '@/redux/slice';
 
 // Reusing Sidebar Layout
