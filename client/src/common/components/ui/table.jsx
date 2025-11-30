@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { cn } from '@/common/lib/utils';
 
@@ -67,3 +67,4 @@ const TableCaption = React.forwardRef(({ className, ...props }, ref) => (
 TableCaption.displayName = 'TableCaption';
 
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+

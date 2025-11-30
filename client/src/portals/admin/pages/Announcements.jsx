@@ -38,53 +38,113 @@ const initialAnnouncements = [
   },
 ];
 
+const statusOptions = ['Published', 'Draft'];
+const sortByOptions = ['Latest', 'Oldest', 'Title'];
+
 export default function Announcements() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [status, setStatus] = useState('Published');
+  const [status, setStatus] = useState(null); // Changed to null for placeholder
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
-  const [filterStatus, setFilterStatus] = useState('All Status');
-  const [sortBy, setSortBy] = useState('Latest');
+  const [filterStatus, setFilterStatus] = useState(null); // Changed to null
+  const [sortBy, setSortBy] = useState(null); // Changed to null
+  const [editingId, setEditingId] = useState(null);
 
-  const handlePublish = () => {
-    if (!title || !content) return;
-    setAnnouncements([
-      ...announcements,
-      {
-        id: announcements.length + 1,
-        title,
-        content,
-        status,
-        date: new Date().toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        }),
-        author: 'Admin',
-      },
-    ]);
+  const handleContinue = () => {
+    if (!title || !content || !status) return;
+
+    if (editingId) {
+      // Update existing announcement
+      setAnnouncements(
+        announcements.map(a =>
+          a.id === editingId
+            ? {
+                ...a,
+                title,
+                content,
+                status,
+              }
+            : a,
+        ),
+      );
+      setEditingId(null);
+    } else {
+      // Create new announcement
+      setAnnouncements([
+        ...announcements,
+        {
+          id: announcements.length + 1,
+          title,
+          content,
+          status,
+          date: new Date().toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          }),
+          author: 'Admin',
+        },
+      ]);
+    }
+
+    // Reset form
     setTitle('');
     setContent('');
-    setStatus('Published');
+    setStatus(null);
   };
 
   const handleEdit = id => {
-    console.log('Edit announcement:', id);
+    const announcement = announcements.find(a => a.id === id);
+    if (announcement) {
+      setTitle(announcement.title);
+      setContent(announcement.content);
+      setStatus(announcement.status);
+      setEditingId(id);
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleCancel = () => {
+    setTitle('');
+    setContent('');
+    setStatus(null);
+    setEditingId(null);
   };
 
   const handleDelete = id => {
     setAnnouncements(announcements.filter(a => a.id !== id));
+    // If deleting the announcement being edited, clear the form
+    if (editingId === id) {
+      handleCancel();
+    }
   };
 
   const filteredAnnouncements = announcements.filter(a =>
-    filterStatus === 'All Status' ? true : a.status === filterStatus,
+    filterStatus ? a.status === filterStatus : true,
   );
+
+  // Sort announcements
+  const sortedAnnouncements = [...filteredAnnouncements].sort((a, b) => {
+    if (!sortBy || sortBy === 'Latest') {
+      return new Date(b.date) - new Date(a.date);
+    }
+    if (sortBy === 'Oldest') {
+      return new Date(a.date) - new Date(b.date);
+    }
+    if (sortBy === 'Title') {
+      return a.title.localeCompare(b.title);
+    }
+    return 0;
+  });
 
   return (
     <div className="flex-1 overflow-y-auto p-8">
-      {/* New Announcement Form */}
+      {/* New/Edit Announcement Form */}
       <div className="bg-zinc-800 border border-zinc-700 rounded-2xl shadow p-6 mb-10">
-        <h2 className="font-bold text-lg mb-5 text-zinc-100">Create a New Announcement</h2>
+        <h2 className="font-bold text-lg mb-5 text-zinc-100">
+          {editingId ? 'Edit Announcement' : 'Create a New Announcement'}
+        </h2>
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-zinc-300 mb-2">Title</label>
@@ -101,25 +161,24 @@ export default function Announcements() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-between bg-zinc-900 border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                  className="w-full flex items-center justify-between bg-zinc-900 border-zinc-700 hover:bg-zinc-800 py-5"
                 >
-                  {status}
+                  <span className={status ? 'text-zinc-200' : 'text-zinc-400'}>
+                    {status || 'Choose Status'}
+                  </span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-40 bg-zinc-800 border-zinc-700">
-                <DropdownMenuItem
-                  onClick={() => setStatus('Published')}
-                  className="text-zinc-200 hover:bg-zinc-700"
-                >
-                  Published
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setStatus('Draft')}
-                  className="text-zinc-200 hover:bg-zinc-700"
-                >
-                  Draft
-                </DropdownMenuItem>
+                {statusOptions.map(option => (
+                  <DropdownMenuItem
+                    key={option}
+                    onSelect={() => setStatus(option)}
+                    className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  >
+                    {option}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -133,75 +192,96 @@ export default function Announcements() {
             onChange={e => setContent(e.target.value)}
           />
         </div>
-        <Button onClick={handlePublish} className="bg-blue-600 text-white hover:bg-blue-700">
-          Publish Announcement
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={handleContinue} className="bg-blue-600 text-white hover:bg-blue-700">
+            {editingId ? 'Update Announcement' : 'Continue'}
+          </Button>
+          {editingId && (
+            <Button
+              onClick={handleCancel}
+              variant="outline"
+              className="border-zinc-700 text-zinc-700 hover:shadow-2xl"
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Filter Section */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
+          {/* Status Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700"
+                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 min-w-[160px] justify-between"
               >
-                {filterStatus}
+                <span className={filterStatus ? 'text-zinc-200' : 'text-zinc-400'}>
+                  {filterStatus || 'Filter by Status'}
+                </span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
-              <DropdownMenuItem
-                onClick={() => setFilterStatus('All Status')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                All Status
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setFilterStatus('Published')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                Published
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setFilterStatus('Draft')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                Draft
-              </DropdownMenuItem>
+              {statusOptions.map(option => (
+                <DropdownMenuItem
+                  key={option}
+                  className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  onSelect={() => setFilterStatus(option)}
+                >
+                  {option}
+                </DropdownMenuItem>
+              ))}
+              {filterStatus && (
+                <>
+                  <div className="h-px bg-zinc-700 my-1" />
+                  <DropdownMenuItem
+                    className="text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                    onSelect={() => setFilterStatus(null)}
+                  >
+                    Clear Filter
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Sort By Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700"
+                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 min-w-[160px] justify-between"
               >
-                Sort by: {sortBy}
+                <span className={sortBy ? 'text-zinc-200' : 'text-zinc-400'}>
+                  {sortBy ? `Sort by: ${sortBy}` : 'Sort by'}
+                </span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
-              <DropdownMenuItem
-                onClick={() => setSortBy('Latest')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                Latest
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSortBy('Oldest')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                Oldest
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSortBy('Title')}
-                className="text-zinc-200 hover:bg-zinc-700"
-              >
-                Title
-              </DropdownMenuItem>
+              {sortByOptions.map(option => (
+                <DropdownMenuItem
+                  key={option}
+                  className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  onSelect={() => setSortBy(option)}
+                >
+                  {option}
+                </DropdownMenuItem>
+              ))}
+              {sortBy && (
+                <>
+                  <div className="h-px bg-zinc-700 my-1" />
+                  <DropdownMenuItem
+                    className="text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                    onSelect={() => setSortBy(null)}
+                  >
+                    Clear Filter
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -210,10 +290,12 @@ export default function Announcements() {
       {/* Existing Announcements */}
       <h2 className="font-bold text-lg mb-4 text-zinc-100">Existing Announcements</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {filteredAnnouncements.map(a => (
+        {sortedAnnouncements.map(a => (
           <div
             key={a.id}
-            className="bg-zinc-800 border border-zinc-700 rounded-2xl shadow p-4 flex flex-col hover:border-zinc-600 transition-all"
+            className={`bg-zinc-800 border ${
+              editingId === a.id ? 'border-blue-500' : 'border-zinc-700'
+            } rounded-2xl shadow p-4 flex flex-col hover:border-zinc-600 transition-all`}
           >
             <div className="flex justify-between items-center mb-1">
               <div className="font-semibold text-zinc-100">{a.title}</div>
@@ -238,15 +320,15 @@ export default function Announcements() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700">
                     <DropdownMenuItem
-                      onClick={() => handleEdit(a.id)}
-                      className="text-zinc-200 hover:bg-zinc-700"
+                      onSelect={() => handleEdit(a.id)}
+                      className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
                     >
                       <Pencil size={14} className="mr-2" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleDelete(a.id)}
-                      className="text-red-400 hover:bg-zinc-700 focus:text-red-400"
+                      onSelect={() => handleDelete(a.id)}
+                      className="text-red-400 hover:bg-zinc-700 focus:text-red-400 cursor-pointer"
                     >
                       <Trash2 size={14} className="mr-2" />
                       Delete
@@ -267,3 +349,4 @@ export default function Announcements() {
     </div>
   );
 }
+

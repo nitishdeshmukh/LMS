@@ -1,221 +1,386 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useId, useMemo, useState } from 'react';
+import { SearchIcon, Eye, Award, RotateCw, ChevronDown, MoreVertical } from 'lucide-react';
+import {
+  flexRender,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFacetedMinMaxValues,
+  getFilteredRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+
 import { Badge } from '../../../common/components/ui/badge';
-import { Search, Eye, Award, RotateCw } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../common/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../common/components/ui/dropdown-menu';
 import { Button } from '@/common/components/ui/button';
+import { Input } from '../../../common/components/ui/input';
+import { Label } from '../../../common/components/ui/label';
+import TablePagination from '@/common/components/TablePagination';
+import { cn } from '@/common/lib/utils';
+
+// Filter Component
+function Filter({ column }) {
+  const id = useId();
+  const columnFilterValue = column.getFilterValue();
+  const { filterVariant } = column.columnDef.meta || {};
+  const columnHeader = typeof column.columnDef.header === 'string' ? column.columnDef.header : '';
+
+  const sortedUniqueValues = useMemo(() => {
+    const values = Array.from(column.getFacetedUniqueValues().keys());
+    const flattenedValues = values.reduce((acc, curr) => {
+      if (Array.isArray(curr)) return [...acc, ...curr];
+      return [...acc, curr];
+    }, []);
+    return Array.from(new Set(flattenedValues)).sort();
+  }, [column.getFacetedUniqueValues()]);
+
+  // Dropdown variant
+  if (filterVariant === 'dropdown') {
+    return (
+      <div className="*:not-first:mt-2">
+        <Label className="text-zinc-300">{columnHeader}</Label>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700 hover:text-zinc-100"
+            >
+              <span
+                className={cn(columnFilterValue ? 'text-zinc-200' : 'text-zinc-400', 'truncate')}
+              >
+                {columnFilterValue ? String(columnFilterValue) : `Filter by ${columnHeader}`}
+              </span>
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            className="w-44 bg-zinc-800 border-zinc-700 max-h-[300px] overflow-y-auto"
+          >
+            {sortedUniqueValues.map(value => (
+              <DropdownMenuItem
+                key={String(value)}
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                onSelect={() => column.setFilterValue(value)}
+              >
+                {String(value)}
+              </DropdownMenuItem>
+            ))}
+            {columnFilterValue && (
+              <>
+                <div className="h-px bg-zinc-700 my-1" />
+                <DropdownMenuItem
+                  className="text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                  onSelect={() => column.setFilterValue(undefined)}
+                >
+                  Clear Filter
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  }
+
+  // Text search variant
+  return (
+    <div className="*:not-first:mt-2">
+      <Label htmlFor={`${id}-input`} className="text-zinc-300">
+        {columnHeader}
+      </Label>
+      <div className="relative">
+        <Input
+          id={`${id}-input`}
+          className="peer pl-9 bg-zinc-800 text-zinc-200 border-zinc-700 placeholder:text-zinc-400"
+          value={columnFilterValue ?? ''}
+          onChange={e => column.setFilterValue(e.target.value)}
+          placeholder={`Search ${columnHeader.toLowerCase()}`}
+          type="text"
+        />
+        <div className="text-zinc-400 pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 peer-disabled:opacity-50">
+          <SearchIcon size={16} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const defaultPageSize = 10;
 
 const CertificateManagement = () => {
-  const [activeTab, setActiveTab] = useState('ready');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const studentsReadyToIssue = [
-    {
-      id: 1,
-      name: 'Eleanor Pena',
-      course: 'Advanced Python Programming',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      completedDate: '15 Aug 2024',
-      status: 'Completed',
-    },
-    {
-      id: 2,
-      name: 'Jane Cooper',
-      course: 'UI/UX Design Fundamentals',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      completedDate: '10 Aug 2024',
-      status: 'Completed',
-    },
-  ];
-
-  const studentsIssued = [
-    {
-      id: 3,
-      name: 'Cameron Williamson',
-      course: 'Data Science with R',
-      avatar: 'https://i.pravatar.cc/150?img=8',
-      issuedDate: '12 Aug 2024',
-      status: 'Issued',
-    },
-    {
-      id: 4,
-      name: 'Cody Fisher',
-      course: 'Machine Learning Basics',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      issuedDate: '05 Aug 2024',
-      status: 'Issued',
-    },
-    {
-      id: 5,
-      name: 'Randy Orton',
-      course: 'Machine Learning Basics',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      issuedDate: '05 Aug 2024',
-      status: 'Issued',
-    },
-  ];
-
-  const filteredReadyStudents = studentsReadyToIssue.filter(
-    student =>
-      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.course.toLowerCase().includes(searchQuery.toLowerCase()),
+  // Combined all students data
+  const allStudents = useMemo(
+    () => [
+      {
+        id: 1,
+        name: 'Eleanor Pena',
+        course: 'Advanced Python Programming',
+        avatar: 'https://i.pravatar.cc/150?img=1',
+        date: '15 Aug 2024',
+        certificateStatus: 'Ready to Issue',
+      },
+      {
+        id: 2,
+        name: 'Jane Cooper',
+        course: 'UI/UX Design Fundamentals',
+        avatar: 'https://i.pravatar.cc/150?img=5',
+        date: '10 Aug 2024',
+        certificateStatus: 'Ready to Issue',
+      },
+      {
+        id: 3,
+        name: 'Cameron Williamson',
+        course: 'Data Science with R',
+        avatar: 'https://i.pravatar.cc/150?img=8',
+        date: '12 Aug 2024',
+        certificateStatus: 'Issued',
+      },
+      {
+        id: 4,
+        name: 'Cody Fisher',
+        course: 'Machine Learning Basics',
+        avatar: 'https://i.pravatar.cc/150?img=12',
+        date: '05 Aug 2024',
+        certificateStatus: 'Issued',
+      },
+      {
+        id: 5,
+        name: 'Randy Orton',
+        course: 'Machine Learning Basics',
+        avatar: 'https://i.pravatar.cc/150?img=12',
+        date: '05 Aug 2024',
+        certificateStatus: 'Issued',
+      },
+    ],
+    [],
   );
 
-  const filteredIssuedStudents = studentsIssued.filter(
-    student =>
-      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.course.toLowerCase().includes(searchQuery.toLowerCase()),
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: defaultPageSize,
+  });
+
+  const handlePreview = student => {
+    console.log('Preview certificate for:', student.name);
+  };
+
+  const handleIssueCertificate = student => {
+    console.log('Issue certificate for:', student.name);
+  };
+
+  const handleReissue = student => {
+    console.log('Re-issue certificate for:', student.name);
+  };
+
+  // Columns
+  const columns = useMemo(
+    () => [
+      {
+        header: 'Student',
+        accessorKey: 'name',
+        meta: { filterVariant: 'text' },
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <img
+              src={row.original.avatar}
+              alt={row.getValue('name')}
+              className="w-10 h-10 rounded-full object-cover border-2 border-zinc-700"
+            />
+            <span className="font-medium text-zinc-100">{row.getValue('name')}</span>
+          </div>
+        ),
+      },
+      {
+        header: 'Course',
+        accessorKey: 'course',
+        meta: { filterVariant: 'dropdown' },
+        cell: ({ row }) => <div className="text-zinc-300">{row.getValue('course')}</div>,
+      },
+      {
+        header: 'Date',
+        accessorKey: 'date',
+        cell: ({ row }) => <div className="text-zinc-300">{row.getValue('date')}</div>,
+      },
+      {
+        header: 'Certificate Status',
+        accessorKey: 'certificateStatus',
+        meta: { filterVariant: 'dropdown' },
+        cell: ({ row }) => {
+          const status = row.getValue('certificateStatus');
+          return (
+            <Badge
+              className={
+                status === 'Issued'
+                  ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20'
+                  : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
+              }
+            >
+              {status}
+            </Badge>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => {
+          const student = row.original;
+          const status = student.certificateStatus;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-500">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700">
+                <DropdownMenuItem
+                  onSelect={() => handlePreview(student)}
+                  className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Preview
+                </DropdownMenuItem>
+                {status === 'Ready to Issue' ? (
+                  <DropdownMenuItem
+                    onSelect={() => handleIssueCertificate(student)}
+                    className="text-blue-400 hover:bg-zinc-700 cursor-pointer"
+                  >
+                    <Award className="mr-2 h-4 w-4" />
+                    Issue Certificate
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onSelect={() => handleReissue(student)}
+                    className="text-green-400 hover:bg-zinc-700 cursor-pointer"
+                  >
+                    <RotateCw className="mr-2 h-4 w-4" />
+                    Re-issue
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [],
   );
+
+  const table = useReactTable({
+    data: allStudents,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    state: { sorting, pagination, columnFilters },
+    enableSortingRemoval: false,
+  });
 
   return (
     <div className="flex-1 overflow-y-auto p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Search and Tabs Section - Same Row */}
-        <div className="mb-6 flex items-center gap-4 flex-wrap">
-          {/* Search Bar */}
-          <div className="relative flex-1 min-w-[300px]">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by student name or course..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-400"
-            />
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 mb-6">
+          <div className="w-44">
+            <Filter column={table.getColumn('name')} />
           </div>
-
-          {/* Tabs */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveTab('ready')}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'ready'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-              }`}
-            >
-              Ready to Issue
-            </button>
-            <button
-              onClick={() => setActiveTab('issued')}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'issued'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-              }`}
-            >
-              Issued
-            </button>
+          <div className="w-44">
+            <Filter column={table.getColumn('course')} />
+          </div>
+          <div className="w-44">
+            <Filter column={table.getColumn('certificateStatus')} />
           </div>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {activeTab === 'ready'
-            ? filteredReadyStudents.map(student => (
-                <div
-                  key={student.id}
-                  className="bg-zinc-800 rounded-xl p-6 shadow-sm border border-zinc-700 hover:shadow-md hover:border-zinc-600 transition-all"
+        {/* Table */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map(headerGroup => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="bg-zinc-800 border-zinc-700 hover:bg-zinc-800"
                 >
-                  {/* Student Info */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={student.avatar}
-                        alt={student.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-zinc-700"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-zinc-100">{student.name}</h3>
-                        <p className="text-sm text-zinc-400">{student.course}</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20">
-                      {student.status}
-                    </Badge>
-                  </div>
-
-                  {/* Date and Actions */}
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <p className="text-sm text-zinc-400">Completed: {student.completedDate}</p>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2 border-blue-500/30 bg-blue-500/5 text-blue-400 hover:bg-blue-500/10"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Preview
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <Award className="w-4 h-4" />
-                        Issue Certificate
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            : filteredIssuedStudents.map(student => (
-                <div
-                  key={student.id}
-                  className="bg-zinc-800 rounded-xl p-6 shadow-sm border border-zinc-700 hover:shadow-md hover:border-zinc-600 transition-all"
-                >
-                  {/* Student Info */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={student.avatar}
-                        alt={student.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-zinc-700"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-zinc-100">{student.name}</h3>
-                        <p className="text-sm text-zinc-400">{student.course}</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20">
-                      {student.status}
-                    </Badge>
-                  </div>
-
-                  {/* Date and Actions */}
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <p className="text-sm text-zinc-400">Issued: {student.issuedDate}</p>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2 border-zinc-600 bg-zinc-700 text-zinc-200 hover:bg-zinc-600"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Preview
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2 border-zinc-600 bg-zinc-700 text-zinc-200 hover:bg-zinc-600"
-                      >
-                        <RotateCw className="w-4 h-4" />
-                        Re-issue
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                  {headerGroup.headers.map(header => (
+                    <TableHead key={header.id} className="font-semibold text-zinc-300 select-none">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-        </div>
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map(row => (
+                  <TableRow
+                    key={row.id}
+                    className="transition-colors hover:bg-zinc-800 border-zinc-800"
+                  >
+                    {row.getVisibleCells().map(cell => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-400">
+                    No students found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
 
-        {/* Empty State */}
-        {((activeTab === 'ready' && filteredReadyStudents.length === 0) ||
-          (activeTab === 'issued' && filteredIssuedStudents.length === 0)) && (
-          <div className="text-center py-12">
-            <p className="text-zinc-400 text-lg">No students found</p>
-          </div>
-        )}
+          <TablePagination
+            pageIndex={table.getState().pagination.pageIndex}
+            pageCount={table.getPageCount()}
+            pageSize={table.getState().pagination.pageSize}
+            setPageIndex={table.setPageIndex}
+            setPageSize={table.setPageSize}
+            canPreviousPage={table.getCanPreviousPage()}
+            canNextPage={table.getCanNextPage()}
+            previousPage={table.previousPage}
+            nextPage={table.nextPage}
+            paginationItemsToDisplay={5}
+          />
+        </div>
       </div>
     </div>
-    
   );
 };
 
 export default CertificateManagement;
+

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -188,3 +188,4 @@ function CarouselNext({ className, variant = 'outline', size = 'icon', ...props 
 }
 
 export { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext };
+

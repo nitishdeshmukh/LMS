@@ -1,15 +1,15 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
-import ColumnChart from './ColumnChart';
+import StudentsPerDomainChart from './StudentsPerDomainChart';
 
 const StatsCard = ({ title, value, change, type }) => {
   return (
-    <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
+    <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800 h-full flex flex-col">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-zinc-100 mb-1">{title}</h2>
         <p className="text-sm text-zinc-400"></p>
       </div>
-      <div className="flex flex-col items-start justify-between gap-2">
+      <div className="flex flex-col items-start justify-between gap-4 flex-1">
         <div>
           <p className="text-3xl font-bold text-zinc-100">10</p>
           {change && (
@@ -55,37 +55,21 @@ const StatisticsSection = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      {/* Total Enrolled */}
+      {/* Total Active Students */}
       <StatsCard title="Total Active Students" value="1,482" change="+52% this month" />
 
-      {/* Students per Domain - Chart Card */}
-      <div className="bg-zinc-900 border border-zinc-800  rounded-xl col-span-2 p-4">
-        <div className="mb-4">
-          <div className="flex">
-            <div>
-              <h2 className="text-lg font-semibold text-zinc-100 mb-1">
-                Active Students per Domain
-              </h2>
-              <p className="text-sm text-zinc-400">
-                This chart shows the number of active students per academic domain.
-              </p>
-            </div>
-
-            <div>
-              from {'date picker'} -- to {'date picker'}
-            </div>
-          </div>
-        </div>
-        <ColumnChart data={chartData} height={200} />
+      {/* Students per Domain Chart */}
+      <div className="col-span-2">
+        <StudentsPerDomainChart data={chartData} />
       </div>
 
       {/* Completion Statistics */}
-      <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
+      <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800 h-full flex flex-col">
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-zinc-100 mb-1">Completion Statistics</h2>
           <p className="text-sm text-zinc-400"></p>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-6 flex-1 flex flex-col justify-start">
           <div>
             <div className="flex justify-between items-center mb-1">
               <span className="text-base text-zinc-400">Certificates Issued</span>

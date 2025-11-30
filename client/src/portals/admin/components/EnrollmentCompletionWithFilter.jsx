@@ -6,7 +6,7 @@ import { Input } from '@/common/components/ui/input';
 import { Popover, PopoverTrigger, PopoverContent } from '@/common/components/ui/popover';
 import { Calendar } from '@/common/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
-import DoughnutChart from './DoughnutChart';
+import EnrollmentCompletion from './EnrollmentCompletion&RevenueTrend';
 
 /**
  * Formats a date object into a readable string format
@@ -33,13 +33,13 @@ function isValidDate(date) {
 }
 
 /**
- * TopPerformingCoursesChartWithFilter - Displays top-performing courses with date filtering
+ * EnrollmentCompletionWithFilter - Displays enrollment, completion, and revenue trends with date filtering
  * @param {Object} props - Component properties
- * @param {Array} props.data - Course performance data array with category, value, and color
+ * @param {Array} props.data - Trend data array with date, enrollments, completions, and revenue
  * @param {number} props.height - Chart height in pixels
- * @param {number} props.innerRadiusPercent - Inner radius percentage for doughnut
+ * @param {Array} props.series - Series configuration for chart lines
  */
-export default function TopPerformingCoursesChart({ data, height = 400, innerRadiusPercent = 60 }) {
+function EnrollmentCompletionWithFilter({ data, height = 400, series }) {
   const [fromOpen, setFromOpen] = useState(false);
   const [fromDate, setFromDate] = useState(undefined);
   const [fromMonth, setFromMonth] = useState(undefined);
@@ -52,12 +52,14 @@ export default function TopPerformingCoursesChart({ data, height = 400, innerRad
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-      <div className="flex items-center justify-between  gap-4">
+      <div className="flex items-center justify-between mb-4 gap-4">
         {/* Title and Description */}
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-zinc-100 mb-1">Top Performing Courses</h2>
+        <div>
+          <h2 className="text-xl font-semibold text-zinc-100 mb-1">
+            Enrollment, Completion & Revenue Trend
+          </h2>
           <p className="text-sm text-zinc-400">
-            Distribution of enrollments across top-performing courses
+            Track student enrollments, course completions, and revenue over time
           </p>
         </div>
 
@@ -66,7 +68,7 @@ export default function TopPerformingCoursesChart({ data, height = 400, innerRad
           {/* From Date Picker */}
           <div className="relative flex gap-2">
             <Input
-              id="from-date-top-courses"
+              id="from-date-enrollment"
               value={fromValue}
               placeholder="From Date"
               className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -119,7 +121,7 @@ export default function TopPerformingCoursesChart({ data, height = 400, innerRad
           {/* To Date Picker */}
           <div className="relative flex gap-2">
             <Input
-              id="to-date-top-courses"
+              id="to-date-enrollment"
               value={toValue}
               placeholder="To Date"
               className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -172,12 +174,9 @@ export default function TopPerformingCoursesChart({ data, height = 400, innerRad
         </div>
       </div>
 
-      <DoughnutChart
-        data={data}
-        height={height}
-        innerRadiusPercent={innerRadiusPercent}
-        showLegend={true}
-      />
+      <EnrollmentCompletion data={data} height={height} series={series} />
     </div>
   );
 }
+
+export default EnrollmentCompletionWithFilter;

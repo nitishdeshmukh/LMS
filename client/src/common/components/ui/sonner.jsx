@@ -1,4 +1,3 @@
-// src/common/components/ui/sonner.jsx
 import { Toaster as Sonner } from "sonner"
 
 

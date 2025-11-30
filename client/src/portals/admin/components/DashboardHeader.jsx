@@ -1,52 +1,241 @@
-import { ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '../../../common/components/ui/dropdown-menu';
+import { Button } from '../../../common/components/ui/button';
+import { Input } from '../../../common/components/ui/input';
+import { Popover, PopoverTrigger, PopoverContent } from '../../../common/components/ui/popover';
+import { Calendar } from '../../../common/components/ui/calendar';
+import { ChevronDown, CalendarIcon } from 'lucide-react';
+
+const collegeOptions = ['All Colleges', 'Stanford University', 'MIT', 'Harvard'];
+const statusOptions = ['All Status', 'Graded', 'Submitted', 'In Progress'];
+
+function formatDate(date) {
+  if (!date) {
+    return '';
+  }
+
+  return date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function isValidDate(date) {
+  if (!date) {
+    return false;
+  }
+  return !isNaN(date.getTime());
+}
 
 const DashboardHeader = () => {
-  const [activeFilter, setActiveFilter] = useState('last7days');
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  // From Date State
+  const [fromOpen, setFromOpen] = useState(false);
+  const [fromDate, setFromDate] = useState(undefined);
+  const [fromMonth, setFromMonth] = useState(undefined);
+  const [fromValue, setFromValue] = useState('');
+
+  // To Date State
+  const [toOpen, setToOpen] = useState(false);
+  const [toDate, setToDate] = useState(undefined);
+  const [toMonth, setToMonth] = useState(undefined);
+  const [toValue, setToValue] = useState('');
 
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 mb-6">
-          <button className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition-colors">
-            <span className="text-zinc-200 font-medium">Filter by College</span>
-            <ChevronDown className="w-4 h-4 text-zinc-400" />
-          </button>
+        <div className="flex items-center gap-4">
+          {/* College Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 min-w-[170px] justify-between"
+              >
+                <span className={selectedCollege ? 'text-zinc-200' : 'text-zinc-400'}>
+                  {selectedCollege || 'Filter by College'}
+                </span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+              {collegeOptions.map(option => (
+                <DropdownMenuItem
+                  key={option}
+                  className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  onClick={() => setSelectedCollege(option)}
+                >
+                  {option}
+                </DropdownMenuItem>
+              ))}
+              {selectedCollege && (
+                <>
+                  <div className="h-px bg-zinc-700 my-1" />
+                  <DropdownMenuItem
+                    className="text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                    onClick={() => setSelectedCollege(null)}
+                  >
+                    Clear Filter
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          <button className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition-colors">
-            <span className="text-zinc-200 font-medium">Filter by Course</span>
-            <ChevronDown className="w-4 h-4 text-zinc-400" />
-          </button>
+          {/* Status Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 min-w-[160px] justify-between"
+              >
+                <span className={selectedStatus ? 'text-zinc-200' : 'text-zinc-400'}>
+                  {selectedStatus || 'Filter by Status'}
+                </span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+              {statusOptions.map(option => (
+                <DropdownMenuItem
+                  key={option}
+                  className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  onClick={() => setSelectedStatus(option)}
+                >
+                  {option}
+                </DropdownMenuItem>
+              ))}
+              {selectedStatus && (
+                <>
+                  <div className="h-px bg-zinc-700 my-1" />
+                  <DropdownMenuItem
+                    className="text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                    onClick={() => setSelectedStatus(null)}
+                  >
+                    Clear Filter
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        {/* Time Filter Buttons */}
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setActiveFilter('today')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'today'
-                ? 'bg-zinc-700 text-zinc-100 border border-zinc-600'
-                : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
-          >
-            Today
-          </button>
-          <button
-            onClick={() => setActiveFilter('last7days')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'last7days'
-                ? 'bg-blue-600 text-white'
-                : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
-          >
-            Last 7 Days
-          </button>
-          <button
-            onClick={() => setActiveFilter('last30days')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'last30days'
-                ? 'bg-zinc-700 text-zinc-100 border border-zinc-600'
-                : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700'
-              }`}
-          >
-            Last 30 Days
-          </button>
+        <div className="flex items-centerb gap-4">
+          {/* From Date Picker */}
+          <div className="relative flex gap-2">
+            <Input
+              id="from-date"
+              value={fromValue}
+              placeholder="From Date"
+              className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
+              onChange={e => {
+                const date = new Date(e.target.value);
+                setFromValue(e.target.value);
+                if (isValidDate(date)) {
+                  setFromDate(date);
+                  setFromMonth(date);
+                }
+              }}
+              onKeyDown={e => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setFromOpen(true);
+                }
+              }}
+            />
+            <Popover open={fromOpen} onOpenChange={setFromOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="from-date-picker"
+                  variant="ghost"
+                  className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700"
+                >
+                  <CalendarIcon className="size-3.5 text-zinc-400" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto overflow-hidden p-0 border-zinc-800"
+                align="end"
+                alignOffset={-8}
+                sideOffset={10}
+              >
+                <Calendar
+                  mode="single"
+                  selected={fromDate}
+                  captionLayout="dropdown"
+                  month={fromMonth}
+                  onMonthChange={setFromMonth}
+                  onSelect={date => {
+                    setFromDate(date);
+                    setFromValue(formatDate(date));
+                    setFromOpen(false);
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* To Date Picker */}
+          <div className="relative flex gap-2">
+            <Input
+              id="to-date"
+              value={toValue}
+              placeholder="To Date"
+              className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
+              onChange={e => {
+                const date = new Date(e.target.value);
+                setToValue(e.target.value);
+                if (isValidDate(date)) {
+                  setToDate(date);
+                  setToMonth(date);
+                }
+              }}
+              onKeyDown={e => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setToOpen(true);
+                }
+              }}
+            />
+            <Popover open={toOpen} onOpenChange={setToOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="to-date-picker"
+                  variant="ghost"
+                  className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700"
+                >
+                  <CalendarIcon className="size-3.5 text-zinc-400" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto overflow-hidden p-0 border-zinc-800"
+                align="end"
+                alignOffset={-8}
+                sideOffset={10}
+              >
+                <Calendar
+                  mode="single"
+                  selected={toDate}
+                  captionLayout="dropdown"
+                  month={toMonth}
+                  onMonthChange={setToMonth}
+                  onSelect={date => {
+                    setToDate(date);
+                    setToValue(formatDate(date));
+                    setToOpen(false);
+                  }}
+                  disabled={date => fromDate && date < fromDate}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </div>
@@ -54,3 +243,4 @@ const DashboardHeader = () => {
 };
 
 export default DashboardHeader;
+

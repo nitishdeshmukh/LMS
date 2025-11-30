@@ -1,15 +1,36 @@
-import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
-import { toast } from 'sonner';
+'use client';
 
-const RevokeAccess = ({ studentName, onConfirm, student, onClose }) => {
+import React from 'react';
+import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/common/components/ui/alert-dialog';
+
+/**
+ * RevokeAccess - Confirmation dialog for revoking student access
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Controls the open state of the dialog
+ * @param {Function} props.onOpenChange - Callback when open state changes
+ * @param {Object} props.student - Student object containing student data
+ * @param {string} props.studentName - Student name (fallback)
+ * @param {Function} props.onConfirm - Optional callback after confirmation
+ */
+const RevokeAccess = ({ open, onOpenChange, student, onConfirm }) => {
   const handleCancel = () => {
-    onClose(); // Close the popup
+    onOpenChange(false);
     toast.info(`Access revocation cancelled for ${student?.studentName}`);
   };
 
   const handleConfirm = () => {
-    onClose(); // Close the popup
+    onOpenChange(false);
     toast.success(`${student?.studentName} has been revoked successfully`);
     // Add your revoke logic here (API call, etc.)
     if (onConfirm) {
@@ -18,53 +39,50 @@ const RevokeAccess = ({ studentName, onConfirm, student, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-      <div className="bg-zinc-900 border border-red-900/50 rounded-3xl max-w-md w-full p-8 relative shadow-2xl shadow-red-900/20 animate-fadeIn">
-        <button
-          onClick={handleCancel}
-          className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-        >
-          <X size={24} />
-        </button>
-
-        <div className="flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center mb-6 border border-red-900/30">
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="bg-zinc-900 border-zinc-700 sm:max-w-md">
+        <AlertDialogHeader className="items-center text-center">
+          <div className="w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center mb-4 border border-red-900/30">
             <AlertTriangle size={40} className="text-red-500" />
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-2">Revoke Access?</h2>
-          <p className="text-zinc-400 mb-6">
-            Are you sure you want to revoke access for{' '}
-            <span className="text-white font-bold">{student?.studentName || studentName}</span>?
-            <br />
-            <br />
-            <span className="text-red-400 text-sm bg-red-900/10 px-3 py-1 rounded-full border border-red-900/30">
+          <AlertDialogTitle className="text-2xl font-bold text-white">
+            Revoke Access?
+          </AlertDialogTitle>
+
+          <AlertDialogDescription className="text-zinc-400 space-y-4 text-center">
+            <p>
+              Are you sure you want to revoke access for{' '}
+              <span className="text-white font-bold">{student?.studentName}</span>?
+            </p>
+
+            <span className="inline-block text-red-400 text-sm bg-red-900/10 px-3 py-1 rounded-full border border-red-900/30">
               This action is irreversible.
             </span>
-          </p>
 
-          <p className="text-xs text-zinc-500 mb-8">
-            This will permanently delete the user's progress, certificates, and account data from
-            the LMS.
-          </p>
+            <p className="text-xs text-zinc-500 pt-2">
+              This will permanently delete the user's progress, certificates, and account data from
+              the LMS.
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-          <div className="flex gap-4 w-full">
-            <button
-              onClick={handleCancel}
-              className="flex-1 py-3 rounded-xl border border-zinc-700 text-white hover:bg-zinc-800 font-medium transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-900/20 transition-colors"
-            >
-              Confirm Revoke
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        <AlertDialogFooter className="sm:space-x-0 gap-4">
+          <AlertDialogCancel
+            onClick={handleCancel}
+            className="flex-1 bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 hover:text-white font-medium"
+          >
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-900/20"
+          >
+            Confirm Revoke
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

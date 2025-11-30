@@ -8,6 +8,7 @@ import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
 import Support from './pages/Support';
 import Courses from './pages/Courses';
+import StudentDetailPage from './pages/StudentDetailPage';
 
 const AdminPortal = () => {
   return (
@@ -22,8 +23,10 @@ const AdminPortal = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/support" element={<Support />} />
       </Route>
+      <Route path="/student/:studentId" element={<StudentDetailPage />} />
     </Routes>
   );
 };
 
 export default AdminPortal;
+

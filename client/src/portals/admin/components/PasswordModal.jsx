@@ -1,74 +1,84 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Input } from '../../../common/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from '@/common/components/ui/alert-dialog';
 import { Button } from '../../../common/components/ui/button';
-import { X } from 'lucide-react';
 
-const PasswordModal = ({ onSubmit, onClose }) => {
+/**
+ * PasswordModal - Admin verification dialog using Radix UI AlertDialog
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Controls the open state of the dialog
+ * @param {Function} props.onOpenChange - Callback when open state changes
+ * @param {Function} props.onSubmit - Callback when password is submitted
+ */
+const PasswordModal = ({ open, onOpenChange, onSubmit }) => {
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     onSubmit(password);
     setPassword(''); // Clear password after submission
+    onOpenChange(false); // Close dialog programmatically
+  };
+
+  const handleClose = () => {
+    setPassword(''); // Clear password on cancel
+    onOpenChange(false);
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div 
-        className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 w-96"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-zinc-100">
-            Admin Verification
-          </h2>
-          <button 
-            onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-100"
-          >
-            <X size={20} />
-          </button>
-        </div>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="bg-zinc-900 border-zinc-800 sm:max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-zinc-100">Admin Verification</AlertDialogTitle>
+          <AlertDialogDescription className="text-zinc-400">
+            Enter your admin password to continue with this action.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-zinc-300 mb-2">
-              Enter Admin Password
+            <label htmlFor="admin-password" className="block text-zinc-300 mb-2 text-sm">
+              Admin Password
             </label>
             <Input
+              id="admin-password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               placeholder="Enter password"
-              className="bg-zinc-800 text-zinc-200 border-zinc-700"
+              className="bg-zinc-800 text-zinc-200 border-zinc-700 focus:border-blue-500"
               autoFocus
               required
             />
           </div>
 
-          <div className="flex gap-3 justify-end">
-            <Button
+          <AlertDialogFooter>
+            <AlertDialogCancel
               type="button"
-              onClick={onClose}
-              variant="outline"
-              className="bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700"
+              onClick={handleClose}
+              className="bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700 hover:text-zinc-100"
             >
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-blue-600 text-white hover:bg-blue-700"
-            >
+            </AlertDialogCancel>
+            <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700">
               Verify
             </Button>
-          </div>
+          </AlertDialogFooter>
         </form>
-      </div>
-    </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
 export default PasswordModal;
+

@@ -51,7 +51,7 @@ function TablePagination({
         <Button
           size="icon"
           variant="outline"
-          className="disabled:pointer-events-none disabled:opacity-50 bg-black border-zinc-700 text-white"
+          className="disabled:pointer-events-none disabled:opacity-50 bg-zinc-950 border-zinc-700 text-white"
           onClick={previousPage}
           disabled={!canPreviousPage}
           aria-label="Go to previous page"
@@ -69,6 +69,7 @@ function TablePagination({
               onClick={() => setPageIndex(page - 1)}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
+                'hover:text-white',
                 'border-zinc-700 hover:bg-zinc-800 text-white',
                 isActive ? 'border-white bg-zinc-900 font-bold' : 'bg-black',
               )}
@@ -81,7 +82,7 @@ function TablePagination({
         <Button
           size="icon"
           variant="outline"
-          className="disabled:pointer-events-none disabled:opacity-50 bg-black border-zinc-700 text-white"
+          className="disabled:pointer-events-none disabled:opacity-50 bg-zinc-950 border-zinc-700 text-white"
           onClick={nextPage}
           disabled={!canNextPage}
           aria-label="Go to next page"
@@ -94,13 +95,13 @@ function TablePagination({
         <Select value={pageSize.toString()} onValueChange={value => setPageSize(Number(value))}>
           <SelectTrigger
             id="results-per-page"
-            className="w-fit whitespace-nowrap border-zinc-700 bg-black text-zinc-100"
+            className="w-fit whitespace-nowrap border-zinc-700 bg-zinc-900 text-zinc-100"
           >
             <SelectValue placeholder="Select number of results" />
           </SelectTrigger>
-          <SelectContent className="bg-black">
+          <SelectContent className="bg-zinc-900 border-zinc-700">
             {pageSizes.map(ps => (
-              <SelectItem key={ps} value={ps.toString()} className="bg-black text-white">
+              <SelectItem key={ps} value={ps.toString()} className="bg-zinc-900 text-white">
                 {ps} / page
               </SelectItem>
             ))}
@@ -112,3 +113,4 @@ function TablePagination({
 }
 
 export default TablePagination;
+

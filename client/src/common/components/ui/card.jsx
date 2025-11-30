@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { cn } from '@/common/lib/utils';
 
@@ -73,3 +73,4 @@ function CardFooter({ className, ...props }) {
 }
 
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+

@@ -186,89 +186,10 @@ export default function LineChart({ data, height = 400, onDateChange }) {
     <div
       style={{
         width: '100%',
-        background: '#18181b', // bg-zinc-900
+        background: '#18181b',
         borderRadius: 12,
-        padding: 20,
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
-      {/* Header and Filter Controls */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 10,
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
-        <h3
-          style={{
-            color: '#e5e7eb', // zinc-200
-            margin: 0,
-            fontSize: '1.1rem',
-            fontWeight: 600,
-          }}
-        >
-          Progress History
-        </h3>
-
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              From
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => handleDateChange('start', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              To
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => handleDateChange('end', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Chart Container */}
       <div
         style={{

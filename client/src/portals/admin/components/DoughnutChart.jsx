@@ -28,11 +28,9 @@ export default function DoughnutChart({
 
   // Default to start of current year and today
   const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
+    new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
   );
-  const [endDate, setEndDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleDateChange = (type, value) => {
     if (type === 'start') setStartDate(value);
@@ -40,10 +38,7 @@ export default function DoughnutChart({
 
     // Trigger parent callback to reload/filter data based on new range
     if (onDateChange) {
-      onDateChange(
-        type === 'start' ? value : startDate,
-        type === 'end' ? value : endDate
-      );
+      onDateChange(type === 'start' ? value : startDate, type === 'end' ? value : endDate);
     }
   };
 
@@ -75,7 +70,7 @@ export default function DoughnutChart({
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
-      })
+      }),
     );
 
     // Create series
@@ -84,7 +79,7 @@ export default function DoughnutChart({
         valueField: 'value',
         categoryField: 'category',
         alignLabels: true,
-      })
+      }),
     );
 
     series.set('innerRadius', am5.percent(innerRadiusPercent));
@@ -108,7 +103,7 @@ export default function DoughnutChart({
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      })
+      }),
     );
 
     // Tooltip label styling
@@ -164,7 +159,7 @@ export default function DoughnutChart({
           x: am5.p50,
           layout: root.horizontalLayout,
           marginTop: 15,
-        })
+        }),
       );
 
       // Legend labels - light text
@@ -214,90 +209,9 @@ export default function DoughnutChart({
     <div
       style={{
         width: '100%',
-        background: '#18181b', // bg-zinc-900
-        borderRadius: 12,
-        padding: 20,
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        background: '#18181b', 
       }}
     >
-      {/* Header and Filter Controls */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 10,
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
-        <h3
-          style={{
-            color: '#e5e7eb', // zinc-200
-            margin: 0,
-            fontSize: '1.1rem',
-            fontWeight: 600,
-          }}
-        >
-          Distribution Overview
-        </h3>
-
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              From
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => handleDateChange('start', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              To
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => handleDateChange('end', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Chart Container */}
       <div
         style={{
           width: '100%',
@@ -309,3 +223,4 @@ export default function DoughnutChart({
     </div>
   );
 }
+

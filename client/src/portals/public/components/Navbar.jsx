@@ -2,6 +2,7 @@ import { Menu, X } from 'lucide-react';
 import React, { useState } from 'react';
 import LoginPopup from './LoginPopup';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,7 +30,7 @@ function Navbar() {
       {/* --- NAVBAR --- */}
       <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between  h-20">
             {/* Logo: use anchor so middle-click works, but intercept left-click */}
             <a
               href="/"
@@ -82,10 +83,10 @@ function Navbar() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="-mr-2 flex md:hidden">
+            <div className=" flex md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+                className="inline-flex items-center justify-center rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
                 aria-expanded={isMenuOpen}
                 aria-label="Toggle menu"
               >
@@ -97,31 +98,31 @@ function Navbar() {
 
         {/* Mobile Menu Panel */}
         {isMenuOpen && (
-          <div className="md:hidden h-[30vh] items-center bg-gray-900 border-b border-gray-800">
+          <div className="md:hidden h-fit items-center bg-gray-900 border-b border-gray-800">
             <div className="px-2 pt-2 flex flex-col items-center pb-3 space-y-1 sm:px-3">
-              <a
-                href="/"
+              <Link
+                to="/"
                 onClick={e => handleInternalNav(e, '/')}
                 className="block px-3 py-2 rounded-md text-2xl font-medium hover:bg-gray-800"
               >
                 Home
-              </a>
+              </Link>
 
-              <a
-                href="/aboutus"
+              <Link
+                to="/aboutus"
                 onClick={e => handleInternalNav(e, '/aboutus')}
                 className="block px-3 py-2 rounded-md text-2xl font-medium hover:bg-gray-800"
               >
                 About Us
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/howitworks"
                 onClick={e => handleInternalNav(e, '/howitworks')}
                 className="block px-3 py-2 rounded-md text-2xl font-medium hover:bg-gray-800"
               >
                 How it works
-              </a>
+              </Link>
 
               <button
                 onClick={() => {
@@ -150,3 +151,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

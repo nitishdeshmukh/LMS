@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { Users, BookOpen, TrendingUp, Award, Clock, Target } from 'lucide-react';
-import DoughnutChart from '@/portals/admin/components/DoughnutChart';
-import ColumnChart from '@/portals/admin/components/ColumnChart';
-import StudentGrowthChart from '@/portals/admin/components/StudentGrowthChart';
-import OverallPerformanceMetrics from '@/portals/admin/components/OverallPerformanceMetrics';
-import EnrollmentCompletion from '@/portals/admin/components/EnrollmentCompletion&RevenueTrend';
 import TopPerformingCoursesChart from '../components/TopPerformingCoursesChart';
+import PerformanceMetricsChart from '../components/PerformanceMetricsChart';
+import StudentGrowthChartWithFilter from '../components/StudentGrowthChartWithFilter';
+import EnrollmentCompletionWithFilter from '../components/EnrollmentCompletionWithFilter';
+import CourseCompletionStatusChart from '../components/CourseCompletionStatusChart';
+import EnrollmentByCategoryChart from '../components/EnrollmentByCategoryChart';
+import MonthlyEnrollmentsTrendChart from '../components/MonthlyEnrollmentsTrendChart';
+import CourseCompletionsByMonthChart from '../components/CourseCompletionsByMonthChart';
 
 // Sample data - replace with your actual API data
 const courseCompletionData = [
@@ -87,62 +89,14 @@ const studentGrowth = [
   { date: new Date(2024, 6, 1).getTime(), value: 2394 },
 ];
 
-// Recent Course Enrollment Trends (for Radial Histogram)
-const recentEnrollmentTrends = [
-  {
-    month: 'Jan',
-    'React Masterclass': 42,
-    'Python Data Science': 35,
-    'UI/UX Design': 31,
-    'Digital Marketing': 28,
-    'Node.js Backend': 26,
-    'Mobile App Dev': 24,
-  },
-  {
-    month: 'Feb',
-    'React Masterclass': 45,
-    'Python Data Science': 38,
-    'UI/UX Design': 33,
-    'Digital Marketing': 29,
-    'Node.js Backend': 28,
-    'Mobile App Dev': 25,
-  },
-  {
-    month: 'Mar',
-    'React Masterclass': 48,
-    'Python Data Science': 41,
-    'UI/UX Design': 35,
-    'Digital Marketing': 31,
-    'Node.js Backend': 29,
-    'Mobile App Dev': 27,
-  },
-  {
-    month: 'Apr',
-    'React Masterclass': 46,
-    'Python Data Science': 39,
-    'UI/UX Design': 34,
-    'Digital Marketing': 30,
-    'Node.js Backend': 28,
-    'Mobile App Dev': 26,
-  },
-  {
-    month: 'May',
-    'React Masterclass': 51,
-    'Python Data Science': 43,
-    'UI/UX Design': 37,
-    'Digital Marketing': 33,
-    'Node.js Backend': 31,
-    'Mobile App Dev': 28,
-  },
-  {
-    month: 'Jun',
-    'React Masterclass': 54,
-    'Python Data Science': 45,
-    'UI/UX Design': 39,
-    'Digital Marketing': 35,
-    'Node.js Backend': 32,
-    'Mobile App Dev': 30,
-  },
+// Top Performing Courses Data (for Doughnut Chart)
+const topPerformingCourses = [
+  { category: 'React Masterclass', value: 286, color: '#3b82f6' },
+  { category: 'Python Data Science', value: 241, color: '#8b5cf6' },
+  { category: 'UI/UX Design', value: 209, color: '#ec4899' },
+  { category: 'Digital Marketing', value: 186, color: '#f59e0b' },
+  { category: 'Node.js Backend', value: 174, color: '#10b981' },
+  { category: 'Mobile App Dev', value: 159, color: '#06b6d4' },
 ];
 
 // Stats cards data
@@ -219,38 +173,16 @@ export default function Analytics() {
 
         {/* Main Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Performance Radar Chart */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">
-                Overall Performance Metrics
-              </h2>
-              <p className="text-sm text-zinc-400">360° view of key performance indicators</p>
-            </div>
-            <OverallPerformanceMetrics data={performanceMetrics} height={400} />
-          </div>
+          {/* Performance Radar Chart with Date Filter */}
+          <PerformanceMetricsChart data={performanceMetrics} height={400} />
 
-          {/* Student Growth Line Chart */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">Total Student Growth</h2>
-              <p className="text-sm text-zinc-400">Cumulative student registration over time</p>
-            </div>
-            <StudentGrowthChart data={studentGrowth} height={400} />
-          </div>
+          {/* Student Growth Line Chart with Date Filter */}
+          <StudentGrowthChartWithFilter data={studentGrowth} height={400} />
         </div>
 
         {/* Enrollment Trend - Full Width */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-zinc-100 mb-1">
-              Enrollment, Completion & Revenue Trend
-            </h2>
-            <p className="text-sm text-zinc-400">
-              Track student enrollments, course completions, and revenue over time
-            </p>
-          </div>
-          <EnrollmentCompletion
+        <div className="mb-6">
+          <EnrollmentCompletionWithFilter
             data={enrollmentTrend}
             height={400}
             series={[
@@ -263,111 +195,31 @@ export default function Analytics() {
 
         {/* Doughnut Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Course Completion Status */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">Course Completion Status</h2>
-              <p className="text-sm text-zinc-400">Overall completion rate across all courses</p>
-            </div>
-            <DoughnutChart
-              data={courseCompletionData}
-              height={320}
-              innerRadiusPercent={60}
-              showLegend={true}
-            />
-          </div>
-
-          {/* Enrollment by Category */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">Enrollment by Category</h2>
-              <p className="text-sm text-zinc-400">
-                Distribution of students across course categories
-              </p>
-            </div>
-            <DoughnutChart
-              data={enrollmentByCategory}
-              height={320}
-              innerRadiusPercent={50}
-              showLegend={true}
-            />
-          </div>
+          <CourseCompletionStatusChart
+            data={courseCompletionData}
+            height={320}
+            innerRadiusPercent={60}
+          />
+          <EnrollmentByCategoryChart
+            data={enrollmentByCategory}
+            height={320}
+            innerRadiusPercent={50}
+          />
         </div>
 
-        {/* Column and Stacked Bar Charts */}
+        {/* Column Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Monthly Enrollments Trend */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">
-                Monthly Enrollments Trend
-              </h2>
-              <p className="text-sm text-zinc-400">
-                New student enrollments over the past 6 months
-              </p>
-            </div>
-            <ColumnChart data={monthlyEnrollments} height={320} />
-          </div>
-
-          {/* Course Completions by Month */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">
-                Course Completions by Month
-              </h2>
-              <p className="text-sm text-zinc-400">Number of courses completed each month</p>
-            </div>
-            <ColumnChart data={courseCompletionByMonth} height={320} />
-          </div>
+          <MonthlyEnrollmentsTrendChart data={monthlyEnrollments} height={320} />
+          <CourseCompletionsByMonthChart data={courseCompletionByMonth} height={320} />
         </div>
 
         {/* Top Performing Courses - Radial Histogram - Full Width */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-zinc-100 mb-1">
-              Top Performing Courses - Enrollment Trends
-            </h2>
-            <p className="text-sm text-zinc-400">
-              Recent 6-month enrollment trends for top-performing courses shown in radial histogram
-              format
-            </p>
-          </div>
-          <TopPerformingCoursesChart data={recentEnrollmentTrends} height={550} />
-        </div>
-
-        {/* Assessment and Engagement */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Assessment Performance */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">Assessment Performance</h2>
-              <p className="text-sm text-zinc-400">
-                Student performance distribution on assessments
-              </p>
-            </div>
-            <DoughnutChart
-              data={assessmentPerformance}
-              height={320}
-              innerRadiusPercent={55}
-              showLegend={true}
-            />
-          </div>
-
-          {/* User Engagement Levels */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">User Engagement Levels</h2>
-              <p className="text-sm text-zinc-400">
-                Active user engagement based on platform activity
-              </p>
-            </div>
-            <DoughnutChart
-              data={userEngagement}
-              height={320}
-              innerRadiusPercent={55}
-              showLegend={true}
-            />
-          </div>
+        <div className="mb-6">
+          <TopPerformingCoursesChart
+            data={topPerformingCourses}
+            height={400}
+            innerRadiusPercent={60}
+          />
         </div>
 
         {/* Additional Insights Section */}
@@ -415,7 +267,7 @@ export default function Analytics() {
                           {performer.score}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-500 truncate">{performer.course}</p>
+                      <p className="text-md text-zinc-500 truncate">{performer.course}</p>
                     </div>
 
                     {/* Score Progress Bar */}

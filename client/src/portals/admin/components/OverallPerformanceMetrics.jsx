@@ -19,11 +19,9 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
 
   // Default to current month for the filter
   const [startDate, setStartDate] = useState(
-    new Date(new Date().setDate(1)).toISOString().split('T')[0]
+    new Date(new Date().setDate(1)).toISOString().split('T')[0],
   );
-  const [endDate, setEndDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleDateChange = (type, value) => {
     if (type === 'start') setStartDate(value);
@@ -31,10 +29,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
 
     // Trigger parent callback to reload data based on new range
     if (onDateChange) {
-      onDateChange(
-        type === 'start' ? value : startDate,
-        type === 'end' ? value : endDate
-      );
+      onDateChange(type === 'start' ? value : startDate, type === 'end' ? value : endDate);
     }
   };
 
@@ -58,7 +53,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
     if (root._logo) {
       try {
         root._logo.dispose();
-      } catch (e) { }
+      } catch (e) {}
     }
 
     // Create chart
@@ -71,7 +66,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
         innerRadius: am5.percent(20),
         startAngle: -90,
         endAngle: 180,
-      })
+      }),
     );
 
     // -------------------------------------------------------------------------
@@ -132,7 +127,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
       'cursor',
       am5radar.RadarCursor.new(root, {
         behavior: 'zoomX',
-      })
+      }),
     );
     cursor.lineY.set('visible', false);
 
@@ -163,7 +158,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
             stroke: am5.color(0x52525b), // zinc-600
           }),
         }),
-      })
+      }),
     );
 
     // Tooltip label styling
@@ -194,7 +189,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
       am5xy.CategoryAxis.new(root, {
         categoryField: 'category',
         renderer: yRenderer,
-      })
+      }),
     );
 
     yAxis.data.setAll(dataWithColors);
@@ -208,7 +203,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
         valueXField: 'full',
         categoryYField: 'category',
         fill: am5.color(0x3f3f46), // zinc-700
-      })
+      }),
     );
 
     series1.columns.template.setAll({
@@ -228,7 +223,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
         clustered: false,
         valueXField: 'value',
         categoryYField: 'category',
-      })
+      }),
     );
 
     series2.columns.template.setAll({
@@ -249,7 +244,7 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
           strokeWidth: 1,
           stroke: am5.color(0x52525b), // zinc-600
         }),
-      })
+      }),
     );
 
     series2.columns.template.get('tooltip').label.setAll({
@@ -274,89 +269,10 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
     <div
       style={{
         width: '100%',
-        background: '#18181b', // bg-zinc-900
+        background: '#18181b',
         borderRadius: 12,
-        padding: 20,
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
-      {/* Header and Filter Controls */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 10,
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
-        <h3
-          style={{
-            color: '#e5e7eb', // zinc-200
-            margin: 0,
-            fontSize: '1.1rem',
-            fontWeight: 600,
-          }}
-        >
-          Performance Radar
-        </h3>
-
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              From
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => handleDateChange('start', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '0.75rem',
-                color: '#a1a1aa', // zinc-400
-                marginBottom: 2,
-              }}
-            >
-              To
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => handleDateChange('end', e.target.value)}
-              style={{
-                background: '#27272a', // zinc-800
-                border: '1px solid #3f3f46', // zinc-700
-                color: '#e5e7eb', // zinc-200
-                padding: '4px 8px',
-                borderRadius: 6,
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Chart Container */}
       <div
         style={{
@@ -369,3 +285,4 @@ export default function RadarChart({ data, height = 500, onDateChange }) {
     </div>
   );
 }
+
