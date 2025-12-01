@@ -8,6 +8,7 @@ import api, {
   getAccessToken,
   getStoredUser,
 } from '../api';
+import { jwtDecode } from 'jwt-decode';
 
 // Re-export token management functions for external use
 export { getAccessToken, getRefreshToken, getStoredUser, setTokens, setUser, clearAuth };
@@ -53,7 +54,7 @@ const authService = {
   // Handle OAuth success (called after redirect from OAuth provider)
   handleOAuthSuccess: (accessToken, refreshToken) => {
     setTokens(accessToken, refreshToken);
-    return authService.getCurrentUser();
+    return authService.getCurrentUser(accessToken);
   },
 
   // Logout from current session
@@ -80,12 +81,10 @@ const authService = {
   },
 
   // Get current authenticated user
-  getCurrentUser: async () => {
-    const response = await api.get('/auth/me');
-    if (response.data.success) {
-      setUser(response.data.data.user);
-    }
-    return response.data;
+  getCurrentUser: async accessToken => {
+    const user = jwtDecode(accessToken);
+    setUser(user);
+    return user;
   },
 
   // Refresh access token manually
@@ -142,3 +141,4 @@ const authService = {
 // ============================================
 
 export default authService;
+

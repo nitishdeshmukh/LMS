@@ -26,6 +26,7 @@ import Github from './pages/VersionControlWithGit.jsx';
 
 import PageNotFound from '@/common/pages/PageNotFound.jsx';
 import AuthSuccess from './pages/AuthSuccess.jsx';
+import ProtectedRoute from '@/common/components/ProtectedRoute.jsx';
 
 const PublicPortal = () => {
   return (
@@ -52,8 +53,22 @@ const PublicPortal = () => {
           <Route path="/mobiledev" element={<MobileDev />} />
           <Route path="/ux" element={<UX />} />
           <Route path="/github" element={<Github />} />
-          <Route path="/enroll" element={<EnrollmentDetails />} />
-          <Route path="/enroll/payment" element={<EnrollmentPayment />} />
+          <Route
+            path="/enroll"
+            element={
+              <ProtectedRoute>
+                <EnrollmentDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/enroll/payment"
+            element={
+              <ProtectedRoute>
+                <EnrollmentPayment />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
@@ -63,3 +78,4 @@ const PublicPortal = () => {
 };
 
 export default PublicPortal;
+

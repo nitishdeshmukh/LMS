@@ -1,15 +1,25 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../../../services/global/authService';
+import Cookies from 'js-cookie';
+import { toast } from 'sonner';
 
 function AuthSuccess() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate('/');
-    }, 1500);
+    // Retrieve tokens from cookies
+    const accessToken = Cookies.get('accessToken');
+    const refreshToken = Cookies.get('refreshToken');
 
-    return () => clearTimeout(timer);
+    if (accessToken && refreshToken) {
+      authService.handleOAuthSuccess(accessToken, refreshToken).then(() => {
+        navigate(-2);
+      });
+    } else {
+      toast.error('Authentication tokens not found. Please log in again.');
+      navigate('/');
+    }
   }, [navigate]);
 
   return (

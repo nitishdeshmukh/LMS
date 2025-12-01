@@ -6,6 +6,7 @@ const initialState = {
   adminSidebarOpen: false,
   globalLoading: false,
   notifications: [],
+  isLoginPopupOpen: false,
 };
 
 const uiSlice = createSlice({
@@ -43,6 +44,18 @@ const uiSlice = createSlice({
     clearNotifications: state => {
       state.notifications = [];
     },
+
+    openLoginPopup: state => {
+      state.isLoginPopupOpen = true;
+    },
+
+    closeLoginPopup: state => {
+      state.isLoginPopupOpen = false;
+    },
+
+    toggleLoginPopup: state => {
+      state.isLoginPopupOpen = !state.isLoginPopupOpen;
+    },
   },
 });
 
@@ -55,6 +68,9 @@ export const {
   addNotification,
   removeNotification,
   clearNotifications,
+  openLoginPopup,
+  closeLoginPopup,
+  toggleLoginPopup,
 } = uiSlice.actions;
 
 // Selectors
@@ -64,5 +80,7 @@ export const selectStudentSidebarOpen = state => state.ui.studentSidebarOpen;
 export const selectAdminSidebarOpen = state => state.ui.adminSidebarOpen;
 export const selectGlobalLoading = state => state.ui.globalLoading;
 export const selectNotifications = state => state.ui.notifications;
+export const selectIsLoginPopupOpen = state => state.ui.isLoginPopupOpen;
 
 export default uiSlice.reducer;
+

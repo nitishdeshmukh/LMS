@@ -22,16 +22,23 @@ import {
 } from 'lucide-react';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
 import { toast } from 'sonner';
-import { Toaster } from '@/common/components/ui/sonner';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectIsAuthenticated, openLoginPopup } from '../../../redux/slices';
 
 const Fullstack = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedModule, setExpandedModule] = useState(null);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const navigateAndStore = useNavigateWithRedux();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useDispatch();
 
   const handleApplyCoupon = () => {
+    if (!isAuthenticated) {
+      dispatch(openLoginPopup());
+      toast.warning('Please log in to apply a coupon code', { duration: 3000 });
+      return;
+    }
     if (!couponCode.trim()) {
       toast.error('Please enter a coupon code', {
         duration: 3000,
@@ -58,6 +65,15 @@ const Fullstack = () => {
       ),
       duration: 5000,
     });
+  };
+
+  const handelEnrollNow = () => {
+    if (!isAuthenticated) {
+      dispatch(openLoginPopup());
+      toast.warning('Please log in to enroll in the course', { duration: 3000 });
+      return;
+    }
+    navigateAndStore('/enroll');
   };
 
   // --- UPDATED DATA FOR FULL STACK ROADMAP ---
@@ -228,9 +244,6 @@ const Fullstack = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
-      {/* --- NAVBAR --- */}
-      <Toaster position="top-center" duration={5000} />
-
       {/* --- MAIN CONTAINER --- */}
       <div className="pt-20 pb-20">
         {/* Hero Banner (Dark Theme) */}
@@ -426,7 +439,7 @@ const Fullstack = () => {
                   </p>
 
                   <button
-                    onClick={() => navigateAndStore('/enroll')}
+                    onClick={() => handelEnrollNow()}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl mb-4 transition-colors shadow-lg shadow-blue-600/25"
                   >
                     Enroll Now
@@ -502,3 +515,4 @@ const Fullstack = () => {
 };
 
 export default Fullstack;
+

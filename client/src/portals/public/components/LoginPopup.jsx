@@ -12,7 +12,7 @@ import {
 } from '@/common/components/ui/dialog';
 import { cn } from '@/common/lib/utils';
 
-const LoginPopup = ({ isOpen, onClose, onSubmit }) => {
+const LoginPopup = ({ isOpen, onClose }) => {
   const location = useLocation();
 
   // Close dialog when route changes

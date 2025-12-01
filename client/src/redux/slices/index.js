@@ -23,6 +23,9 @@ export {
   addNotification,
   removeNotification,
   clearNotifications,
+  openLoginPopup,
+  closeLoginPopup,
+  toggleLoginPopup,
   selectUI,
   selectCurrentNavigation,
   selectStudentSidebarOpen,
@@ -81,3 +84,4 @@ export {
   selectSupport,
   selectSupportQueries,
 } from './studentSlice';
+
