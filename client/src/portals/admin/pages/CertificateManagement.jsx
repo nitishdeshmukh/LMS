@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Badge } from '../../../common/components/ui/badge';
 import { Search, Eye, Award, RotateCw } from 'lucide-react';
 import { Button } from '@/common/components/ui/button';
+import CustomCertificate from '../components/CustomCertificate';
 
 const CertificateManagement = () => {
   const [activeTab, setActiveTab] = useState('ready');
@@ -213,6 +214,15 @@ const CertificateManagement = () => {
           </div>
         )}
       </div>
+       <div className=" overflow-auto">
+          <CustomCertificate
+            studentName={"Deepak Agrawal"}
+            course={"Web Development"}
+            timeperiod={"3 Months"}
+            conductedFrom={"1-october to 3 october"}
+          />
+        </div>
+      
     </div>
     
   );

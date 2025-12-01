@@ -7,7 +7,7 @@ import { Mail, Globe, FileText, Building2, MapPin } from 'lucide-react';
 
 const CustomCertificate = ({
     // Student/Certificate Data - DYNAMIC
-    studentName = "John Doe",
+    studentName = "Deepak Agrawal",
     course = "Full Stack Development",
     timeperiod = "3 months",
     conductedFrom = "1st August - 31th October, 2025",
@@ -23,7 +23,7 @@ const CustomCertificate = ({
 }) => {
     return (
         // Dark Blue Background Container
-        <div className="relative w-full min-h-screen bg-[#243d5c] flex items-center justify-center p-14">
+        <div className="relative w-full max-h-[794px] max-w-[1123px] bg-[#243d5c] flex items-center justify-center p-10">
 
             {/* Certificate Container */}
             <div className="relative">
@@ -32,7 +32,7 @@ const CustomCertificate = ({
                 <img src={certificateBG} alt="" className="w-full h-auto" />
 
                 {/* Text Content Overlay - Positioned Above Image */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center px-16 py-8">
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-12 py-8">
                     <div className="text-center space-y-1 w-full">
 
                         {/* Logo */}
@@ -141,7 +141,7 @@ const CustomCertificate = ({
                                 <img
                                     src={signature}
                                     alt="Signature"
-                                    className="w-full h-auto max-h-[120px] object-contain"
+                                    className="w-full h-auto max-h-[100px] object-contain"
                                 />
                             </div>
 
