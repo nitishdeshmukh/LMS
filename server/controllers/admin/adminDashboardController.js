@@ -11,7 +11,7 @@ export const getDashboardCardStats = async (req, res) => {
 
         // Base filter for paid enrollments
         const baseFilter = {
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         };
 
         if (college) baseFilter["checkoutDetails.collegeName"] = college;
@@ -60,7 +60,7 @@ export const getDashboardCardStats = async (req, res) => {
             college
                 ? Enrollment.distinct("course", {
                       "checkoutDetails.collegeName": college,
-                      paymentStatus: "paid",
+                      paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
                   })
                 : Course.countDocuments({ isPublished: true }),
         ]);
@@ -106,7 +106,7 @@ export const getTotalEnrolledStudentInEveryActiveCourse = async (req, res) => {
 
         // Build match filter
         const matchFilter = {
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         };
 
         if (Object.keys(dateFilter).length > 0) {

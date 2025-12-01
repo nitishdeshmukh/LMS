@@ -1,5 +1,9 @@
 import { Payment, Student, Course, Enrollment } from "../../models/index.js";
 
+/**
+ * Submit payment proof for partial or full payment
+ * POST /api/public/payment/:enrollmentId
+ */
 export const submitPaymentProof = async (req, res) => {
     try {
         const {
@@ -8,49 +12,20 @@ export const submitPaymentProof = async (req, res) => {
             ifscCode,
             accountNumber,
             transactionId,
+            paymentType, // 'partial' or 'full'
         } = req.validatedData;
 
-        // Get IDs from URL params or auth (adjust based on your flow)
-        const { studentId, courseId, enrollmentId } = req.params;
+        const { enrollmentId } = req.params;
 
         // Get screenshot URL from uploaded file
         const screenshotUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
-        // Verify student exists
-        const student = await Student.findById(studentId);
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-
-        // Verify course exists
-        const courseDoc = await Course.findById(courseId);
-        if (!courseDoc) {
-            return res.status(404).json({
-                success: false,
-                message: "Course not found",
-            });
-        }
-
-        // Verify enrollment exists
-        const enrollmentDoc = await Enrollment.findById(enrollmentId);
-        if (!enrollmentDoc) {
+        // Verify enrollment exists and get details
+        const enrollment = await Enrollment.findById(enrollmentId).populate("course", "title price");
+        if (!enrollment) {
             return res.status(404).json({
                 success: false,
                 message: "Enrollment not found",
-            });
-        }
-
-        // Check if payment already exists for this enrollment
-        const existingPayment = await Payment.findOne({
-            enrollment: enrollmentId,
-        });
-        if (existingPayment) {
-            return res.status(409).json({
-                success: false,
-                message: "Payment already submitted for this enrollment",
             });
         }
 
@@ -63,42 +38,44 @@ export const submitPaymentProof = async (req, res) => {
             });
         }
 
+        // Determine payment amount based on type
+        const coursePrice = enrollment.courseAmount || enrollment.course.price || 500;
+        const amount = paymentType === 'partial' ? Math.ceil(coursePrice / 2) : (enrollment.amountRemaining || coursePrice);
+
         // Create payment record
         const payment = await Payment.create({
-            student: studentId,
-            course: courseId,
-            enrollment: enrollmentId,
             accountHolderName,
             bankName,
             ifscCode,
             accountNumber,
             transactionId,
             screenshotUrl,
-            amount: 500, // default or get from course
+            amount,
             currency: "INR",
-            status: "Submitted",
         });
 
-        // Populate the response
-        const populatedPayment = await Payment.findById(payment._id)
-            .populate("student", "name email")
-            .populate("course", "name")
-            .populate("enrollment");
+        // Update enrollment with payment reference and status
+        if (paymentType === 'partial') {
+            enrollment.partialPaymentDetails = payment._id;
+            enrollment.paymentStatus = "PARTIAL_PAYMENT_VERIFICATION_PENDING";
+        } else {
+            enrollment.fullPaymentDetails = payment._id;
+            enrollment.paymentStatus = "FULLY_PAYMENT_VERIFICATION_PENDING";
+        }
+
+        await enrollment.save();
 
         res.status(201).json({
             success: true,
-            message:
-                "Payment proof submitted successfully. It will be verified within 24-48 hours.",
+            message: "Payment proof submitted successfully. It will be verified within 24-48 hours.",
             data: {
-                paymentId: populatedPayment._id,
-                transactionId: populatedPayment.transactionId,
-                amount: populatedPayment.amount,
-                currency: populatedPayment.currency,
-                status: populatedPayment.status,
-                screenshotUrl: populatedPayment.screenshotUrl,
-                student: populatedPayment.student,
-                course: populatedPayment.course,
-                submittedAt: populatedPayment.createdAt,
+                paymentId: payment._id,
+                transactionId: payment.transactionId,
+                amount: payment.amount,
+                currency: payment.currency,
+                paymentType,
+                screenshotUrl: payment.screenshotUrl,
+                submittedAt: payment.createdAt,
             },
         });
     } catch (error) {
@@ -119,43 +96,71 @@ export const submitPaymentProof = async (req, res) => {
     }
 };
 
+/**
+ * Verify/Reject payment (Admin only)
+ * PATCH /api/admin/payment/:enrollmentId/verify
+ */
 export const updatePaymentStatus = async (req, res) => {
     try {
-        const { paymentId } = req.params;
-        const { status, adminRemarks } = req.body;
+        const { enrollmentId } = req.params;
+        const { action, paymentType } = req.body; // action: 'approve' or 'reject', paymentType: 'partial' or 'full'
 
-        // Validate status
-        if (!["submitted", "verified", "rejected"].includes(status)) {
+        // Validate action
+        if (!["approve", "reject"].includes(action)) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "Invalid status. Must be submitted, verified, or rejected",
+                message: "Invalid action. Must be 'approve' or 'reject'",
             });
         }
 
-        const payment = await Payment.findByIdAndUpdate(
-            paymentId,
-            {
-                status,
-                adminRemarks: adminRemarks || undefined,
-                updatedAt: Date.now(),
-            },
-            { new: true }
-        )
-            .populate("student", "name email")
-            .populate("course", "name");
+        const enrollment = await Enrollment.findById(enrollmentId)
+            .populate("partialPaymentDetails")
+            .populate("fullPaymentDetails")
+            .populate("course", "title price");
 
-        if (!payment) {
+        if (!enrollment) {
             return res.status(404).json({
                 success: false,
-                message: "Payment not found",
+                message: "Enrollment not found",
             });
         }
+
+        const coursePrice = enrollment.courseAmount || enrollment.course.price || 500;
+
+        if (action === "approve") {
+            if (paymentType === "partial") {
+                const partialAmount = enrollment.partialPaymentDetails?.amount || Math.ceil(coursePrice / 2);
+                enrollment.paymentStatus = "PARTIAL_PAID";
+                enrollment.amountPaid = partialAmount;
+                enrollment.amountRemaining = coursePrice - partialAmount;
+            } else {
+                const fullAmount = enrollment.fullPaymentDetails?.amount || enrollment.amountRemaining || coursePrice;
+                enrollment.paymentStatus = "FULLY_PAID";
+                enrollment.amountPaid = coursePrice;
+                enrollment.amountRemaining = 0;
+            }
+        } else {
+            // Reject - reset to previous state
+            if (paymentType === "partial") {
+                enrollment.paymentStatus = "UNPAID";
+                enrollment.partialPaymentDetails = null;
+            } else {
+                enrollment.paymentStatus = enrollment.partialPaymentDetails ? "PARTIAL_PAID" : "UNPAID";
+                enrollment.fullPaymentDetails = null;
+            }
+        }
+
+        await enrollment.save();
 
         res.status(200).json({
             success: true,
-            message: `Payment ${status} successfully`,
-            data: payment,
+            message: `Payment ${action === "approve" ? "approved" : "rejected"} successfully`,
+            data: {
+                enrollmentId: enrollment._id,
+                paymentStatus: enrollment.paymentStatus,
+                amountPaid: enrollment.amountPaid,
+                amountRemaining: enrollment.amountRemaining,
+            },
         });
     } catch (error) {
         console.error("Update payment status error:", error);

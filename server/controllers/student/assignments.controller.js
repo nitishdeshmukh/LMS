@@ -32,7 +32,7 @@ export const getAssignmentsByCourse = async (req, res) => {
     try {
         const enrollments = await Enrollment.find({
             student: req.userId,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         }).populate("course", "title slug thumbnail modules");
 
         const coursesWithAssignments = enrollments.map((enrollment) => {
@@ -98,7 +98,7 @@ export const getCourseAssignments = async (req, res) => {
         const enrollment = await Enrollment.findOne({
             student: req.userId,
             course: course._id,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         });
 
         if (!enrollment) {
@@ -192,7 +192,7 @@ export const submitAssignment = async (req, res) => {
         const enrollment = await Enrollment.findOne({
             student: req.userId,
             course: courseId,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         });
 
         if (!enrollment) {

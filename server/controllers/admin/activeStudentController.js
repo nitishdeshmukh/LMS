@@ -189,7 +189,7 @@ async function getTotalActiveStudentsBreakdown(dateFilter) {
  */
 async function getActiveStudentsPerDomain(dateFilter) {
     const matchConditions = {
-        paymentStatus: "paid",
+        paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAID"] },
         ...dateFilter, // Apply date filter if provided
     };
 
@@ -264,7 +264,7 @@ async function getCompletionStatistics(dateFilter) {
     const completionStats = await Enrollment.aggregate([
         {
             $match: {
-                paymentStatus: "paid",
+                paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAID"] },
                 ...dateFilter,
             },
         },
@@ -787,7 +787,7 @@ export const getFilterOptions = async (req, res) => {
             data: {
                 colleges: options[0].colleges.map((c) => c._id),
                 years: options[0].years.map((y) => y._id),
-                paymentStatuses: ["pending", "paid", "failed", "refunded"],
+                paymentStatuses: ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING", "PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"],
                 capstoneStatuses: [
                     "Not Submitted",
                     "submitted",
@@ -814,7 +814,7 @@ export const updatePaymentStatus = async (req, res) => {
         const { enrollmentId } = req.params;
         const { paymentStatus } = req.body;
 
-        const validStatuses = ["pending", "paid", "failed", "refunded"];
+        const validStatuses = ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING", "PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"];
         if (!validStatuses.includes(paymentStatus)) {
             return res.status(400).json({
                 success: false,

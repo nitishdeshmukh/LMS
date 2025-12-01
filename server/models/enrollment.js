@@ -13,33 +13,19 @@ const enrollmentSchema = new mongoose.Schema(
             ref: "Course",
             required: true,
         },
-
-        // Checkout Form Details
-        checkoutDetails: {
-            firstName: { type: String, required: true },
-            middleName: { type: String },
-            lastName: { type: String, required: true },
-            collegeName: { type: String, required: true },
-            degreeCourseName: { type: String, required: true },
-            yearOfStudy: { type: String, required: true },
-            email: { type: String, required: true },
-            phoneNumber: { type: String, required: true },
-            alternatePhone: { type: String },
-        },
-
+        
+        partialPaymentDetails: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
+        fullPaymentDetails: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
         paymentStatus: {
             type: String,
-            enum: ["pending", "paid", "failed", "refunded"],
-            default: "pending",
+            enum: ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING", "PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"],
+            default: "UNPAID",
         },
 
-        transactionId: { type: String },
+        courseAmount: { type: Number },
         amountPaid: { type: Number },
+        amountRemaining: { type: Number },
         enrollmentDate: { type: Date, default: Date.now },
-
-        // ADDED: Admin Issues LMS Credentials
-        lmsIssuedId: { type: String },
-        lmsIssuedPassword: { type: String },
 
         // Progress tracking - completed quizzes and tasks
         completedQuizzes: [{ type: mongoose.Schema.Types.ObjectId }],

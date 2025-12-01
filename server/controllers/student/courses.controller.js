@@ -53,7 +53,7 @@ export const getMyCourses = async (req, res) => {
     try {
         const enrollments = await Enrollment.find({
             student: req.userId,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         })
             .populate(
                 "course",
@@ -124,7 +124,7 @@ export const getCourseDetails = async (req, res) => {
         const enrollment = await Enrollment.findOne({
             student: req.userId,
             course: course._id,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         });
 
         if (!enrollment) {
@@ -195,13 +195,13 @@ export const getCourseDetails = async (req, res) => {
         // Check capstone status
         const allModulesCompleted = modules.every((m) => m.isCompleted);
 
-        // Get capstone projects
-        const capstoneProjects = course.capstoneProjects?.map((cp) => ({
-            id: cp._id,
-            title: cp.title,
-            description: cp.description,
+        // Get capstone project (single object, not array)
+        const capstone = course.capstoneProject ? {
+            title: course.capstoneProject.title,
+            description: course.capstoneProject.description,
             isLocked: !allModulesCompleted,
-        }));
+            isCompleted: course.capstoneProject.isCapstoneCompleted,
+        } : null;
 
         res.json({
             success: true,
@@ -217,8 +217,7 @@ export const getCourseDetails = async (req, res) => {
                 tags: course.tags,
                 progress: enrollment.progressPercentage,
                 modules,
-                capstone: capstoneProjects?.[0] || null,
-                capstoneProjects,
+                capstone,
                 isCompleted: enrollment.isCompleted,
             },
         });
@@ -254,7 +253,7 @@ export const getCourseModules = async (req, res) => {
         const enrollment = await Enrollment.findOne({
             student: req.userId,
             course: course._id,
-            paymentStatus: "paid",
+            paymentStatus: { $in: ["PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"] },
         });
 
         if (!enrollment) {
