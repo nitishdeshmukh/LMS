@@ -112,7 +112,6 @@ api.interceptors.response.use(
       const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
-        clearAuth();
         navigateToLogin();
         return Promise.reject(error);
       }
@@ -134,7 +133,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
         onRefreshError(refreshError);
-        clearAuth();
         navigateToLogin();
         return Promise.reject(refreshError);
       }
@@ -144,7 +142,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Only redirect if not already trying to refresh token
       if (!originalRequest._retry) {
-        clearAuth();
         navigateToLogin();
       }
     }
@@ -152,7 +149,6 @@ api.interceptors.response.use(
     // Handle 403 Forbidden for blocked accounts
     if (error.response?.status === 403) {
       if (error.response?.data?.code === 'ACCOUNT_BLOCKED') {
-        clearAuth();
         navigateToLogin();
       }
     }
