@@ -377,7 +377,7 @@ const MobileDev = () => {
                         onClick={() => setShowCouponInput(true)}
                         className="text-blue-400 text-sm hover:underline flex items-center gap-2 mx-auto"
                       >
-                        <Tag size={16} /> Have a refrral code?
+                        <Tag size={16} /> Have a referral code?
                       </button>
                     ) : (
                       <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -435,3 +435,4 @@ const MobileDev = () => {
 };
 
 export default MobileDev;
+
