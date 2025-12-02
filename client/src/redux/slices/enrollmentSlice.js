@@ -18,7 +18,8 @@ const initialState = {
     ifscCode: '',
     accountNumber: '',
     transactionId: '',
-    screenshotUrl: '',
+    screenshot: null, // ← Changed to store file object
+    screenshotUrl: '', // ← For preview URL
   },
   referralCode: '',
   currentStep: 1,
@@ -53,6 +54,14 @@ const enrollmentSlice = createSlice({
       const { field, value } = action.payload;
       state.paymentDetails[field] = value;
     },
+    setScreenshot: (state, action) => {
+      state.paymentDetails.screenshot = action.payload.file;
+      state.paymentDetails.screenshotUrl = action.payload.url;
+    },
+    clearScreenshot: state => {
+      state.paymentDetails.screenshot = null;
+      state.paymentDetails.screenshotUrl = '';
+    },
   },
 });
 
@@ -65,6 +74,8 @@ export const {
   resetEnrollment,
   updateEnrollmentField,
   updatePaymentField,
+  setScreenshot,
+  clearScreenshot,
 } = enrollmentSlice.actions;
 
 export const selectEnrollment = state => state.enrollment;

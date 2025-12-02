@@ -8,7 +8,7 @@ import {
   selectEnrollmentDetails,
   setCurrentStep,
   selectUser,
-  openLoginPopup, // ← Added
+  openLoginPopup,
 } from '@/redux/slices';
 
 const EnrollmentForm = () => {

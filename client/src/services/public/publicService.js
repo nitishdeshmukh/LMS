@@ -65,6 +65,15 @@ export const getFAQs = async () => {
   return response.data;
 };
 
+// ============================================
+// ENROLLMENT
+// ============================================
+
+export const submitEnrollment = async enrollmentData => {
+  const response = await publicApi.post('/public/enrollment', enrollmentData);
+  return response.data;
+};
+
 // Export all public service functions as a single object
 const publicService = {
   getLandingPageData,
@@ -76,6 +85,8 @@ const publicService = {
   getPublicCourseBySlug,
   submitContactForm,
   getFAQs,
+  submitEnrollment,
 };
 
 export default publicService;
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CreditCard,
   UploadCloud,
@@ -8,10 +8,11 @@ import {
   User,
   Building,
   Hash,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { Toaster } from '@/common/components/ui/sonner';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
 import {
   setPaymentDetails,
@@ -21,17 +22,24 @@ import {
   selectFullEnrollmentData,
   selectIsSubmitted,
   setCurrentStep,
+  setScreenshot,
+  clearScreenshot,
 } from '@/redux/slices';
+import { submitEnrollment } from '@/services/public/publicService';
 
 const EnrollmentPayment = () => {
   const dispatch = useDispatch();
   const navigate = useNavigateWithRedux();
+  const fileInputRef = useRef(null);
 
   const paymentDetails = useSelector(selectPaymentDetails);
   const fullEnrollmentData = useSelector(selectFullEnrollmentData);
   const isSubmitted = useSelector(selectIsSubmitted);
 
   const [paymentData, setPaymentData] = useState(paymentDetails);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(paymentDetails.screenshotUrl || '');
 
   useEffect(() => {
     dispatch(setCurrentStep(2));
@@ -72,34 +80,86 @@ const EnrollmentPayment = () => {
     dispatch(updatePaymentField({ field: name, value }));
   };
 
+  // Handle file selection
+  const handleFileSelect = e => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Invalid file type', {
+        description: 'Please upload a JPG, PNG, or WebP image',
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('File too large', {
+        description: 'Please upload an image smaller than 5MB',
+      });
+      return;
+    }
+
+    // Create preview URL
+    const url = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setPreviewUrl(url);
+
+    // Save to Redux
+    dispatch(setScreenshot({ file, url }));
+
+    toast.success('Screenshot uploaded successfully!');
+  };
+
+  // Remove screenshot
+  const handleRemoveFile = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl('');
+    dispatch(clearScreenshot());
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    toast.info('Screenshot removed');
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
 
-    // Save payment details to Redux
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     dispatch(setPaymentDetails(paymentData));
 
-    // Get complete enrollment data (enrollment + payment + referral)
+    // Prepare form data for file upload
+    const formData = new FormData();
+
+    // Add enrollment details
     const enrollmentData = fullEnrollmentData;
-    console.log('📦 Submitting Full Enrollment Data:', enrollmentData);
-
-    // API CALL - Replace with your actual endpoint
-    try {
-      const response = await fetch('YOUR_API_ENDPOINT/api/enrollment/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add auth token if needed:
-          // 'Authorization': `Bearer ${yourToken}`,
-        },
-        body: JSON.stringify(enrollmentData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+    Object.keys(enrollmentData).forEach(key => {
+      if (key !== 'screenshot' && key !== 'screenshotUrl') {
+        formData.append(key, enrollmentData[key]);
       }
+    });
 
-      const result = await response.json();
-      console.log('✅ API Response:', result);
+    // Add screenshot file if exists
+    if (selectedFile) {
+      formData.append('screenshot', selectedFile);
+    }
+
+    console.log('📦 Submitting Full Enrollment Data with screenshot');
+
+    try {
+      // ✅ Use the service function
+      const result = await submitEnrollment(formData);
+
+      console.log('✅ Enrollment Successful:', result);
 
       // Show success toast
       toast.success('Thank you for the payment!', {
@@ -129,11 +189,15 @@ const EnrollmentPayment = () => {
       }, 8000);
     } catch (error) {
       console.error('❌ Enrollment submission error:', error);
+
+      const errorMessage = error.response?.data?.message || error.message || 'Something went wrong';
+
       toast.error('Submission failed. Please try again.', {
-        description: error.message,
+        description: errorMessage,
         duration: 5000,
       });
-      return;
+
+      setIsSubmitting(false);
     }
   };
 
@@ -163,8 +227,6 @@ const EnrollmentPayment = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white flex flex-col">
-      <Toaster position="top-center" duration={8000} />
-
       <header className="h-20 border-b border-zinc-800 flex items-center px-8 bg-zinc-900/50 backdrop-blur-md">
         <span className="text-2xl font-bold tracking-tighter">
           LMS<span className="text-blue-500">PORTAL</span>
@@ -265,9 +327,10 @@ const EnrollmentPayment = () => {
                     type="text"
                     name="accountHolderName"
                     required
+                    disabled={isSubmitting}
                     value={paymentData.accountHolderName}
                     onChange={handleChange}
-                    className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="As per passbook"
                   />
                 </div>
@@ -287,9 +350,10 @@ const EnrollmentPayment = () => {
                       type="text"
                       name="bankName"
                       required
+                      disabled={isSubmitting}
                       value={paymentData.bankName}
                       onChange={handleChange}
-                      className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Your Bank"
                     />
                   </div>
@@ -307,9 +371,10 @@ const EnrollmentPayment = () => {
                       type="text"
                       name="ifscCode"
                       required
+                      disabled={isSubmitting}
                       value={paymentData.ifscCode}
                       onChange={handleChange}
-                      className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-black border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="ABCD0123456"
                     />
                   </div>
@@ -324,9 +389,10 @@ const EnrollmentPayment = () => {
                   type="text"
                   name="accountNumber"
                   required
+                  disabled={isSubmitting}
                   value={paymentData.accountNumber}
                   onChange={handleChange}
-                  className="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none font-mono"
+                  className="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="000000000000"
                 />
               </div>
@@ -339,41 +405,114 @@ const EnrollmentPayment = () => {
                   type="text"
                   name="transactionId"
                   required
+                  disabled={isSubmitting}
                   value={paymentData.transactionId}
                   onChange={handleChange}
-                  className="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none placeholder-zinc-700 font-mono"
+                  className="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none placeholder-zinc-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. 1234567890"
                 />
               </div>
 
+              {/* Upload Screenshot */}
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                   Upload Screenshot (Optional)
                 </label>
-                <div className="border-2 border-dashed border-zinc-700 rounded-xl p-4 hover:border-blue-500 hover:bg-zinc-800/50 transition-all cursor-pointer text-center flex items-center justify-center gap-3">
-                  <UploadCloud size={20} className="text-zinc-500" />
-                  <span className="text-sm text-zinc-400">Click to upload proof</span>
-                </div>
+
+                {!previewUrl ? (
+                  <div
+                    onClick={() => !isSubmitting && fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-zinc-700 rounded-xl p-4 hover:border-blue-500 hover:bg-zinc-800/50 transition-all cursor-pointer text-center flex items-center justify-center gap-3"
+                  >
+                    <UploadCloud size={20} className="text-zinc-500" />
+                    <span className="text-sm text-zinc-400">Click to upload proof</span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                ) : (
+                  <div className="relative border-2 border-blue-500 rounded-xl p-3 bg-zinc-800/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-black flex-shrink-0">
+                        <img
+                          src={previewUrl}
+                          alt="Screenshot preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white font-medium truncate">
+                          {selectedFile?.name || 'Screenshot'}
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          {selectedFile ? (selectedFile.size / 1024).toFixed(2) : '0'} KB
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        disabled={isSubmitting}
+                        className="p-2 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <X size={18} className="text-red-500" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-xs text-zinc-500 mt-1 ml-1">
+                  Accepted formats: JPG, PNG, WebP • Max size: 5MB
+                </p>
               </div>
 
               <div className="pt-4 flex gap-4">
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => navigate('/enroll/details')}
-                  className="px-6 py-3 border border-zinc-700 rounded-xl text-zinc-400 font-bold hover:text-white hover:bg-zinc-800 transition-colors"
+                  className="px-6 py-3 border border-zinc-700 rounded-xl text-zinc-400 font-bold hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
-                  disabled={!paymentData.transactionId || !paymentData.accountNumber}
+                  disabled={
+                    !paymentData.transactionId || !paymentData.accountNumber || isSubmitting
+                  }
                   className={`flex-1 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
-                    paymentData.transactionId && paymentData.accountNumber
+                    paymentData.transactionId && paymentData.accountNumber && !isSubmitting
                       ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-900/20'
                       : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                   }`}
                 >
-                  Submit Payment
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Submitting...
+                    </span>
+                  ) : (
+                    'Submit Payment'
+                  )}
                 </button>
               </div>
             </form>

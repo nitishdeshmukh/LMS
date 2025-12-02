@@ -97,6 +97,8 @@ export {
   resetEnrollment,
   updateEnrollmentField,
   updatePaymentField,
+  setScreenshot, // ← Added
+  clearScreenshot, // ← Added
   // Selectors
   selectEnrollment,
   selectEnrollmentDetails,
