@@ -1,4 +1,4 @@
-import { Payment, Student, Course, Enrollment } from "../../models/index.js";
+import { Payment, Enrollment } from "../../models/index.js";
 
 /**
  * Submit payment proof for partial or full payment

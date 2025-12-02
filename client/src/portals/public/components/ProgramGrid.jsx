@@ -38,11 +38,10 @@ export default function ProgramsGrid({ programs }) {
           const key = program.id ?? index;
 
           return (
-            <a
-              href={program.link}
+            <Link
+              to={program.link}
               key={key}
               onClick={e => handleInternalNav(e, program.link)}
-              className="block"
               aria-label={`Open ${program.title}`}
             >
               <div
@@ -103,7 +102,7 @@ export default function ProgramsGrid({ programs }) {
                   </div>
                 </div>
               </div>
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -131,3 +130,4 @@ export default function ProgramsGrid({ programs }) {
     </div>
   );
 }
+

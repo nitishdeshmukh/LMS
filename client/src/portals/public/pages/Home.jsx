@@ -5,8 +5,6 @@ import {
   Smartphone,
   BrainCircuit,
   BarChart3,
-  ChevronRight,
-  ChevronLeft,
   Award,
   Users,
   Rocket,
@@ -23,10 +21,15 @@ import {
   CarouselPrevious,
 } from '@/common/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { getCourseIcon, getSlotStatus } from '../utils/courseIcons';
 import ceoHomeImg from '@/assets/images/CEO-HOME-IMAGE.jpeg';
+import { getPublicCourses } from '@/services';
 
 function Home() {
   const [api, setApi] = useState(null);
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [current, setCurrent] = useState(0);
   const [testimonialApi, setTestimonialApi] = React.useState();
   const [currentTestimonial, setCurrentTestimonial] = React.useState(0);
@@ -41,6 +44,42 @@ function Home() {
       setCurrentTestimonial(testimonialApi.selectedScrollSnap());
     });
   }, [testimonialApi]);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const result = await getPublicCourses();
+
+        if (result.success && result.data) {
+          const transformedPrograms = result.data.map(course => {
+            const IconComponent = getCourseIcon(course.stream); // Get component class
+
+            return {
+              title: course.title,
+              description: course.description,
+              icon: <IconComponent className="w-8 h-8 text-blue-400" />, // Render here
+              price: `₹${course.price}`,
+              slots: getSlotStatus(course.level),
+              link: `/courses/${course.slug}`,
+            };
+          });
+
+          setPrograms(transformedPrograms);
+        }
+      } catch (err) {
+        console.error('Fetch Error:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
+
   const textTestimonials = [
     {
       id: 1,
@@ -132,98 +171,6 @@ function Home() {
       color: 'from-red-400 to-pink-500',
       linkedin: 'https://in.linkedin.com/in/mebishnusahu05',
       initial: 'B',
-    },
-  ];
-
-  const programs = [
-    {
-      title: 'Full Stack Web Development',
-      description:
-        'Master the MERN stack. Build scalable web applications from scratch with real-world projects.',
-      icon: <Code className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/fullstack',
-    },
-    {
-      title: 'Data Science & AI',
-      description:
-        'Analyze complex data and build predictive models using Python, Pandas, and Scikit-learn.',
-      icon: <BrainCircuit className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Filling Fast',
-      link: '/datascience',
-    },
-    {
-      title: 'Mobile App Development',
-      description:
-        'Create cross-platform applications for iOS and Android using React Native and Flutter.',
-      icon: <Smartphone className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Open',
-      link: '/mobiledev',
-    },
-    {
-      title: 'Data Analytics',
-      description: 'Turn raw data into actionable insights using SQL, Tableau, and PowerBI.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/dataanalytics',
-    },
-    {
-      title: 'FrontEnd Development',
-      description:
-        'Learn HTML, CSS, JavaScript, and modern frameworks like React to build fast, responsive user interfaces.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹300',
-      slots: 'Limited Seats',
-      link: '/frontend',
-    },
-    {
-      title: 'BackEnd Development',
-      description:
-        'Work with Node.js, APIs, authentication, and server-side programming to create scalable backends.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹300',
-      slots: 'Limited Seats',
-      link: '/backend',
-    },
-    {
-      title: 'Database',
-      description:
-        'Learn SQL for relational databases and MongoDB for NoSQL applications to handle real-world data efficiently.',
-      icon: <Database className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/database',
-    },
-    {
-      title: 'Python with Django + Flask',
-      description:
-        'Build production-ready web apps using Django’s structured approach and Flask’s lightweight flexibility.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/python',
-    },
-    {
-      title: 'UI/UX Design',
-      description:
-        'Learn design principles, Figma workflows, and how to create intuitive user-friendly interfaces.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/UX',
-    },
-    {
-      title: 'Version Control with Git & GitHub',
-      description:
-        'Understand branching, pull requests, conflict resolution, and how to collaborate using Git.',
-      icon: <BarChart3 className="w-8 h-8 text-blue-400" />,
-      price: '₹500',
-      slots: 'Limited Seats',
-      link: '/github',
     },
   ];
 
@@ -425,7 +372,7 @@ function Home() {
             <p className="text-gray-400">Curated paths for the most in-demand tech roles.</p>
           </div>
 
-          <ProgramsGrid programs={programs} />
+          {loading ? <>loading..</> : <ProgramsGrid programs={programs} />}
         </section>
 
         {/* BENEFITS SECTION */}
@@ -748,3 +695,4 @@ function Home() {
 }
 
 export default Home;
+

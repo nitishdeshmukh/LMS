@@ -21,6 +21,7 @@ const initialState = {
     screenshot: null, // ← Changed to store file object
     screenshotUrl: '', // ← For preview URL
   },
+  courseId: '',
   referralCode: '',
   currentStep: 1,
   isSubmitted: false,
@@ -38,6 +39,9 @@ const enrollmentSlice = createSlice({
     },
     setReferralCode: (state, action) => {
       state.referralCode = action.payload;
+    },
+    setCourseId: (state, action) => {
+      state.courseId = action.payload;
     },
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
@@ -69,6 +73,7 @@ export const {
   setEnrollmentDetails,
   setPaymentDetails,
   setReferralCode,
+  setCourseId,
   setCurrentStep,
   setIsSubmitted,
   resetEnrollment,
@@ -82,6 +87,7 @@ export const selectEnrollment = state => state.enrollment;
 export const selectEnrollmentDetails = state => state.enrollment.enrollmentDetails;
 export const selectPaymentDetails = state => state.enrollment.paymentDetails;
 export const selectReferralCode = state => state.enrollment.referralCode;
+export const selectCourseId = state => state.enrollment.courseId;
 export const selectCurrentStep = state => state.enrollment.currentStep;
 export const selectIsSubmitted = state => state.enrollment.isSubmitted;
 
@@ -89,6 +95,7 @@ export const selectFullEnrollmentData = state => ({
   ...state.enrollment.enrollmentDetails,
   ...state.enrollment.paymentDetails,
   referralCode: state.enrollment.referralCode,
+  courseId: state.enrollment.courseId,
 });
 
 export default enrollmentSlice.reducer;
