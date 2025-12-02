@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { authReducer, uiReducer, studentReducer } from './slices';
+import { authReducer, uiReducer, studentReducer, enrollmentReducer } from './slices';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     ui: uiReducer,
     student: studentReducer,
+    enrollment: enrollmentReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
@@ -17,3 +18,4 @@ export const store = configureStore({
     }),
   devTools: import.meta.env.DEV,
 });
+

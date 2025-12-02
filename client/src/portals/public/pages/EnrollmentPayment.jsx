@@ -1,34 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CreditCard,
   UploadCloud,
   CheckCircle,
   Copy,
-  ArrowLeft,
   ShieldCheck,
   User,
   Building,
   Hash,
 } from 'lucide-react';
 import { toast } from 'sonner';
-
+import { useDispatch, useSelector } from 'react-redux';
 import { Toaster } from '@/common/components/ui/sonner';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
+import {
+  setPaymentDetails,
+  updatePaymentField,
+  setIsSubmitted,
+  selectPaymentDetails,
+  selectFullEnrollmentData,
+  selectIsSubmitted,
+  setCurrentStep,
+} from '@/redux/slices';
 
 const EnrollmentPayment = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigateWithRedux();
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Form State
-  const [paymentData, setPaymentData] = useState({
-    accountHolderName: '',
-    bankName: '',
-    ifscCode: '',
-    accountNumber: '',
-    transactionId: '',
-  });
+  const paymentDetails = useSelector(selectPaymentDetails);
+  const fullEnrollmentData = useSelector(selectFullEnrollmentData);
+  const isSubmitted = useSelector(selectIsSubmitted);
 
-  // Bank Details to show user
+  const [paymentData, setPaymentData] = useState(paymentDetails);
+
+  useEffect(() => {
+    dispatch(setCurrentStep(2));
+  }, [dispatch]);
+
   const bankDetails = {
     bankName: 'Punjab National Bank',
     accountName: 'LMS Portal Edutech Pvt Ltd',
@@ -40,7 +48,7 @@ const EnrollmentPayment = () => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard
         .writeText(text)
-        .then(() => alert('Copied to clipboard!'))
+        .then(() => toast.success('Copied to clipboard!'))
         .catch(err => console.error('Failed to copy: ', err));
     } else {
       const textArea = document.createElement('textarea');
@@ -50,7 +58,7 @@ const EnrollmentPayment = () => {
       textArea.select();
       try {
         document.execCommand('copy');
-        alert('Copied to clipboard!');
+        toast.success('Copied to clipboard!');
       } catch (err) {
         console.error('Fallback: Oops, unable to copy', err);
       }
@@ -59,41 +67,74 @@ const EnrollmentPayment = () => {
   };
 
   const handleChange = e => {
-    setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setPaymentData({ ...paymentData, [name]: value });
+    dispatch(updatePaymentField({ field: name, value }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
-    // Simulate API submission
-    console.log('Submitting Payment Proof:', paymentData);
+    // Save payment details to Redux
+    dispatch(setPaymentDetails(paymentData));
 
-    // Show success toast
-    toast.success('Thank you for the payment!', {
-      description:
-        'Your payment is being verified and your login credentials will be sent to your email within 24 hours.',
-      icon: (
-        <svg
-          className="w-5 h-5 text-green-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
-      duration: 8000,
-    });
+    // Get complete enrollment data (enrollment + payment + referral)
+    const enrollmentData = fullEnrollmentData;
+    console.log('📦 Submitting Full Enrollment Data:', enrollmentData);
 
-    // Set submitted state after showing toast
-    setTimeout(() => {
-      setIsSubmitted(true);
-    }, 8000);
+    // API CALL - Replace with your actual endpoint
+    try {
+      const response = await fetch('YOUR_API_ENDPOINT/api/enrollment/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add auth token if needed:
+          // 'Authorization': `Bearer ${yourToken}`,
+        },
+        body: JSON.stringify(enrollmentData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ API Response:', result);
+
+      // Show success toast
+      toast.success('Thank you for the payment!', {
+        description:
+          'Your payment is being verified and your login credentials will be sent to your email within 24 hours.',
+        icon: (
+          <svg
+            className="w-5 h-5 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        ),
+        duration: 8000,
+      });
+
+      // Set submitted state after showing toast
+      setTimeout(() => {
+        dispatch(setIsSubmitted(true));
+      }, 8000);
+    } catch (error) {
+      console.error('❌ Enrollment submission error:', error);
+      toast.error('Submission failed. Please try again.', {
+        description: error.message,
+        duration: 5000,
+      });
+      return;
+    }
   };
 
   if (isSubmitted) {
@@ -122,7 +163,6 @@ const EnrollmentPayment = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white flex flex-col">
-      {/* Add Toaster component here */}
       <Toaster position="top-center" duration={8000} />
 
       <header className="h-20 border-b border-zinc-800 flex items-center px-8 bg-zinc-900/50 backdrop-blur-md">
@@ -212,7 +252,6 @@ const EnrollmentPayment = () => {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Account Holder Name */}
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                   Account Holder Name *
@@ -235,7 +274,6 @@ const EnrollmentPayment = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {/* Bank Name */}
                 <div>
                   <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                     Bank Name *
@@ -256,7 +294,6 @@ const EnrollmentPayment = () => {
                     />
                   </div>
                 </div>
-                {/* IFSC Code */}
                 <div>
                   <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                     IFSC Code *
@@ -279,7 +316,6 @@ const EnrollmentPayment = () => {
                 </div>
               </div>
 
-              {/* Account Number */}
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                   Account Number *
@@ -295,7 +331,6 @@ const EnrollmentPayment = () => {
                 />
               </div>
 
-              {/* Transaction ID */}
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                   Transaction ID / UTR *
@@ -311,7 +346,6 @@ const EnrollmentPayment = () => {
                 />
               </div>
 
-              {/* Upload Screenshot */}
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase mb-1">
                   Upload Screenshot (Optional)
@@ -325,7 +359,7 @@ const EnrollmentPayment = () => {
               <div className="pt-4 flex gap-4">
                 <button
                   type="button"
-                  onClick={() => window.history.back()}
+                  onClick={() => navigate('/enroll/details')}
                   className="px-6 py-3 border border-zinc-700 rounded-xl text-zinc-400 font-bold hover:text-white hover:bg-zinc-800 transition-colors"
                 >
                   Back
@@ -334,7 +368,7 @@ const EnrollmentPayment = () => {
                   type="submit"
                   disabled={!paymentData.transactionId || !paymentData.accountNumber}
                   className={`flex-1 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
-                    paymentData.transactionId
+                    paymentData.transactionId && paymentData.accountNumber
                       ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-900/20'
                       : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                   }`}
@@ -351,3 +385,4 @@ const EnrollmentPayment = () => {
 };
 
 export default EnrollmentPayment;
+

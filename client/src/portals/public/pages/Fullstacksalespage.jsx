@@ -23,7 +23,7 @@ import {
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectIsAuthenticated, openLoginPopup } from '../../../redux/slices';
+import { selectIsAuthenticated, openLoginPopup, setReferralCode } from '../../../redux/slices';
 
 const Fullstack = () => {
   const [expandedModule, setExpandedModule] = useState(null);
@@ -33,21 +33,21 @@ const Fullstack = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const dispatch = useDispatch();
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = referralCode => {
     if (!isAuthenticated) {
       dispatch(openLoginPopup());
       toast.warning('Please log in to apply a coupon code', { duration: 3000 });
       return;
     }
+
     if (!couponCode.trim()) {
       toast.error('Please enter a coupon code', {
         duration: 3000,
       });
       return;
     }
-
-    toast.success('You have applied the coupon code!', {
-      description: `Coupon "${couponCode}" has been applied successfully.`,
+    dispatch(setReferralCode(referralCode));
+    toast.success('You have applied the referral code!', {
       icon: (
         <svg
           className="w-5 h-5 text-green-500"
@@ -465,7 +465,7 @@ const Fullstack = () => {
                         />
                         <button
                           type="button"
-                          onClick={handleApplyCoupon}
+                          onClick={() => handleApplyCoupon(couponCode)}
                           className="bg-zinc-800 hover:bg-zinc-700 text-white text-sm px-4 py-2 rounded-lg transition-colors border border-zinc-700"
                         >
                           Apply

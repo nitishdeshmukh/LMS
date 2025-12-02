@@ -21,7 +21,7 @@ import MobileDev from './pages/MobileDevSalesPage.jsx';
 import UX from './pages/UXSalesPage.jsx';
 import AboutUs from './pages/AboutUSPage.jsx';
 import EnrollmentDetails from './pages/EnrollmentForm.jsx';
-import EnrollmentPayment from './components/UpdatedPaymentPage.jsx';
+import EnrollmentPayment from './pages/EnrollmentPayment.jsx';
 import Github from './pages/VersionControlWithGit.jsx';
 
 import PageNotFound from '@/common/pages/PageNotFound.jsx';

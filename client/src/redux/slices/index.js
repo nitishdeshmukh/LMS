@@ -85,3 +85,25 @@ export {
   selectSupportQueries,
 } from './studentSlice';
 
+// Enrollment Slice
+export {
+  default as enrollmentReducer,
+  // Actions
+  setEnrollmentDetails,
+  setPaymentDetails,
+  setReferralCode,
+  setCurrentStep,
+  setIsSubmitted,
+  resetEnrollment,
+  updateEnrollmentField,
+  updatePaymentField,
+  // Selectors
+  selectEnrollment,
+  selectEnrollmentDetails,
+  selectPaymentDetails,
+  selectReferralCode,
+  selectCurrentStep,
+  selectIsSubmitted,
+  selectFullEnrollmentData,
+} from './enrollmentSlice';
+
