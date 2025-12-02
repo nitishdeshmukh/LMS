@@ -15,7 +15,7 @@ import EnrollmentPayment from './pages/EnrollmentPayment.jsx';
 import PageNotFound from '@/common/pages/PageNotFound.jsx';
 import CourseDetails from './pages/CourseDetails.jsx';
 import PublicProtectedRoute from '@/common/components/PublicProtectedRoute.jsx';
-import AuthSuccess from './pages/AuthSuccess.jsx';
+import AuthSuccess from '@/portals/public/pages/AuthSuccess.jsx';
 
 const PublicPortal = () => {
   return (
@@ -58,4 +58,3 @@ const PublicPortal = () => {
 };
 
 export default PublicPortal;
-
