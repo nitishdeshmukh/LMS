@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Notify from './Notify';
 
 import {
-  setStudentSidebarOpen,
   selectStudentSidebarOpen,
   selectCurrentNavigation,
   selectNotifications,
