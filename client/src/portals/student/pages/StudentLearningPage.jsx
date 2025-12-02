@@ -192,7 +192,7 @@ const StudentLearningPage = () => {
                       <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
                         Reading Material {idx + 1}
                       </h3>
-                      <p className="text-zinc-500 text-sm truncate">{url}</p>
+                      <p className="text-zinc-500 text-sm wrap-anywhere">{url}</p>
                     </div>
                     <ExternalLink
                       size={20}
@@ -485,7 +485,7 @@ const StudentLearningPage = () => {
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setbar(!bar)}
-        className={`fixed z-40 top-24 p-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-l-full shadow-lg transition-all duration-300 ${
+        className={`fixed top-24 z-50 p-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-l-full shadow-lg transition-all duration-300 ${
           bar ? 'right-80' : 'right-0'
         }`}
       >
@@ -495,20 +495,20 @@ const StudentLearningPage = () => {
       {/* Sidebar Overlay for Mobile */}
       {bar && isMobile && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setbar(false)}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed lg:static right-0 top-0 z-40 h-full lg:h-[calc(100vh-5rem)] shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`fixed lg:static right-0 h-[calc(100vh-5rem)] shrink-0 overflow-hidden transition-all duration-300 ease-in-out z-40 lg:z-auto ${
           bar ? 'w-80' : 'w-0'
         }`}
       >
-        <div className="w-80 h-full bg-zinc-900/95 backdrop-blur-md border-l border-zinc-800 flex flex-col">
+        <div className="w-80 h-full bg-zinc-900 border-l border-zinc-800 flex flex-col">
           {/* Course Header */}
-          <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="p-6 border-b border-zinc-800 bg-zinc-900 sticky top-0 z-10">
             <h2 className="font-bold text-lg leading-tight line-clamp-1">{course.title}</h2>
             <div className="flex items-center gap-2 mt-3 text-xs text-zinc-400">
               <div className="flex-1 h-2 bg-zinc-700 rounded-full overflow-hidden">
@@ -842,7 +842,7 @@ const StudentLearningPage = () => {
             )}
 
             {/* Certification */}
-            <div className="mt-4 p-4 bg-gradient-to-br from-blue-900/30 to-blue-950/30 border border-blue-500/20 rounded-xl">
+            <div className="mt-4 p-4 bg-linear-to-br from-blue-900/30 to-blue-950/30 border border-blue-500/20 rounded-xl">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <CreditCard size={16} className="text-blue-400" />

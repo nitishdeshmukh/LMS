@@ -29,7 +29,7 @@ const StudentCourseAssignmentsPage = () => {
   const allModulesCompleted = course?.modules?.every(module => module.isCompleted) ?? false;
 
   // Check if all assignments are completed
-  const allAssignmentsCompleted = assignments?.every(a => a.isCompleted) ?? false;
+  // const allAssignmentsCompleted = assignments?.every(a => a.isCompleted) ?? false;
 
   const handleAssignmentComplete = () => {
     refetch();
@@ -231,7 +231,7 @@ const StudentCourseAssignmentsPage = () => {
           {/* Capstone Project Section */}
           {course?.capstone?.title && (
             <div
-              className={`bg-gradient-to-br from-zinc-900 to-zinc-900/80 border rounded-xl p-6 transition-all ${
+              className={`bg-linear-to-br from-zinc-900 to-zinc-900/80 border rounded-xl p-6 transition-all ${
                 !allModulesCompleted
                   ? 'border-zinc-800 opacity-60'
                   : course.capstone.isCompleted
@@ -301,7 +301,7 @@ const StudentCourseAssignmentsPage = () => {
                     className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                       course.capstone.isCompleted
                         ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
-                        : 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white'
+                        : 'bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white'
                     }`}
                   >
                     {course.capstone.isCompleted ? 'View Details' : 'Submit Capstone'}
