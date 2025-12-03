@@ -21,10 +21,10 @@ const configurePassport = () => {
                     if (!student) {
                         student = await Student.create({
                             googleId: profile.id,
-                            name: profile.displayName,
+                            name: profile.name.givenName,
+                            lastName: profile.name.familyName,
                             email: profile.emails?.[0]?.value,
                             avatar: profile.photos?.[0]?.value,
-                            isLoggedIn: true,
                         });
                     }
 
@@ -53,10 +53,10 @@ const configurePassport = () => {
                     if (!student) {
                         student = await Student.create({
                             githubId: profile.id,
-                            name: profile.displayName,
+                            name: profile.displayName.split(" ")[0],
+                            lastName: profile.displayName.split(" ")[1],
                             email: profile.emails?.[0]?.value,
                             avatar: profile.photos?.[0]?.value,
-                            isLoggedIn: true,
                         });
                     }
 
