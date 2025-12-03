@@ -8,6 +8,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
+    console.log('hi :>> ');
     const uploadParams = {
       Bucket: process.env.R2_BUCKET_NAME,
       Key: req.file.originalname,
