@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Award,
   ArrowLeft,
@@ -9,21 +9,107 @@ import {
   Calendar,
   User,
   BookOpen,
+  CreditCard,
+  Clock,
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
-import { useCourseCertificate } from '../hooks';
+import { useCourseCertificate, useCourseDetails } from '../hooks';
 import { useNavigateWithRedux } from '@/common/hooks/useNavigateWithRedux';
+import PaymentModal from '../components/PaymentModal';
 
 const StudentCourseCertificatesPage = () => {
   const { coursename } = useParams();
   const navigate = useNavigateWithRedux();
-  const { certificate, loading, error, refetch } = useCourseCertificate(coursename);
+  const { certificate, loading, error, refetch, paymentStatus } = useCourseCertificate(coursename);
+  const { course } = useCourseDetails(coursename);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full bg-black">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  // Show payment required state
+  if (paymentStatus && paymentStatus !== 'FULLY_PAID') {
+    const isPending = paymentStatus === 'FULLY_PAYMENT_VERIFICATION_PENDING';
+    
+    return (
+      <div className="p-6 sm:p-8 h-full overflow-y-auto custom-scrollbar bg-black text-white w-full">
+        <button
+          onClick={() => navigate('/student/certificates')}
+          className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 transition-colors"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Certificates</span>
+        </button>
+
+        <div className="max-w-lg mx-auto text-center">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+            {isPending ? (
+              <>
+                <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Clock size={40} className="text-yellow-400" />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2">Payment Verification Pending</h2>
+                <p className="text-zinc-400 mb-6">
+                  Your payment is being verified. Certificate will be available once approved (usually within 24-48 hours).
+                </p>
+                <button
+                  onClick={() => navigate('/student/certificates')}
+                  className="px-6 py-3 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                >
+                  Back to Certificates
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CreditCard size={40} className="text-blue-400" />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2">Payment Required</h2>
+                <p className="text-zinc-400 mb-4">
+                  Complete your payment to access the course certificate.
+                </p>
+                {course && (
+                  <div className="bg-zinc-800/50 rounded-lg p-4 mb-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-400">Amount Remaining:</span>
+                      <span className="text-xl font-bold text-blue-400">₹{course.amountRemaining || 0}</span>
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CreditCard size={18} />
+                  Pay & Get Certificate
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Payment Modal */}
+        {course && (
+          <PaymentModal
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            enrollmentId={course.enrollmentId}
+            courseTitle={course.title}
+            amountRemaining={course.amountRemaining}
+            bankDetails={course.bankDetails}
+            onSuccess={() => {
+              refetch();
+              toast.success('Payment submitted! Certificate will be available after verification.');
+            }}
+          />
+        )}
       </div>
     );
   }

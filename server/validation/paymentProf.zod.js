@@ -47,6 +47,12 @@ export const paymentProofSchema = z.object({
             "Transaction ID should contain only alphanumeric characters"
         )
         .toUpperCase(),
+
+    // Payment Type (required)
+    paymentType: z
+        .enum(["partial", "full"], {
+            errorMap: () => ({ message: "Payment type must be 'partial' or 'full'" }),
+        }),
 });
 
 // Middleware function

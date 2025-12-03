@@ -17,6 +17,7 @@ import {
   Video,
   Lock,
   Download,
+  Clock,
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ import { toast } from 'sonner';
 import QuizCard from '../components/QuizCard';
 import AssignmentCard from '../components/AssignmentCard';
 import CapstoneCard from '../components/CapstoneCard';
+import PaymentModal from '../components/PaymentModal';
 import { useCourseDetails, useMarkModuleAccessed, useCourseProgress, useProfile } from '../hooks';
 import { downloadModuleCertificate } from '../utils/downloadModuleCertificate';
 
@@ -34,6 +36,7 @@ const StudentLearningPage = () => {
   const [bar, setbar] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [downloadingCertificate, setDownloadingCertificate] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Fetch course details and progress
   const { course, loading, error, refetch } = useCourseDetails(coursename);
@@ -845,34 +848,104 @@ const StudentLearningPage = () => {
                 </div>
                 <span className="font-bold text-sm text-white">Final Certification</span>
               </div>
-              <p className="text-xs text-zinc-400 mb-4">
-                Complete all modules and capstone to earn your certificate.
-              </p>
-              <button
-                disabled={
-                  !allModulesCompleted ||
-                  (!course.capstone?.isCompleted && !course.capstone?.isSubmitted)
+              
+              {/* Different states based on course completion and payment */}
+              {(() => {
+                const capstoneComplete = course.capstone?.isCompleted || course.capstone?.isSubmitted;
+                const isFullyPaid = course.paymentStatus === 'FULLY_PAID';
+                const isPaymentPending = course.paymentStatus === 'FULLY_PAYMENT_VERIFICATION_PENDING';
+                const courseComplete = allModulesCompleted && capstoneComplete;
+
+                // State 1: Course not complete
+                if (!courseComplete) {
+                  return (
+                    <>
+                      <p className="text-xs text-zinc-400 mb-4">
+                        Complete all modules and capstone to earn your certificate.
+                      </p>
+                      <button
+                        disabled
+                        className="w-full bg-zinc-800 text-zinc-500 text-sm font-semibold py-2.5 rounded-lg cursor-not-allowed"
+                      >
+                        {!allModulesCompleted
+                          ? `${overallProgress}% Complete`
+                          : 'Complete Capstone First'}
+                      </button>
+                    </>
+                  );
                 }
-                onClick={() => {
-                  if (
-                    allModulesCompleted &&
-                    (course.capstone?.isCompleted || course.capstone?.isSubmitted)
-                  ) {
-                    window.open(`/student/certificates/${coursename}`, '_blank');
-                  }
-                }}
-                className="w-full bg-blue-600 disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-blue-500 disabled:hover:bg-zinc-800 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors"
-              >
-                {!allModulesCompleted
-                  ? `${overallProgress}% Complete`
-                  : !course.capstone?.isCompleted && !course.capstone?.isSubmitted
-                    ? 'Complete Capstone First'
-                    : 'Get Certificate'}
-              </button>
+
+                // State 2: Course complete but not fully paid
+                if (!isFullyPaid && !isPaymentPending) {
+                  return (
+                    <>
+                      <p className="text-xs text-zinc-400 mb-2">
+                        Course completed! Pay remaining amount to get your certificate.
+                      </p>
+                      <div className="flex items-center justify-between text-xs mb-4 bg-zinc-800/50 rounded-lg p-2">
+                        <span className="text-zinc-500">Amount Remaining:</span>
+                        <span className="text-blue-400 font-bold">₹{course.amountRemaining || 0}</span>
+                      </div>
+                      <button
+                        onClick={() => setShowPaymentModal(true)}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <CreditCard size={16} />
+                        Pay & Request Certificate
+                      </button>
+                    </>
+                  );
+                }
+
+                // State 3: Payment verification pending
+                if (isPaymentPending) {
+                  return (
+                    <>
+                      <p className="text-xs text-zinc-400 mb-4">
+                        Your payment is being verified. Certificate will be available once approved.
+                      </p>
+                      <div className="w-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2">
+                        <Clock size={16} />
+                        Payment Verification Pending
+                      </div>
+                    </>
+                  );
+                }
+
+                // State 4: Fully paid - can get certificate
+                return (
+                  <>
+                    <p className="text-xs text-zinc-400 mb-4">
+                      Congratulations! Your certificate is ready to download.
+                    </p>
+                    <button
+                      onClick={() => window.open(`/student/certificates/${coursename}`, '_blank')}
+                      className="w-full bg-green-600 hover:bg-green-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Award size={16} />
+                      Get Certificate
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        enrollmentId={course?.enrollmentId}
+        courseTitle={course?.title}
+        amountRemaining={course?.amountRemaining}
+        bankDetails={course?.bankDetails}
+        onSuccess={() => {
+          refetch();
+          toast.success('Payment submitted! Certificate will be available after verification.');
+        }}
+      />
     </div>
   );
 };

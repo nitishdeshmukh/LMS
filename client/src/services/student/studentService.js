@@ -133,6 +133,30 @@ export const getCourseCertificate = async courseSlug => {
 };
 
 // ============================================
+// PAYMENT
+// ============================================
+
+export const submitFullPayment = async (enrollmentId, paymentData) => {
+  const formData = new FormData();
+  formData.append('accountHolderName', paymentData.accountHolderName);
+  formData.append('bankName', paymentData.bankName);
+  formData.append('ifscCode', paymentData.ifscCode);
+  formData.append('accountNumber', paymentData.accountNumber);
+  formData.append('transactionId', paymentData.transactionId);
+  formData.append('paymentType', 'full');
+  if (paymentData.screenshot) {
+    formData.append('screenshot', paymentData.screenshot);
+  }
+
+  const response = await api.post(`/public/payment/${enrollmentId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+// ============================================
 // LEADERBOARD
 // ============================================
 
@@ -200,6 +224,7 @@ const studentService = {
   getCourseProgress,
   getCertificates,
   getCourseCertificate,
+  submitFullPayment,
   getLeaderboard,
   getReferralInfo,
   applyReferralCode,

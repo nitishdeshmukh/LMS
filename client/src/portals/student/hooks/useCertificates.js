@@ -50,18 +50,25 @@ export const useCourseCertificate = courseSlug => {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   const fetchCertificate = useCallback(async () => {
     if (!courseSlug) return;
 
     setLoading(true);
     setError(null);
+    setPaymentStatus(null);
 
     try {
       const response = await getCourseCertificate(courseSlug);
       setCertificate(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch certificate');
+      const errorData = err.response?.data;
+      // Check if error is payment related
+      if (errorData?.paymentStatus) {
+        setPaymentStatus(errorData.paymentStatus);
+      }
+      setError(errorData?.message || 'Failed to fetch certificate');
     } finally {
       setLoading(false);
     }
@@ -75,6 +82,7 @@ export const useCourseCertificate = courseSlug => {
     certificate,
     loading,
     error,
+    paymentStatus,
     refetch: fetchCertificate,
   };
 };

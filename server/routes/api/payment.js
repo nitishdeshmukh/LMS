@@ -20,9 +20,9 @@ const uploadPaymentScreenshot = (req, res, next) => {
     });
 };
 
-// POST /api/payment/submit - Submit payment proof
+// POST /api/public/payment/:enrollmentId - Submit payment proof
 router.post(
-    "/submit",
+    "/:enrollmentId",
     uploadPaymentScreenshot,
     PaymentProofValidation.validatePaymentProof,
     PaymentController.submitPaymentProof

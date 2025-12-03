@@ -39,20 +39,45 @@ export const getCourseCertificate = async (req, res) => {
             });
         }
 
+        // Check enrollment and payment status
+        const enrollment = await Enrollment.findOne({
+            student: req.userId,
+            course: course._id,
+        });
+
+        if (!enrollment) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not enrolled in this course",
+                code: ERROR_CODES.NOT_ENROLLED,
+            });
+        }
+
+        // Check if payment is complete
+        if (enrollment.paymentStatus !== "FULLY_PAID") {
+            const statusMessages = {
+                "UNPAID": "Please complete payment to access your certificate",
+                "PARTIAL_PAYMENT_VERIFICATION_PENDING": "Your partial payment is being verified",
+                "PARTIAL_PAID": "Please complete full payment to access your certificate",
+                "FULLY_PAYMENT_VERIFICATION_PENDING": "Your payment is being verified. Certificate will be available once approved.",
+            };
+            
+            return res.status(403).json({
+                success: false,
+                message: statusMessages[enrollment.paymentStatus] || "Payment required for certificate",
+                code: ERROR_CODES.PAYMENT_REQUIRED,
+                paymentStatus: enrollment.paymentStatus,
+            });
+        }
+
         const certificate = await Certificate.findOne({
             student: req.userId,
             course: course._id,
         }).populate("course", "title");
 
         if (!certificate) {
-            // Check if eligible for certificate
-            const enrollment = await Enrollment.findOne({
-                student: req.userId,
-                course: course._id,
-                isCompleted: true,
-            });
-
-            if (!enrollment) {
+            // Check if course is completed
+            if (!enrollment.isCompleted) {
                 return res.status(404).json({
                     success: false,
                     message: "Complete the course to earn a certificate",

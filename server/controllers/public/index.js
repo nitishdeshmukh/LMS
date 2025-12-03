@@ -1,4 +1,4 @@
 import * as userController from "./userController.js";
-// import * as PaymentController from "./paymentController.js";
+import * as PaymentController from "./paymentController.js";
 
-export { userController };
+export { userController, PaymentController };
