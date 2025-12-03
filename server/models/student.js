@@ -13,7 +13,7 @@ const studentSchema = new mongoose.Schema(
         githubId: { type: String, select: false },
 
         // PROFILE
-        name: { type: String, required: true, trim: true },
+        name: { type: String, trim: true },
         middleName: { type: String },
         lastName: { type: String },
         phoneNumber: { type: String },
@@ -48,7 +48,7 @@ const studentSchema = new mongoose.Schema(
 
         accountStatus: {
             type: String,
-            enum: ["unenrolled", "pending", "verified", "blocked"],
+            enum: ["unenrolled", "enrolled"],
             default: "unenrolled",
         },
 
