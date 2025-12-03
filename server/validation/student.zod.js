@@ -18,9 +18,22 @@ export const updateProfileSchema = z.object({
         .or(z.literal("")),
 });
 
-// Avatar Update Schema
+// Avatar Update Schema - accepts both URLs and base64 data URLs
 export const updateAvatarSchema = z.object({
-    avatar: z.string().url("Invalid avatar URL"),
+    avatar: z.string().refine(
+        (val) => {
+            // Accept regular URLs
+            if (val.startsWith('http://') || val.startsWith('https://')) {
+                return true;
+            }
+            // Accept base64 data URLs for image uploads
+            if (val.startsWith('data:image/')) {
+                return true;
+            }
+            return false;
+        },
+        { message: "Invalid avatar format. Must be a URL or base64 image" }
+    ),
 });
 
 // Privacy Settings Schema
