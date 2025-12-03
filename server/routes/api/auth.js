@@ -33,6 +33,8 @@ router.post(
 );
 router.post("/reset-password", authController.resetPassword);
 
+router.post("/verify-admin", isAuthenticated,authController.verifyAdmin);
+
 // ============================================
 // GOOGLE OAUTH ROUTES
 // ============================================

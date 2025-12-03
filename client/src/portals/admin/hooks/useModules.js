@@ -262,6 +262,7 @@ export const useModules = () => {
 
   return {
     modules,
+    setModules,
     addModule,
     deleteModule,
     updateModule,
@@ -281,3 +282,4 @@ export const useModules = () => {
     updateOption,
   };
 };
+

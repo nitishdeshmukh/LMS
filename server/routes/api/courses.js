@@ -12,6 +12,8 @@ router.get("/filter-options", courseController.getCourseFilterOptions);
 
 // POST /api/admin/courses - Create new course
 router.post("/", courseController.createCourse);
+//get course by id
+router.get("/:courseId", courseController.getCourseById);
 
 // PUT /api/admin/courses/:courseId - Update course
 router.put("/:courseId", courseController.updateCourse);

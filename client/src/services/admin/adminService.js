@@ -4,6 +4,11 @@ import api from '../api';
 // DASHBOARD
 // ============================================
 
+export const verifyAdmin = async password => {
+  const response = await api.post('/auth/verify-admin', { password });
+  return response.data;
+};
+
 export const getDashboard = async () => {
   const response = await api.get('/admin/dashboard');
   return response.data;
@@ -45,6 +50,11 @@ export const updateCourse = async (courseId, courseData) => {
 
 export const deleteCourse = async courseId => {
   const response = await api.delete(`/admin/course/${courseId}`);
+  return response.data;
+};
+
+export const toggleCourseStatus = async (courseId, data) => {
+  const response = await api.patch(`/admin/course/${courseId}/status`, data);
   return response.data;
 };
 
@@ -127,6 +137,7 @@ export const getCourseAnalytics = async courseId => {
 
 // Export all admin service functions as a single object
 const adminService = {
+  verifyAdmin,
   getDashboard,
   getDashboardStats,
   getAllStudents,
@@ -135,6 +146,7 @@ const adminService = {
   createCourse,
   updateCourse,
   deleteCourse,
+  toggleCourseStatus,
   getOngoingStudents,
   approveOngoingStudent,
   // rejectOngoingStudent,

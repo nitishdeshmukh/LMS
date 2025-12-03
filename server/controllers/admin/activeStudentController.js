@@ -512,7 +512,6 @@ export const getAllStudentsWithEnrollments = async (req, res) => {
 
         // Build match conditions
         const matchConditions = {
-            role: "student",
             accountStatus: "verified", // Only verified students
         };
 
@@ -664,10 +663,10 @@ export const getAllStudentsWithEnrollments = async (req, res) => {
                                   capstoneStatus === "submitted"
                                       ? "submitted"
                                       : capstoneStatus === "graded"
-                                        ? "graded"
-                                        : capstoneStatus === "in-progress"
-                                          ? "In Progress"
-                                          : "Not Submitted",
+                                      ? "graded"
+                                      : capstoneStatus === "in-progress"
+                                      ? "In Progress"
+                                      : "Not Submitted",
                           },
                       },
                   ]
@@ -787,7 +786,13 @@ export const getFilterOptions = async (req, res) => {
             data: {
                 colleges: options[0].colleges.map((c) => c._id),
                 years: options[0].years.map((y) => y._id),
-                paymentStatuses: ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING", "PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"],
+                paymentStatuses: [
+                    "UNPAID",
+                    "PARTIAL_PAYMENT_VERIFICATION_PENDING",
+                    "PARTIAL_PAID",
+                    "FULLY_PAYMENT_VERIFICATION_PENDING",
+                    "FULLY_PAID",
+                ],
                 capstoneStatuses: [
                     "Not Submitted",
                     "submitted",
@@ -814,7 +819,13 @@ export const updatePaymentStatus = async (req, res) => {
         const { enrollmentId } = req.params;
         const { paymentStatus } = req.body;
 
-        const validStatuses = ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING", "PARTIAL_PAID", "FULLY_PAYMENT_VERIFICATION_PENDING", "FULLY_PAID"];
+        const validStatuses = [
+            "UNPAID",
+            "PARTIAL_PAYMENT_VERIFICATION_PENDING",
+            "PARTIAL_PAID",
+            "FULLY_PAYMENT_VERIFICATION_PENDING",
+            "FULLY_PAID",
+        ];
         if (!validStatuses.includes(paymentStatus)) {
             return res.status(400).json({
                 success: false,

@@ -100,6 +100,7 @@ export const useCapstoneProjects = () => {
 
   return {
     capstoneProjects,
+    setCapstoneProjects,
     addCapstoneProject,
     deleteCapstoneProject,
     updateCapstoneProject,
@@ -111,3 +112,4 @@ export const useCapstoneProjects = () => {
     removeDeliverable,
   };
 };
+

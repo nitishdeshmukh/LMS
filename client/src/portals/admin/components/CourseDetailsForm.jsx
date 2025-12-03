@@ -144,48 +144,6 @@ export const CourseDetailsForm = ({ control }) => {
           {/* Instructor and Duration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Controller
-              name="instructor"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="course-instructor" className="text-zinc-300 font-medium">
-                    Instructor
-                  </FieldLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger
-                      id="course-instructor"
-                      aria-invalid={fieldState.invalid}
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100"
-                    >
-                      <SelectValue placeholder="Select instructor" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
-                      <SelectItem
-                        value="67890abc12345def67890abc"
-                        className="text-zinc-200 hover:bg-zinc-700"
-                      >
-                        Dr. Ada Lovelace
-                      </SelectItem>
-                      <SelectItem
-                        value="67890abc12345def67890abd"
-                        className="text-zinc-200 hover:bg-zinc-700"
-                      >
-                        Prof. Alan Turing
-                      </SelectItem>
-                      <SelectItem
-                        value="67890abc12345def67890abe"
-                        className="text-zinc-200 hover:bg-zinc-700"
-                      >
-                        Sarah Chen
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
               name="totalDuration"
               control={control}
               render={({ field }) => (
@@ -259,48 +217,24 @@ export const CourseDetailsForm = ({ control }) => {
             />
           </div>
 
-          {/* Tags and Difficulty */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="course-tags" className="text-zinc-300 font-medium">
-                    Tags (Optional)
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="course-tags"
-                    placeholder="e.g., javascript, react, nodejs"
-                    className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-500"
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="difficultyIndex"
-              control={control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="difficulty-index" className="text-zinc-300 font-medium">
-                    Difficulty Index (0-5)
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="difficulty-index"
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="1"
-                    placeholder="1"
-                    className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-500"
-                  />
-                </Field>
-              )}
-            />
-          </div>
+          {/* Tags */}
+          <Controller
+            name="tags"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor="course-tags" className="text-zinc-300 font-medium">
+                  Tags (Optional)
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="course-tags"
+                  placeholder="e.g., javascript, react, nodejs"
+                  className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-500"
+                />
+              </Field>
+            )}
+          />
         </FieldGroup>
       </CardContent>
     </Card>

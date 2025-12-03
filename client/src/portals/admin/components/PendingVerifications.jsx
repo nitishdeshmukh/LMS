@@ -168,7 +168,6 @@ const PendingVerifications = () => {
             student.fullPaymentDetails?.transactionId ||
             'N/A',
           enrollmentId: student.enrollmentId,
-          userId: student._id || student.id,
         }));
         setStudentsData(transformedData);
       } else {
@@ -194,7 +193,7 @@ const PendingVerifications = () => {
     try {
       setIsVerifying(true);
 
-      const response = await adminService.approveOngoingStudent(studentData.userId);
+      const response = await adminService.approveOngoingStudent(studentData.id);
 
       if (response.success) {
         setIsDialogOpen(false);

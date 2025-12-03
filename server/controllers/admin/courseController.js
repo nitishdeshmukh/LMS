@@ -1,6 +1,5 @@
-import { Course, Admin } from "../../models/index.js";
-import multer from "multer";
-import path from "path";
+import mongoose from "mongoose";
+import { Course } from "../../models/index.js";
 
 /**
  * Get All Courses with Filters, Search, and Sorting
@@ -49,16 +48,6 @@ export const getAllCourses = async (req, res) => {
             // Stage 1: Match courses
             { $match: matchConditions },
 
-            // Stage 2: Lookup instructor details
-            {
-                $lookup: {
-                    from: "admins",
-                    localField: "instructor",
-                    foreignField: "_id",
-                    as: "instructorDetails",
-                },
-            },
-
             {
                 $unwind: {
                     path: "$instructorDetails",
@@ -89,36 +78,7 @@ export const getAllCourses = async (req, res) => {
                 },
             },
 
-            // Stage 4: Project fields
-            {
-                $project: {
-                    _id: 1,
-                    courseId: 1,
-                    title: 1,
-                    slug: 1,
-                    description: 1,
-                    thumbnail: 1,
-                    stream: 1,
-                    level: 1,
-                    price: 1,
-                    discountedPrice: 1,
-                    moduleCount: 1,
-                    totalDuration: 1,
-                    enrolledCount: 1,
-                    isPublished: 1,
-                    statusBadge: 1,
-                    tags: 1,
-                    difficultyIndex: 1,
-                    courseVersion: 1,
-                    instructor: 1,
-                    instructorName: 1,
-                    instructorEmail: "$instructorDetails.email",
-                    createdAt: 1,
-                    updatedAt: 1,
-                },
-            },
-
-            // Stage 5: Sort
+            // Stage 4: Sort
             {
                 $sort: {
                     [sortBy]: sortOrder === "asc" ? 1 : -1,
@@ -160,24 +120,33 @@ export const getAllCourses = async (req, res) => {
 };
 
 /**
- * Create New Course
+ * Create New Course with Modules and Capstone
  */
 export const createCourse = async (req, res) => {
     try {
         const {
             title,
+            slug,
             description,
             stream,
             level,
             price,
             discountedPrice,
-            instructor,
             totalDuration,
             tags,
-            difficultyIndex,
-            courseVersion,
-            thumbnail,
+            isPublished,
+            modules,
+            capstoneProject,
         } = req.body;
+
+        // Validate required fields
+        if (!title || !description || !stream || !level || !price) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Missing required fields: title, description, stream, level, price",
+            });
+        }
 
         // Check if course with same title exists
         const existingCourse = await Course.findOne({ title });
@@ -188,29 +157,33 @@ export const createCourse = async (req, res) => {
             });
         }
 
-        // Create course
-        const course = await Course.create({
+        // Create course data object
+        const courseData = {
             title,
+            slug: slug || title.toLowerCase().replace(/\s+/g, "-"),
             description,
             stream,
             level,
             price: parseFloat(price),
             discountedPrice: discountedPrice
                 ? parseFloat(discountedPrice)
-                : undefined,
-            instructor,
-            totalDuration,
-            tags: tags
+                : null,
+            totalDuration: totalDuration || "",
+            tags: Array.isArray(tags)
+                ? tags
+                : tags
                 ? tags
                       .split(",")
                       .map((t) => t.trim())
                       .filter(Boolean)
                 : [],
-            difficultyIndex: difficultyIndex ? parseInt(difficultyIndex) : 1,
-            courseVersion: courseVersion || "1.0.0",
-            thumbnail,
-            isPublished: false, // Draft by default
-        });
+            isPublished: isPublished || false,
+            modules: modules || [],
+            capstoneProject: capstoneProject || null,
+        };
+
+        // Create course
+        const course = await Course.create(courseData);
 
         res.status(201).json({
             success: true,
@@ -228,24 +201,24 @@ export const createCourse = async (req, res) => {
 };
 
 /**
- * Update Existing Course
+ * Update Existing Course with Modules and Capstone
  */
 export const updateCourse = async (req, res) => {
     try {
         const { courseId } = req.params;
         const {
             title,
+            slug,
             description,
             stream,
             level,
             price,
             discountedPrice,
-            instructor,
             totalDuration,
             tags,
-            difficultyIndex,
-            courseVersion,
-            thumbnail,
+            isPublished,
+            modules,
+            capstoneProject,
         } = req.body;
 
         // Check if course exists
@@ -257,39 +230,56 @@ export const updateCourse = async (req, res) => {
             });
         }
 
-        // Update fields
+        // Build update data
         const updateData = {
-            title,
-            description,
-            stream,
-            level,
-            price: parseFloat(price),
-            discountedPrice: discountedPrice
-                ? parseFloat(discountedPrice)
-                : undefined,
-            instructor,
-            totalDuration,
+            title: title || course.title,
+            slug:
+                slug ||
+                (title
+                    ? title.toLowerCase().replace(/\s+/g, "-")
+                    : course.slug),
+            description: description || course.description,
+            stream: stream || course.stream,
+            level: level || course.level,
+            price: price !== undefined ? parseFloat(price) : course.price,
+            discountedPrice:
+                discountedPrice !== undefined
+                    ? discountedPrice
+                        ? parseFloat(discountedPrice)
+                        : null
+                    : course.discountedPrice,
+            totalDuration:
+                totalDuration !== undefined
+                    ? totalDuration
+                    : course.totalDuration,
             tags: tags
-                ? tags
-                      .split(",")
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                : [],
-            difficultyIndex: difficultyIndex
-                ? parseInt(difficultyIndex)
-                : course.difficultyIndex,
-            courseVersion: courseVersion || course.courseVersion,
+                ? Array.isArray(tags)
+                    ? tags
+                    : tags
+                          .split(",")
+                          .map((t) => t.trim())
+                          .filter(Boolean)
+                : course.tags,
+            isPublished:
+                isPublished !== undefined ? isPublished : course.isPublished,
         };
 
-        if (thumbnail) {
-            updateData.thumbnail = thumbnail;
+        // Update modules if provided
+        if (modules !== undefined) {
+            updateData.modules = modules;
         }
 
+        // Update capstone project if provided
+        if (capstoneProject !== undefined) {
+            updateData.capstoneProject = capstoneProject;
+        }
+
+        // Update course
         const updatedCourse = await Course.findByIdAndUpdate(
             courseId,
             updateData,
             { new: true, runValidators: true }
-        ).populate("instructor", "name lastName email");
+        );
 
         res.json({
             success: true,
@@ -342,6 +332,11 @@ export const deleteCourse = async (req, res) => {
  * Publish/Unpublish Course
  */
 export const toggleCourseStatus = async (req, res) => {
+    console.log(req.body);
+    console.log(req.params);
+    console.log("________----->");
+    
+    
     try {
         const { courseId } = req.params;
         const { isPublished } = req.body;
@@ -416,63 +411,81 @@ export const getCourseFilterOptions = async (req, res) => {
 };
 
 /**
- * Upload Course Thumbnail
+ * Get Single Course by ID
  */
-// Multer configuration for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/course-thumbnails/");
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, "course-" + uniqueSuffix + path.extname(file.originalname));
-    },
-});
-
-const upload = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|gif|webp/;
-        const extname = allowedTypes.test(
-            path.extname(file.originalname).toLowerCase()
-        );
-        const mimetype = allowedTypes.test(file.mimetype);
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error("Only image files are allowed!"));
-        }
-    },
-});
-
-export const uploadThumbnail = upload.single("thumbnail");
-
-export const handleThumbnailUpload = async (req, res) => {
+export const getCourseById = async (req, res) => {
     try {
-        if (!req.file) {
+        const { courseId } = req.params;
+
+        // Validate courseId
+        if (!courseId) {
             return res.status(400).json({
                 success: false,
-                message: "No file uploaded",
+                message: "Course ID is required",
             });
         }
 
-        const fileUrl = `/uploads/course-thumbnails/${req.file.filename}`;
+        // Check if courseId is valid ObjectId format
+        if (!courseId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid course ID format",
+            });
+        }
+
+        // Use aggregation pipeline (matching getAllCourses structure)
+        const courseDetails = await Course.aggregate([
+            // Stage 1: Match specific course by ID
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(courseId),
+                },
+            },
+
+            // Stage 2: Add computed fields
+            {
+                $addFields: {
+                    courseId: {
+                        $concat: [
+                            "C2D-",
+                            { $toUpper: { $substr: ["$slug", 0, 4] } },
+                        ],
+                    },
+                    moduleCount: { $size: { $ifNull: ["$modules", []] } },
+                    statusBadge: {
+                        $cond: ["$isPublished", "Published", "Draft"],
+                    },
+                },
+            },
+        ]);
+
+        // Check if course exists
+        if (!courseDetails || courseDetails.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+            });
+        }
 
         res.json({
             success: true,
-            message: "Thumbnail uploaded successfully",
-            data: {
-                url: fileUrl,
-                filename: req.file.filename,
-            },
+            message: "Course retrieved successfully",
+            data: courseDetails[0],
         });
     } catch (error) {
-        console.error("Upload thumbnail error:", error);
+        console.error("Get course by ID error:", error);
+
+        // Handle invalid ObjectId format
+        if (error.name === "CastError") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid course ID format",
+            });
+        }
+
         res.status(500).json({
             success: false,
-            message: "Failed to upload thumbnail",
+            message: "Failed to get course",
             error: error.message,
         });
     }

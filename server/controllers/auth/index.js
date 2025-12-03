@@ -2,7 +2,7 @@
 // ============================================
 
 // Login (Email & LMS)
-export { login, lmsLogin } from "./login.controller.js";
+export { login, lmsLogin, verifyAdmin } from "./login.controller.js";
 
 // Logout
 export { logout, logoutAll } from "./logout.controller.js";

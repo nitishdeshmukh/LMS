@@ -159,3 +159,44 @@ export const lmsLogin = async (req, res) => {
         });
     }
 };
+
+
+export const verifyAdmin = async (req, res) => {
+    try {
+        const { password } = req.body;
+        
+        // Find admin and explicitly select password
+        const admin = await Admin.findOne({ email: req.user.email }).select("+password");
+        
+        if (!admin) {
+            return res.status(401).json({
+                success: false,
+                message: "Admin not found",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
+            });
+        }
+
+        // Verify password
+        const isPasswordValid = await admin.matchPassword(password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid password",
+                code: ERROR_CODES.INVALID_CREDENTIALS,
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Admin verified successfully",
+        });
+    } catch (error) {
+        console.error("Verify admin error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Verify admin failed",
+            code: ERROR_CODES.INTERNAL_ERROR,
+        });
+    }
+};
+
