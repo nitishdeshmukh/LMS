@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useId, useMemo, useState } from 'react';
-import { SearchIcon, ChevronDown, MoreVertical } from 'lucide-react';
+import React, { useId, useMemo, useState, useEffect } from 'react';
+import { SearchIcon, ChevronDown, MoreVertical, Loader2, RefreshCw } from 'lucide-react';
 import {
   flexRender,
   getCoreRowModel,
@@ -31,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from '../../../common/components/ui/dropdown-menu';
 import { Input } from '../../../common/components/ui/input';
-
 import {
   Dialog,
   DialogContent,
@@ -43,6 +42,7 @@ import {
 import { Button } from '@/common/components/ui/button';
 import TablePagination from '@/common/components/TablePagination';
 import { cn } from '@/common/lib/utils';
+import adminService from '@/services/admin/adminService';
 
 // Filter Component
 function Filter({ column }) {
@@ -128,7 +128,7 @@ function Filter({ column }) {
   );
 }
 
-const defaultPageSize = 5;
+const defaultPageSize = 10;
 
 const PendingVerifications = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -140,90 +140,104 @@ const PendingVerifications = () => {
     pageSize: defaultPageSize,
   });
 
-  const handleVerifyStudent = studentData => {
-    setIsDialogOpen(false);
+  // API State
+  const [studentsData, setStudentsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState(null);
 
-    toast.success('Sending email to the student', {
-      description: `Verification email is being sent to ${studentData.email}`,
-      icon: (
-        <svg
-          className="w-5 h-5 text-green-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      duration: 5000,
-    });
+  // Fetch students data
+  const fetchStudents = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await adminService.getOngoingStudents();
+
+      if (response.success) {
+        // Transform API data to match table structure
+        const transformedData = response.data.pendingUsers.map(student => ({
+          id: student._id || student.id,
+          name: `${student.name || ''} ${student.middleName || ''} ${student.lastName || ''}`.trim(),
+          email: student.email,
+          college: student.collegeName,
+          year: student.yearOfStudy,
+          domain: student.courseName,
+          paymentStatus: student.accountStatus === 'pending' ? 'Pending' : student.accountStatus,
+          paymentId:
+            student.partialPaymentDetails?.transactionId ||
+            student.fullPaymentDetails?.transactionId ||
+            'N/A',
+          enrollmentId: student.enrollmentId,
+          userId: student._id || student.id,
+        }));
+        setStudentsData(transformedData);
+      } else {
+        throw new Error(response.message || 'Failed to fetch students');
+      }
+    } catch (err) {
+      console.error('Error fetching students:', err);
+      setError(err.message || 'Failed to load students');
+      toast.error('Failed to load students', {
+        description: err.message || 'Please try again later',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch on component mount
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const handleVerifyStudent = async studentData => {
+    try {
+      setIsVerifying(true);
+
+      const response = await adminService.approveOngoingStudent(studentData.userId);
+
+      if (response.success) {
+        setIsDialogOpen(false);
+
+        toast.success('Student verified successfully', {
+          description: `${studentData.name} has been verified and will receive a confirmation email.`,
+          icon: (
+            <svg
+              className="w-5 h-5 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          ),
+          duration: 5000,
+        });
+
+        // Refresh the students list
+        fetchStudents();
+      } else {
+        throw new Error(response.message || 'Verification failed');
+      }
+    } catch (err) {
+      console.error('Error verifying student:', err);
+      toast.error('Verification failed', {
+        description: err.message || 'Please try again later',
+      });
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const openVerifyDialog = student => {
     setSelectedStudent(student);
     setIsDialogOpen(true);
   };
-
-  const studentsData = useMemo(
-    () => [
-      {
-        id: 1,
-        name: 'Aarav Sharma',
-        email: 'aarav.sharma@example.com',
-        college: 'IIT Bombay',
-        year: 'Third Year',
-        domain: 'Data Science',
-        paymentStatus: 'Pending',
-        paymentId: 'PAY_001',
-      },
-      {
-        id: 2,
-        name: 'Diya Patel',
-        email: 'diya.patel@example.com',
-        college: 'NIT Trichy',
-        year: 'Final Year',
-        domain: 'Web Development',
-        paymentStatus: 'Pending',
-        paymentId: 'PAY_002',
-      },
-      {
-        id: 3,
-        name: 'Rohan Gupta',
-        email: 'rohan.gupta@example.com',
-        college: 'BITS Pilani',
-        year: 'Second Year',
-        domain: 'Machine Learning',
-        paymentStatus: 'Pending',
-        paymentId: 'PAY_003',
-      },
-      {
-        id: 4,
-        name: 'Priya Singh',
-        email: 'priya.singh@example.com',
-        college: 'IIT Delhi',
-        year: 'Third Year',
-        domain: 'Cybersecurity',
-        paymentStatus: 'Pending',
-        paymentId: 'PAY_004',
-      },
-      {
-        id: 5,
-        name: 'Vikram Kumar',
-        email: 'vikram.kumar@example.com',
-        college: 'VIT Vellore',
-        year: 'Final Year',
-        domain: 'Cloud Computing',
-        paymentStatus: 'Pending',
-        paymentId: 'PAY_005',
-      },
-    ],
-    [],
-  );
 
   // Define columns
   const columns = useMemo(
@@ -244,7 +258,7 @@ const PendingVerifications = () => {
         header: 'College',
         accessorKey: 'college',
         meta: { filterVariant: 'dropdown' },
-        cell: ({ row }) => <div className="text-blue-400">{row.getValue('college')}</div>,
+        cell: ({ row }) => <div className="text-zinc-200">{row.getValue('college')}</div>,
       },
       {
         header: 'Year',
@@ -261,11 +275,25 @@ const PendingVerifications = () => {
       {
         header: 'Payment Status',
         accessorKey: 'paymentStatus',
-        cell: ({ row }) => (
-          <Badge className="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/20">
-            {row.getValue('paymentStatus')}
-          </Badge>
-        ),
+        cell: ({ row }) => {
+          const status = row.getValue('paymentStatus');
+          const statusColors = {
+            Pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+            pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+            verified: 'bg-green-500/10 text-green-400 border-green-500/20',
+          };
+
+          return (
+            <Badge
+              className={cn(
+                'hover:bg-opacity-20 border',
+                statusColors[status] || statusColors.Pending,
+              )}
+            >
+              {status}
+            </Badge>
+          );
+        },
       },
       {
         id: 'actions',
@@ -276,7 +304,7 @@ const PendingVerifications = () => {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-400">
+                <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-200">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -284,6 +312,9 @@ const PendingVerifications = () => {
                 <DropdownMenuItem
                   onClick={() => openVerifyDialog(student)}
                   className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                  disabled={
+                    student.paymentStatus !== 'Pending' && student.paymentStatus !== 'pending'
+                  }
                 >
                   <svg
                     className="w-4 h-4 mr-2 text-green-400"
@@ -335,9 +366,41 @@ const PendingVerifications = () => {
   return (
     <div className="p-8 min-h-screen">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Pending Verifications</h1>
+            <p className="text-zinc-400 text-sm mt-1">
+              Review and verify student payment submissions
+            </p>
+          </div>
+          <Button
+            onClick={fetchStudents}
+            disabled={isLoading}
+            className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+          >
+            <RefreshCw className={cn('h-4 w-4', isLoading && 'animate-spin')} />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+            <p className="text-red-400 text-sm">{error}</p>
+            <Button
+              onClick={fetchStudents}
+              variant="outline"
+              className="mt-2 text-red-400 border-red-500/20 hover:bg-red-500/10"
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="bg-zinc-800 rounded-lg p-4 mb-6 shadow-sm border border-zinc-700">
-          <div className="flex items-center gap-4 flex-nowrap">
+          <div className="flex items-center gap-4 flex-wrap">
             <Filter column={table.getColumn('name')} />
             <Filter column={table.getColumn('email')} />
             <Filter column={table.getColumn('college')} />
@@ -358,59 +421,76 @@ const PendingVerifications = () => {
 
         {/* Table */}
         <div className="bg-zinc-900 rounded-lg shadow-sm border border-zinc-800 overflow-hidden">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map(headerGroup => (
-                <TableRow
-                  key={headerGroup.id}
-                  className="bg-zinc-800 border-zinc-700 hover:bg-zinc-800"
-                >
-                  {headerGroup.headers.map(header => (
-                    <TableHead key={header.id} className="font-semibold text-zinc-300 select-none">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
+                <p className="text-zinc-400">Loading students...</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <TableRow
+                      key={headerGroup.id}
+                      className="bg-zinc-800 border-zinc-700 hover:bg-zinc-800"
+                    >
+                      {headerGroup.headers.map(header => (
+                        <TableHead
+                          key={header.id}
+                          className="font-semibold text-zinc-300 select-none"
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map(row => (
-                  <TableRow
-                    key={row.id}
-                    className="transition-colors hover:bg-zinc-800 border-zinc-800"
-                  >
-                    {row.getVisibleCells().map(cell => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map(row => (
+                      <TableRow
+                        key={row.id}
+                        className="transition-colors hover:bg-zinc-800 border-zinc-800"
+                      >
+                        {row.getVisibleCells().map(cell => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center text-zinc-400"
+                      >
+                        No pending verifications found.
                       </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-400">
-                    No students found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
 
-          <TablePagination
-            pageIndex={table.getState().pagination.pageIndex}
-            pageCount={table.getPageCount()}
-            pageSize={table.getState().pagination.pageSize}
-            setPageIndex={table.setPageIndex}
-            setPageSize={table.setPageSize}
-            canPreviousPage={table.getCanPreviousPage()}
-            canNextPage={table.getCanNextPage()}
-            previousPage={table.previousPage}
-            nextPage={table.nextPage}
-            paginationItemsToDisplay={5}
-          />
+              <TablePagination
+                pageIndex={table.getState().pagination.pageIndex}
+                pageCount={table.getPageCount()}
+                pageSize={table.getState().pagination.pageSize}
+                setPageIndex={table.setPageIndex}
+                setPageSize={table.setPageSize}
+                canPreviousPage={table.getCanPreviousPage()}
+                canNextPage={table.getCanNextPage()}
+                previousPage={table.previousPage}
+                nextPage={table.nextPage}
+                paginationItemsToDisplay={5}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -435,7 +515,7 @@ const PendingVerifications = () => {
               Confirm Verification
             </DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Do you really want to verify this student?
+              Do you really want to verify this student? They will receive a confirmation email.
             </DialogDescription>
           </DialogHeader>
 
@@ -468,15 +548,24 @@ const PendingVerifications = () => {
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              className="border-zinc-700 text-zinc-900 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20"
+              disabled={isVerifying}
+              className="border-zinc-700 text-zinc-100 hover:bg-zinc-800 hover:text-red-400 hover:border-red-500/20"
             >
               Cancel
             </Button>
             <Button
               onClick={() => selectedStudent && handleVerifyStudent(selectedStudent)}
+              disabled={isVerifying}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              Verify & Send Email
+              {isVerifying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify & Send Email'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -486,3 +575,4 @@ const PendingVerifications = () => {
 };
 
 export default PendingVerifications;
+

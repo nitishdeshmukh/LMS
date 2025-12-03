@@ -14,6 +14,11 @@ export const getDashboardStats = async () => {
   return response.data;
 };
 
+export const getAllStudents = async () => {
+  const response = await api.get('/admin/dashboard/enrollments');
+  return response.data;
+};
+
 // ============================================
 // COURSES
 // ============================================
@@ -47,60 +52,54 @@ export const deleteCourse = async courseId => {
 // ONGOING STUDENTS
 // ============================================
 
-export const getOngoingStudents = async (params = {}) => {
-  const response = await api.get('/admin/ongoing/students', { params });
+export const getOngoingStudents = async () => {
+  const response = await api.get('/admin/ongoing/students');
   return response.data;
 };
 
-export const getOngoingStudentById = async studentId => {
-  const response = await api.get(`/admin/ongoing/students/${studentId}`);
+export const approveOngoingStudent = async userId => {
+  const response = await api.patch(`/admin/ongoing/students/${userId}/approve`);
   return response.data;
 };
 
-export const approveOngoingStudent = async studentId => {
-  const response = await api.post(`/admin/ongoing/students/${studentId}/approve`);
-  return response.data;
-};
-
-export const rejectOngoingStudent = async (studentId, reason) => {
-  const response = await api.post(`/admin/ongoing/students/${studentId}/reject`, {
-    reason,
-  });
-  return response.data;
-};
+// export const rejectOngoingStudent = async (studentId, reason) => {
+//   const response = await api.post(`/admin/ongoing/students/${studentId}/reject`, {
+//     reason,
+//   });
+//   return response.data;
+// };
 
 // ============================================
 // ACTIVE STUDENTS
 // ============================================
 
-export const getActiveStudents = async (params = {}) => {
-  const response = await api.get('/admin/active/students', { params });
+export const getActiveStudents = async () => {
+  const response = await api.get('/admin/active/students');
   return response.data;
 };
 
-export const getActiveStudentById = async studentId => {
-  const response = await api.get(`/admin/active/students/${studentId}`);
+export const issueCertificateByEnrollmentId = async () => {
+  const response = await api.post('admin/active/students/certificate');
   return response.data;
 };
 
-export const updateStudentStatus = async (studentId, status) => {
-  const response = await api.put(`/admin/active/students/${studentId}/status`, {
-    status,
-  });
-  return response.data;
-};
+// export const getActiveStudentById = async studentId => {
+//   const response = await api.get(`/admin/active/students/${studentId}`);
+// };
 
-export const blockStudent = async (studentId, reason) => {
-  const response = await api.post(`/admin/active/students/${studentId}/block`, {
-    reason,
-  });
-  return response.data;
-};
+// export const updateStudentStatus = async (studentId, status) => {
+//   const response = await api.put(`/admin/active/students/${studentId}/status`, {
+//     status,
+//   });
+//   return response.data;
+// };
 
-export const unblockStudent = async studentId => {
-  const response = await api.post(`/admin/active/students/${studentId}/unblock`);
-  return response.data;
-};
+// export const blockStudent = async (studentId, reason) => {
+//   const response = await api.post(`/admin/active/students/${studentId}/block`, {
+//     reason,
+//   });
+//   return response.data;
+// };
 
 // ============================================
 // ANALYTICS
@@ -130,24 +129,26 @@ export const getCourseAnalytics = async courseId => {
 const adminService = {
   getDashboard,
   getDashboardStats,
+  getAllStudents,
   getAllCourses,
   getCourseById,
   createCourse,
   updateCourse,
   deleteCourse,
   getOngoingStudents,
-  getOngoingStudentById,
   approveOngoingStudent,
-  rejectOngoingStudent,
+  // rejectOngoingStudent,
   getActiveStudents,
-  getActiveStudentById,
-  updateStudentStatus,
-  blockStudent,
-  unblockStudent,
+  // getActiveStudentById,
+  // updateStudentStatus,
+  // blockStudent,
+  // unblockStudent,
   getAnalytics,
   getEnrollmentAnalytics,
   getRevenueAnalytics,
   getCourseAnalytics,
+  issueCertificateByEnrollmentId,
 };
 
 export default adminService;
+

@@ -68,11 +68,11 @@ const CourseDetails = () => {
   // Set page title when course data loads
   useEffect(() => {
     if (courseData?.courseDetails?.title) {
-      document.title = `${courseData.courseDetails.title} | Code2Debug`;
+      document.title = `${courseData.courseDetails.title}`;
     }
 
     return () => {
-      document.title = 'Code2Debug';
+      document.title = '';
     };
   }, [courseData]);
 
@@ -115,12 +115,14 @@ const CourseDetails = () => {
       toast.warning('Please log in to enroll in the course', { duration: 3000 });
       return;
     }
-
+    
     // Save courseId to Redux
     if (courseData?.courseDetails?.id) {
       dispatch(setCourseId(courseData.courseDetails.id));
       console.log('Course ID saved to Redux:', courseData.courseDetails.id);
     }
+
+    
 
     // Navigate to enrollment page
     navigateAndStore('/enroll');

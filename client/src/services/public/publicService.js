@@ -1,4 +1,5 @@
 import { publicApi } from '../api';
+import api from '../api';
 
 // ============================================
 // LANDING PAGE
@@ -70,7 +71,7 @@ export const getFAQs = async () => {
 // ============================================
 
 export const submitEnrollment = async enrollmentData => {
-  const response = await publicApi.post('/public/enrollment', enrollmentData);
+  const response = await api.post('/public/enroll', enrollmentData);
   return response.data;
 };
 

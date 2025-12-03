@@ -6,12 +6,6 @@ const router = express.Router();
 
 router.get("/", ongoingStudentController.getOngoingUsers);
 
-// GET /api/admin/pending-users/filter-options - Get dropdown options
-router.get(
-    "/filter-options",
-    ongoingStudentController.getOngoingUsersFilterOptions
-);
-
 // PATCH /api/admin/pending-users/:userId/approve - Approve single user
 router.patch("/:userId/approve", ongoingStudentController.approveOngoingUser);
 

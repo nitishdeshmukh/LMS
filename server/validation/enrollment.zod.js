@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-// Enrollment validation schema
+// Enrollment validation schema (matching Redux state)
 export const enrollmentSchema = z.object({
-    // Personal Information
-    name: z
+    // Personal Information (matching Redux enrollmentDetails)
+    firstName: z
         .string()
         .trim()
         .min(2, "First name must be at least 2 characters")
@@ -32,7 +32,7 @@ export const enrollmentSchema = z.object({
         .min(3, "College name must be at least 3 characters")
         .max(200, "College name must not exceed 200 characters"),
 
-    courseName: z
+    degreeCourse: z
         .string()
         .trim()
         .min(2, "Degree/Course is required")
@@ -46,6 +46,7 @@ export const enrollmentSchema = z.object({
             message: "Please select a valid year of study",
         }),
 
+    // Contact Information
     email: z.email("Please enter a valid email address"),
 
     phoneNumber: z
@@ -67,17 +68,77 @@ export const enrollmentSchema = z.object({
         )
         .optional()
         .or(z.literal("")),
+
+    // Course Selection
+    courseId: z
+        .string()
+        .min(1, "Course ID is required")
+        .regex(/^[0-9a-fA-F]{24}$/, "Invalid course ID format"),
+
+    // Referral Code (Optional)
+    referralCode: z
+        .string()
+        .trim()
+        .max(50, "Referral code must not exceed 50 characters")
+        .optional()
+        .or(z.literal("")),
+
+    // Payment Details (matching Redux paymentDetails)
+    accountHolderName: z
+        .string()
+        .trim()
+        .min(2, "Account holder name must be at least 2 characters")
+        .max(100, "Account holder name must not exceed 100 characters")
+        .regex(
+            /^[a-zA-Z\s]+$/,
+            "Account holder name should contain only letters"
+        ),
+
+    bankName: z
+        .string()
+        .trim()
+        .min(2, "Bank name must be at least 2 characters")
+        .max(100, "Bank name must not exceed 100 characters"),
+
+    ifscCode: z
+        .string()
+        .trim()
+        .length(11, "IFSC code must be exactly 11 characters")
+        .regex(
+            /^[A-Z]{4}0[A-Z0-9]{6}$/,
+            "Invalid IFSC code format (e.g., SBIN0001234)"
+        )
+        .transform((val) => val.toUpperCase()),
+
+    accountNumber: z
+        .string()
+        .trim()
+        .min(9, "Account number must be at least 9 digits")
+        .max(18, "Account number must not exceed 18 digits")
+        .regex(/^[0-9]+$/, "Account number should contain only numbers"),
+
+    transactionId: z
+        .string()
+        .trim()
+        .min(10, "Transaction ID must be at least 10 characters")
+        .max(50, "Transaction ID must not exceed 50 characters"),
+
+    paymentType: z
+        .enum(["partial", "full"], {
+            errorMap: () => ({
+                message: "Payment type must be either 'partial' or 'full'",
+            }),
+        })
+        .default("partial"),
 });
 
-// Middleware function - FIXED: Use .issues instead of .errors
+// Middleware for enrollment validation
 export const validateEnrollment = (req, res, next) => {
     try {
         const validatedData = enrollmentSchema.parse(req.body);
         req.validatedData = validatedData;
         next();
     } catch (error) {
-        // console.error("Validation error:", error);
-
         if (error instanceof z.ZodError) {
             return res.status(400).json({
                 success: false,

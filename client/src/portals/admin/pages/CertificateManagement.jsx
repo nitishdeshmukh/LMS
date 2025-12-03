@@ -34,6 +34,7 @@ import { Input } from '../../../common/components/ui/input';
 import { Label } from '../../../common/components/ui/label';
 import TablePagination from '@/common/components/TablePagination';
 import { cn } from '@/common/lib/utils';
+import CustomCertificate from '@/portals/student/components/ModuleCertificate';
 
 // Filter Component
 function Filter({ column }) {
@@ -378,17 +379,17 @@ const CertificateManagement = () => {
           />
         </div>
       </div>
-       <div className=" overflow-auto">
-          <CustomCertificate
-            studentName={"Deepak Agrawal"}
-            course={"Web Development"}
-            timeperiod={"3 Months"}
-            conductedFrom={"1-october to 3 october"}
-          />
-        </div>
-      
+      <div className=" overflow-auto">
+        <CustomCertificate
+          studentName={'Deepak Agrawal'}
+          course={'Web Development'}
+          timeperiod={'3 Months'}
+          conductedFrom={'1-october to 3 october'}
+        />
+      </div>
     </div>
   );
 };
 
 export default CertificateManagement;
+

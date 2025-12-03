@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Plus, MoreVertical, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, MoreVertical, Filter, RefreshCw, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/common/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +13,8 @@ import {
 import { Badge } from '@/common/components/ui/badge';
 import CreateCourse from '../components/CreateCourse';
 import ManageCourse from '../components/ManageCourse';
+import adminService from '@/services/admin/adminService';
+import { cn } from '@/common/lib/utils';
 
 const Courses = () => {
   const [view, setView] = useState('list'); // 'list', 'create', 'edit'
@@ -22,101 +25,149 @@ const Courses = () => {
     status: 'all',
   });
 
-  const coursesData = [
-    {
-      id: 'C2D-PY01',
-      title: 'Introduction to Python',
-      category: 'Web Development',
-      modules: 12,
-      status: 'Published',
-      instructor: 'Dr. Ada Lovelace',
-      price: 299.99,
-      thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400',
-      description: 'Learn Python from scratch with hands-on projects',
-      students: 245,
-    },
-    {
-      id: 'C2D-JS02',
-      title: 'Advanced JavaScript',
-      category: 'Web Development',
-      modules: 15,
-      status: 'Published',
-      instructor: 'Dr. Ada Lovelace',
-      price: 349.99,
-      thumbnail: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400',
-      description: 'Master advanced JavaScript concepts and patterns',
-      students: 189,
-    },
-    {
-      id: 'C2D-DS01',
-      title: 'Data Structures & Algorithms',
-      category: 'Computer Science',
-      modules: 20,
-      status: 'Draft',
-      instructor: 'Prof. Alan Turing',
-      price: 399.99,
-      thumbnail: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=400',
-      description: 'Deep dive into DSA with coding challenges',
-      students: 0,
-    },
-    {
-      id: 'C2D-RE01',
-      title: 'Frontend with React',
-      category: 'Web Development',
-      modules: 18,
-      status: 'Published',
-      instructor: 'Sarah Chen',
-      price: 329.99,
-      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400',
-      description: 'Build modern web apps with React and Redux',
-      students: 312,
-    },
-    {
-      id: 'C2D-NO01',
-      title: 'Backend with Node.js',
-      category: 'Backend Development',
-      modules: 16,
-      status: 'Draft',
-      instructor: 'Mike Johnson',
-      price: 319.99,
-      thumbnail: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400',
-      description: 'Master backend development with Node.js and Express',
-      students: 0,
-    },
-    {
-      id: 'C2D-UX01',
-      title: 'UI/UX Design Principles',
-      category: 'Design',
-      modules: 10,
-      status: 'Published',
-      instructor: 'Emily Davis',
-      price: 279.99,
-      thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400',
-      description: 'Learn to create beautiful and intuitive interfaces',
-      students: 156,
-    },
-  ];
+  // API State
+  const [coursesData, setCoursesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch courses data
+  const fetchCourses = async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setIsLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+      setError(null);
+
+      const response = await adminService.getAllCourses();
+
+      if (response.success) {
+        // Transform API data to match component structure
+        const transformedData = response.data.courses.map(course => ({
+          id: course._id,
+          courseId: course._id,
+          title: course.title,
+          category: course.stream,
+          modules: course.modules?.length,
+          status: course.isPublished ? 'Published' : 'Draft',
+          instructor: course.instructor,
+          price: course.price,
+          thumbnail:
+            course.thumbnail ||
+            course.coverImage ||
+            'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400',
+          description: course.description,
+          students: course.enrolledStudents || 0,
+          slug: course.slug,
+          createdAt: course.createdAt,
+          updatedAt: course.updatedAt,
+        }));
+
+        setCoursesData(transformedData);
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError(err.message || 'Failed to load courses');
+      toast.error('Failed to load courses', {
+        description: err.message || 'Please try again later',
+      });
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Fetch on component mount
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  // Manual refresh handler
+  const handleRefresh = () => {
+    fetchCourses(false);
+  };
 
   const handleEdit = course => {
     setSelectedCourse(course);
     setView('edit');
   };
 
-  const handleDelete = courseId => {
-    console.log('Deleting course:', courseId);
-    // Add delete logic here
+  const handleDelete = async courseId => {
+    try {
+      const confirmed = window.confirm(
+        'Are you sure you want to delete this course? This action cannot be undone.',
+      );
+
+      if (!confirmed) return;
+
+      toast.loading('Deleting course...', { id: 'delete-course' });
+
+      const response = await adminService.deleteCourse(courseId);
+
+      if (response.success) {
+        toast.success('Course deleted successfully', {
+          id: 'delete-course',
+          description: 'The course has been permanently removed',
+        });
+
+        // Refresh courses list
+        await fetchCourses(false);
+      } else {
+        throw new Error(response.message || 'Failed to delete course');
+      }
+    } catch (err) {
+      console.error('Error deleting course:', err);
+      toast.error('Failed to delete course', {
+        id: 'delete-course',
+        description: err.message || 'Please try again later',
+      });
+    }
   };
 
   const handleBackToCourses = () => {
     setView('list');
     setSelectedCourse(null);
+    fetchCourses(false); // Refresh courses list when coming back
   };
 
-  const filteredCourses = coursesData.filter(
-    course =>
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.id.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Apply filters and search
+  const getFilteredCourses = () => {
+    let filtered = coursesData.filter(
+      course =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.courseId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.id.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+
+    // Filter by status
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(
+        course => course.status.toLowerCase() === filters.status.toLowerCase(),
+      );
+    }
+
+    // Sort courses
+    switch (filters.sortBy) {
+      case 'title':
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'students':
+        filtered.sort((a, b) => b.students - a.students);
+        break;
+      case 'date':
+      default:
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+    }
+
+    return filtered;
+  };
+
+  const filteredCourses = getFilteredCourses();
 
   // If creating a new course
   if (view === 'create') {
@@ -132,6 +183,37 @@ const Courses = () => {
   return (
     <div className="flex-1 overflow-y-auto p-8">
       <div className="max-w-full mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Course Management</h1>
+            <p className="text-zinc-400 text-sm mt-1">Create, edit, and manage your courses</p>
+          </div>
+          <Button
+            onClick={handleRefresh}
+            disabled={isLoading || isRefreshing}
+            variant="outline"
+            className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700"
+          >
+            <RefreshCw className={cn('h-4 w-4', isRefreshing && 'animate-spin')} />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+            <p className="text-red-400 text-sm">{error}</p>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              className="mt-2 text-red-400 border-red-500/20 hover:bg-red-500/10"
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
+
         {/* Search, Filters, and Create Button */}
         <div className="mb-6 flex items-center gap-4 flex-wrap">
           {/* Search Bar */}
@@ -142,69 +224,83 @@ const Courses = () => {
               placeholder="Search by course title or ID..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-400"
+              className="w-full px-4 pl-10 py-1.5 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-400"
+              disabled={isLoading}
             />
           </div>
 
-          {/* Filters */}
+          {/* Sort Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700"
+                disabled={isLoading}
               >
-                Sort by: Date
+                Sort by:{' '}
+                {filters.sortBy === 'date'
+                  ? 'Date'
+                  : filters.sortBy === 'title'
+                    ? 'Title'
+                    : 'Students'}
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, sortBy: 'date' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 Date
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, sortBy: 'title' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 Title
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, sortBy: 'students' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 Students
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Status Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 className="flex items-center gap-2 bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700"
+                disabled={isLoading}
               >
-                Status: All
+                Status:{' '}
+                {filters.status === 'all'
+                  ? 'All'
+                  : filters.status === 'published'
+                    ? 'Published'
+                    : 'Draft'}
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, status: 'all' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 All
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, status: 'published' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 Published
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilters({ ...filters, status: 'draft' })}
-                className="text-zinc-200 hover:bg-zinc-700"
+                className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
               >
                 Draft
               </DropdownMenuItem>
@@ -215,93 +311,146 @@ const Courses = () => {
           <Button
             onClick={() => setView('create')}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isLoading}
           >
             <Plus className="h-5 w-5" />
             Add Course
           </Button>
         </div>
 
-        {/* Course Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredCourses.map(course => (
-            <div
-              key={course.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all group"
-            >
-              {/* Course Thumbnail */}
-              <div className="relative h-40 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden">
-                <img
-                  src={course.thumbnail}
-                  alt={course.title}
-                  className="w-full h-full object-cover opacity-80"
-                />
-                <div className="absolute top-3 right-3">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 h-8 w-8 p-0"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
-                      <DropdownMenuItem
-                        onClick={() => handleEdit(course)}
-                        className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
-                      >
-                        Edit Course
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(course.id)}
-                        className="text-red-400 hover:bg-zinc-700 cursor-pointer"
-                      >
-                        Delete Course
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
+              <p className="text-zinc-400">Loading courses...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Course Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <p className="text-zinc-400 text-sm">Total Courses</p>
+                <p className="text-2xl font-bold text-white mt-1">{coursesData.length}</p>
               </div>
-
-              {/* Course Info */}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-zinc-500 font-mono">{course.id}</span>
-                  <Badge
-                    className={
-                      course.status === 'Published'
-                        ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20'
-                        : 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/20'
-                    }
-                  >
-                    {course.status}
-                  </Badge>
-                </div>
-
-                <h3 className="text-lg font-semibold text-zinc-100 mb-1 line-clamp-1">
-                  {course.title}
-                </h3>
-                <p className="text-sm text-zinc-400 mb-3">ID: {course.id}</p>
-                <p className="text-sm text-zinc-500 mb-3">Modules: {course.modules}</p>
-
-                <Button
-                  onClick={() => handleEdit(course)}
-                  size="sm"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Edit Course
-                </Button>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <p className="text-zinc-400 text-sm">Published</p>
+                <p className="text-2xl font-bold text-green-400 mt-1">
+                  {coursesData.filter(c => c.status === 'Published').length}
+                </p>
+              </div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <p className="text-zinc-400 text-sm">Drafts</p>
+                <p className="text-2xl font-bold text-yellow-400 mt-1">
+                  {coursesData.filter(c => c.status === 'Draft').length}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Empty State */}
-        {filteredCourses.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-zinc-400 text-lg">No courses found</p>
-          </div>
+            {/* Course Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredCourses.map(course => (
+                <div
+                  key={course.id}
+                  className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all group"
+                >
+                  {/* Course Thumbnail */}
+                  <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
+                    <img
+                      src={course.thumbnail}
+                      alt={course.title}
+                      className="w-full h-full object-cover opacity-80"
+                      onError={e => {
+                        e.target.src =
+                          'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400';
+                      }}
+                    />
+                    <div className="absolute top-3 right-3">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 h-8 w-8 p-0"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(course)}
+                            className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
+                          >
+                            Edit Course
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(course.id)}
+                            className="text-red-400 hover:bg-zinc-700 cursor-pointer"
+                          >
+                            Delete Course
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  {/* Course Info */}
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-zinc-500 font-mono truncate">
+                        {course.courseId || course.id}
+                      </span>
+                      <Badge
+                        className={
+                          course.status === 'Published'
+                            ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20'
+                            : 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/20'
+                        }
+                      >
+                        {course.status}
+                      </Badge>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-zinc-100 mb-1 line-clamp-1">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-zinc-400 mb-1">{course.category}</p>
+                    <p className="text-sm text-zinc-500 mb-3">
+                      {course.modules} Modules • {course.students} Students
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-blue-400">₹{course.price}</span>
+                      <Button
+                        onClick={() => handleEdit(course)}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Empty State */}
+            {filteredCourses.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-zinc-400 text-lg mb-2">No courses found</p>
+                {searchQuery && (
+                  <Button
+                    onClick={() => setSearchQuery('')}
+                    variant="outline"
+                    className="mt-2 border-zinc-700 text-zinc-300"
+                  >
+                    Clear Search
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -309,3 +458,4 @@ const Courses = () => {
 };
 
 export default Courses;
+

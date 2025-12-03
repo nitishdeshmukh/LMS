@@ -5,7 +5,6 @@ const router = express.Router();
 // GET /api/admin/dashboard/stats - Main dashboard (verified students only)
 router.get("/", acvtiveStudentController.getAllStudentsWithEnrollments);
 router.get("/stats", acvtiveStudentController.getActiveStudentStats);
-router.get("/filter-options", acvtiveStudentController.getFilterOptions);
 router.get("/export-csv", acvtiveStudentController.exportStudentsCSV);
 router.patch(
     "/enrollment/:enrollmentId/payment",

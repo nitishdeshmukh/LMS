@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useId, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Add this import
-import { SearchIcon, MoreVertical, Check, ChevronDown } from 'lucide-react';
+import React, { useId, useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { SearchIcon, MoreVertical, Check, ChevronDown, Loader2 } from 'lucide-react';
 import {
   flexRender,
   getCoreRowModel,
@@ -40,6 +40,7 @@ import TablePagination from '@/common/components/TablePagination';
 import RevokeAccess from './RevokeAccess.jsx';
 import PasswordModal from './PasswordModal';
 import { cn } from '@/common/lib/utils';
+import adminService from '@/services/admin/adminService.js';
 
 /**
  * Formats a date object into a readable string format
@@ -151,41 +152,6 @@ const columns = [
         </DropdownMenu>
       );
     },
-  },
-];
-
-const enrollments = [
-  {
-    id: 1,
-    studentName: 'Alex Johnson',
-    course: 'Advanced JavaScript',
-    college: 'College of Engineering',
-    date: '2023-10-26',
-    email: 'alex.johnson@example.com',
-  },
-  {
-    id: 2,
-    studentName: 'Maria Garcia',
-    course: 'UI/UX Design Fundamentals',
-    college: 'College of Arts & Design',
-    date: '2023-10-26',
-    email: 'maria.garcia@example.com',
-  },
-  {
-    id: 3,
-    studentName: 'James Smith',
-    course: 'Data Structures & Algorithms',
-    college: 'College of Science',
-    date: '2023-10-25',
-    email: 'james.smith@example.com',
-  },
-  {
-    id: 4,
-    studentName: 'Patricia Brown',
-    course: 'Introduction to Python',
-    college: 'College of Engineering',
-    date: '2023-10-25',
-    email: 'patricia.brown@example.com',
   },
 ];
 
@@ -365,8 +331,14 @@ const defaultPageSize = 5;
  * EnrollmentsTable - Displays student enrollments with filtering and actions
  */
 const EnrollmentsTable = () => {
-  const navigate = useNavigate(); // Add the hook here
+  const navigate = useNavigate();
 
+  // Data fetching states
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Table states
   const [columnFilters, setColumnFilters] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
@@ -378,6 +350,41 @@ const EnrollmentsTable = () => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await adminService.getAllStudents();
+
+        // Transform API response to match your table structure
+        const transformedData =
+          response.data?.students.map(student => ({
+            id: student._id,
+            studentName: student.fullName,
+            course: student.courseName,
+            college: student.collegeName,
+            date: new Date(student.createdAt).toLocaleDateString('en-US', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+            }),
+            email: student.email,
+          })) || [];
+
+        setData(transformedData);
+      } catch (err) {
+        setError(err.message || 'Failed to fetch students');
+        console.error('Error fetching students:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
   // Handler functions
   const handleRevoke = student => {
@@ -405,7 +412,7 @@ const EnrollmentsTable = () => {
   };
 
   const table = useReactTable({
-    data: enrollments,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -424,6 +431,34 @@ const EnrollmentsTable = () => {
       handleViewDetails,
     },
   });
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-zinc-900 rounded-xl border border-zinc-800">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <p className="text-zinc-400 text-sm">Loading students...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-zinc-900 rounded-xl border border-zinc-800">
+        <p className="text-red-400 mb-2 font-semibold">Error loading students</p>
+        <p className="text-zinc-400 text-sm">{error}</p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -526,3 +561,4 @@ const EnrollmentsTable = () => {
 };
 
 export default EnrollmentsTable;
+
