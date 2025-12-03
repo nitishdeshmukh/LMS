@@ -319,21 +319,20 @@ export const submitAssignment = async (req, res) => {
             });
 
             // Mark capstone as completed in course (for this student's enrollment tracking)
-            // Update user stats
+            // Update user stats (no XP for assignments)
             await Student.findByIdAndUpdate(req.userId, {
-                $inc: { xp: 100, assignmentsCompleted: 1 },
+                $inc: { assignmentsCompleted: 1 },
             });
 
-            // Update leaderboard with XP
-            await updateLeaderboard(req.userId, courseId, 100, {
+            // Update leaderboard with assignment completion (no XP)
+            await updateLeaderboard(req.userId, courseId, 0, {
                 assignmentsCompleted: 1,
             });
 
             return res.status(200).json({
                 success: true,
                 data: submission,
-                message:
-                    "Capstone project submitted successfully! You earned 100 XP!",
+                message: "Capstone project submitted successfully!",
             });
         }
 
@@ -442,20 +441,20 @@ export const submitAssignment = async (req, res) => {
 
         await enrollment.save();
 
-        // Update user stats
+        // Update user stats (no XP for assignments)
         await Student.findByIdAndUpdate(req.userId, {
-            $inc: { xp: 50, assignmentsCompleted: 1 },
+            $inc: { assignmentsCompleted: 1 },
         });
 
-        // Update leaderboard with XP and assignment completion
-        await updateLeaderboard(req.userId, courseId, 50, {
+        // Update leaderboard with assignment completion (no XP)
+        await updateLeaderboard(req.userId, courseId, 0, {
             assignmentsCompleted: 1,
         });
 
         res.status(200).json({
             success: true,
             data: submission,
-            message: "Assignment submitted successfully! You earned 50 XP!",
+            message: "Assignment submitted successfully!",
         });
     } catch (error) {
         console.error("Submit assignment error:", error);

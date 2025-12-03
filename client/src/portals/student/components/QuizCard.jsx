@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 
 import { useQuizQuestions, useSubmitQuiz } from '../hooks';
@@ -16,15 +16,56 @@ const QuizCard = ({
   const [selectedOption, setSelectedOption] = useState(null);
   const [showResults, setShowResults] = useState(initialIsSubmitted || false);
   const [quizResults, setQuizResults] = useState(null);
+  
+  // Time tracking for XP calculation (internal - not shown to user)
+  const [answerTimes, setAnswerTimes] = useState({});
+  const questionStartTimeRef = useRef(null);
 
   const { quiz, loading: loadingQuiz, error: quizError } = useQuizQuestions(courseSlug, quizId);
   const { submit, loading: submitting, error: submitError } = useSubmitQuiz();
+
+  // Anti-copy/cheating prevention
+  const preventCopy = useCallback(e => {
+    e.preventDefault();
+    return false;
+  }, []);
+
+  // Prevent keyboard shortcuts for copying
+  const preventKeyboardCopy = useCallback(e => {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.key === 'c' ||
+        e.key === 'C' ||
+        e.key === 'a' ||
+        e.key === 'A' ||
+        e.key === 'x' ||
+        e.key === 'X')
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  }, []);
+
+  // Set up anti-copy event listeners
+  useEffect(() => {
+    document.addEventListener('copy', preventCopy);
+    document.addEventListener('cut', preventCopy);
+    document.addEventListener('keydown', preventKeyboardCopy);
+    
+    return () => {
+      document.removeEventListener('copy', preventCopy);
+      document.removeEventListener('cut', preventCopy);
+      document.removeEventListener('keydown', preventKeyboardCopy);
+    };
+  }, [preventCopy, preventKeyboardCopy]);
 
   // Reset state when quiz changes
   useEffect(() => {
     setCurrentQuestionIndex(0);
     setAnswers({});
     setSelectedOption(null);
+    setAnswerTimes({});
+    questionStartTimeRef.current = null;
 
     // If quiz is already submitted, show results
     if (initialIsSubmitted) {
@@ -34,6 +75,13 @@ const QuizCard = ({
     }
     setQuizResults(null);
   }, [quizId, initialIsSubmitted]);
+
+  // Start timer when question changes or quiz loads
+  useEffect(() => {
+    if (quiz && !showResults && !initialIsSubmitted) {
+      questionStartTimeRef.current = Date.now();
+    }
+  }, [currentQuestionIndex, quiz, showResults, initialIsSubmitted]);
 
   // When quiz data loads and it's submitted, build results from the quiz data
   useEffect(() => {
@@ -55,6 +103,15 @@ const QuizCard = ({
       setShowResults(true);
     }
   }, [quiz]);
+
+  // Anti-copy styles to prevent cheating
+  const antiCopyStyles = {
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    msUserSelect: 'none',
+    WebkitTouchCallout: 'none',
+  };
 
   if (loadingQuiz) {
     return (
@@ -81,22 +138,32 @@ const QuizCard = ({
   const handleNext = async () => {
     if (selectedOption === null) return;
 
-    // Save current answer
+    // Calculate time taken for this question (in seconds)
+    const timeTaken = questionStartTimeRef.current
+      ? Math.floor((Date.now() - questionStartTimeRef.current) / 1000)
+      : 60; // Default to 60 seconds if no start time
+
+    // Save current answer and time
     const newAnswers = { ...answers, [currentQuestion.id]: selectedOption };
+    const newAnswerTimes = { ...answerTimes, [currentQuestion.id]: timeTaken };
     setAnswers(newAnswers);
+    setAnswerTimes(newAnswerTimes);
 
     if (!isLastQuestion) {
       // Move to next question
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOption(null);
+      // Reset timer for next question
+      questionStartTimeRef.current = Date.now();
     } else {
-      // Submit quiz
+      // Submit quiz with answer times for XP calculation
       try {
         const response = await submit({
           courseId,
           moduleId,
           quizId,
           answers: newAnswers,
+          answerTimes: newAnswerTimes,
         });
 
         if (response.success) {
@@ -220,7 +287,12 @@ const QuizCard = ({
   }
 
   return (
-    <div className="max-w-3xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+    <div
+      className="max-w-3xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-8"
+      style={antiCopyStyles}
+      onContextMenu={e => e.preventDefault()}
+      onDragStart={e => e.preventDefault()}
+    >
       <div className="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
         <div>
           <h2 className="text-2xl font-bold">{quiz.title}</h2>

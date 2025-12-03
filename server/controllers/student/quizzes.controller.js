@@ -388,7 +388,7 @@ export const submitQuiz = async (req, res) => {
             });
         }
 
-        const { courseId, moduleId, quizId, answers } = validation.data;
+        const { courseId, moduleId, quizId, answers, answerTimes = {} } = validation.data;
 
         const course = await Course.findById(courseId);
         if (!course) {
@@ -483,13 +483,38 @@ export const submitQuiz = async (req, res) => {
             });
         }
 
-        // Calculate score
+        // Helper function to calculate XP based on time
+        // Max XP: 100 (instant answer), Min XP: 40 (after 60 seconds)
+        // Decreases by 1 XP per second for the first 60 seconds
+        const calculateTimeBasedXP = (timeInSeconds) => {
+            const MAX_XP = 100;
+            const MIN_XP = 40;
+            const DECAY_DURATION = 60; // seconds
+            
+            if (timeInSeconds <= 0) return MAX_XP;
+            if (timeInSeconds >= DECAY_DURATION) return MIN_XP;
+            
+            // Linear decay: 100 - (time * 1) but not below 40
+            return Math.max(MIN_XP, MAX_XP - Math.floor(timeInSeconds));
+        };
+
+        // Calculate score and XP
         let score = 0;
+        let totalXP = 0;
         const results = [];
         quiz.questions.forEach((question) => {
-            const userAnswer = answers[question._id.toString()];
+            const questionId = question._id.toString();
+            const userAnswer = answers[questionId];
             const isCorrect = userAnswer === question.correctAnswer;
-            if (isCorrect) score++;
+            
+            if (isCorrect) {
+                score++;
+                // Calculate XP based on answer time (only for correct answers)
+                const answerTime = answerTimes[questionId] || 60; // Default to 60s if no time recorded
+                const questionXP = calculateTimeBasedXP(answerTime);
+                totalXP += questionXP;
+            }
+            
             results.push({
                 questionId: question._id,
                 userAnswer,
@@ -536,13 +561,13 @@ export const submitQuiz = async (req, res) => {
 
         await enrollment.save();
 
-        // Update user stats
+        // Update user stats with time-based XP
         await Student.findByIdAndUpdate(req.userId, {
-            $inc: { xp: score * 10, quizzesCompleted: 1 },
+            $inc: { xp: totalXP, quizzesCompleted: 1 },
         });
 
         // Update leaderboard with XP and quiz completion
-        await updateLeaderboard(req.userId, courseId, score * 10, {
+        await updateLeaderboard(req.userId, courseId, totalXP, {
             quizzesCompleted: 1,
         });
 
@@ -554,7 +579,7 @@ export const submitQuiz = async (req, res) => {
                 percentage: Math.round((score / quiz.questions.length) * 100),
                 results,
             },
-            message: `Quiz submitted! You scored ${score}/${quiz.questions.length} and earned ${score * 10} XP!`,
+            message: `Quiz submitted! You scored ${score}/${quiz.questions.length}`,
         });
     } catch (error) {
         console.error("Submit quiz error:", error);
