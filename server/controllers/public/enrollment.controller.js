@@ -1,5 +1,31 @@
 import { Payment, Enrollment, Course, Student } from "../../models/index.js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { r2 } from "../../config/r2.js";
 import mongoose from "mongoose";
+import crypto from "crypto";
+
+/**
+ * Upload file to R2 and return the URL
+ */
+const uploadToR2 = async (file) => {
+    const uniqueKey = `initial-payment-screenshots/${Date.now()}-${crypto.randomUUID()}-${file.originalname}`;
+
+    const uploadParams = {
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: uniqueKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+    };
+
+    await r2.send(new PutObjectCommand(uploadParams));
+
+    // Return the R2 public URL or custom domain URL
+    const publicUrl = process.env.R2_PUBLIC_URL
+        ? `${process.env.R2_PUBLIC_URL}/${uniqueKey}`
+        : `/api/file/${uniqueKey}`;
+
+    return publicUrl;
+};
 
 /**
  * Create enrollment with payment proof in single request
@@ -29,8 +55,20 @@ export const createEnrollmentWithPayment = async (req, res) => {
             transactionId,
         } = req.validatedData;
 
-        // Get screenshot URL from uploaded file
-        const screenshotUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        // Upload screenshot to R2 and get URL
+        let screenshotUrl = null;
+        if (req.file) {
+            try {
+                screenshotUrl = await uploadToR2(req.file);
+            } catch (uploadError) {
+                console.error("R2 upload error:", uploadError);
+                return res.status(500).json({
+                    success: false,
+                    message:
+                        "Failed to upload payment screenshot. Please try again.",
+                });
+            }
+        }
 
         // Verify course exists and get details
         const course = await Course.findById(courseId).session(session);

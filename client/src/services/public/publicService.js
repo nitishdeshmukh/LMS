@@ -71,7 +71,11 @@ export const getFAQs = async () => {
 // ============================================
 
 export const submitEnrollment = async enrollmentData => {
-  const response = await api.post('/public/enroll', enrollmentData);
+  const response = await api.post('/public/enroll', enrollmentData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

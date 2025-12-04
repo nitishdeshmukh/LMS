@@ -2,6 +2,7 @@ import express from "express";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import { r2 } from "../../config/r2.js";
+import { isAuthenticated, authorizeRoles } from "../../middlewares/isAuthenticated.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -25,9 +26,10 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     }
 });
 
-router.get("/*", async (req, res) => {
+// Only admin can fetch files
+router.get("/*", isAuthenticated, authorizeRoles("admin"), async (req, res) => {
     try {
-        // Get the full path after /api/r2/
+        // Get the full path after /api/file/
         const key = req.params[0];
 
         if (!key) {
