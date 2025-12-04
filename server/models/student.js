@@ -48,8 +48,6 @@ const studentSchema = new mongoose.Schema(
 
         accountStatus: {
             type: String,
-            enum: ["unenrolled", "enrolled"],
-            default: "unenrolled",
         },
 
         // LMS LOGIN

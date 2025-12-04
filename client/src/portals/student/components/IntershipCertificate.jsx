@@ -5,7 +5,7 @@ import signature from '../../../assets/images/signature.png';
 
 import { Mail, Globe, FileText, Building2, MapPin } from 'lucide-react';
 
-const CustomCertificate = ({
+const IntershipCertificate = ({
   // Student/Certificate Data - DYNAMIC
   studentName = 'Deepak Agrawal',
   course = 'Full Stack Development',
@@ -173,4 +173,4 @@ const CustomCertificate = ({
   );
 };
 
-export default CustomCertificate;
+export default IntershipCertificate;

@@ -112,14 +112,14 @@ export const lmsLogin = async (req, res) => {
         }
 
         // Check account status
-        if (student.accountStatus === "blocked") {
-            return res.status(403).json({
-                success: false,
-                message:
-                    "Your account has been blocked. Please contact support.",
-                code: ERROR_CODES.ACCOUNT_BLOCKED,
-            });
-        }
+        // if (student.accountStatus === "blocked") {
+        //     return res.status(403).json({
+        //         success: false,
+        //         message:
+        //             "Your account has been blocked. Please contact support.",
+        //         code: ERROR_CODES.ACCOUNT_BLOCKED,
+        //     });
+        // }
 
         // Generate tokens
         const accessToken = student.generateAccessToken();

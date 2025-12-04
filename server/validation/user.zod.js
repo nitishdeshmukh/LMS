@@ -40,7 +40,7 @@ export const userSchema = z.object({
 
     // ROLES & ACCOUNT STATE
     role: z.enum(["student", "admin"]).optional(),
-    accountStatus: z.enum(["pending", "verified", "blocked"]).optional(),
+    accountStatus: z.string().optional(),
 
     // ⚡ LMS LOGIN CREDENTIALS (Admin-assigned)
     lmsId: z.string().optional(),
