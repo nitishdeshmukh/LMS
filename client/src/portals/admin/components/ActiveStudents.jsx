@@ -6,7 +6,6 @@ import StatisticsSection from './StatisticsSection';
 import adminService from '@/services/admin/adminService';
 import { Button } from '@/common/components/ui/button';
 import CertificateIssueDialog from './CertificateIssueDialog';
-import { downloadFinalCertificate } from '../lib/genrateFinalCertificate';
 
 const ActiveStudents = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -106,36 +105,9 @@ const ActiveStudents = () => {
       setIsIssuingCert(true);
       toast.loading('Issuing certificate...', { id: 'cert-issue' });
 
-      const response = await adminService.issueCertificateByEnrollmentId({ enrollmentId: student.enrollmentId });
+      // const response = await adminService.issueCertificateByEnrollmentId({ enrollmentId: student.enrollmentId });
 
-      if (response.success) {
-        // Generate and download the certificate
-        const certData = response.data;
-        const downloadSuccess = await downloadFinalCertificate({
-          studentName: certData.studentName,
-          courseName: certData.courseName,
-          certificateId: certData.certificateId,
-          completionDate: new Date(certData.completionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-        });
-
-        if (downloadSuccess) {
-          toast.success('Certificate issued and downloaded!', {
-            id: 'cert-issue',
-            description: `Certificate for ${student.name} has been generated.`,
-          });
-        } else {
-          toast.warning('Certificate issued but download failed', {
-            id: 'cert-issue',
-            description: 'Please try downloading it manually later.',
-          });
-        }
-
-        setIsCertDialogOpen(false);
-        // Refresh the students list
-        await fetchActiveStudents(false);
-      } else {
-        throw new Error(response.message || 'Failed to issue certificate');
-      }
+      
     } catch (err) {
       console.error('Error issuing certificate:', err);
       toast.error('Failed to issue certificate', {
