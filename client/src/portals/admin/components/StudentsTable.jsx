@@ -15,6 +15,9 @@ import {
 } from '@tanstack/react-table';
 import { toast } from 'sonner';
 
+import CertificateIssueDialog from './CertificateIssueDialog';
+import adminService from '@/services/admin/adminService';
+
 import {
   Table,
   TableBody,
@@ -32,15 +35,6 @@ import {
 } from '../../../common/components/ui/dropdown-menu';
 import { Input } from '../../../common/components/ui/input';
 import { Label } from '../../../common/components/ui/label';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/common/components/ui/dialog';
 import { Button } from '@/common/components/ui/button';
 import TablePagination from '@/common/components/TablePagination';
 import { cn } from '@/common/lib/utils';
@@ -299,9 +293,10 @@ function Filter({ column }) {
 
 const defaultPageSize = 10;
 
-const StudentsTable = ({ data = [] }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const StudentsTable = ({ data , onRefresh }) => {
+  const [isCertDialogOpen, setIsCertDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isIssuingCert, setIsIssuingCert] = useState(false);
   const [columnFilters, setColumnFilters] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
@@ -309,38 +304,75 @@ const StudentsTable = ({ data = [] }) => {
     pageSize: defaultPageSize,
   });
 
-  const handleIssueCertificate = student => {
-    setIsDialogOpen(false);
+  // Open Certificate Dialog
+  const openCertificateDialog = student => {
+    setSelectedStudent(student);
+    setIsCertDialogOpen(true);
+  };
 
-    toast.success('Certificate is being issued', {
-      description: `The certificate is being issued to ${student.name}`,
-      icon: (
-        <svg
-          className="w-5 h-5 text-green-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-          />
-        </svg>
-      ),
-      duration: 5000,
-    });
+  // Confirm Issue Certificate
+  const handleConfirmIssueCertificate = async (student) => {
+    try {
+      setIsIssuingCert(true);
+      toast.loading('Issuing certificate...', { id: 'cert-issue' });
+
+      // Generate certificate ID using browser crypto API with fallback
+      let certificateId;
+      try {
+        if (crypto && crypto.randomUUID) {
+          certificateId = `C2D-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+        } else {
+          // Fallback for older browsers
+          certificateId = `C2D-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        }
+      } catch (error) {
+        console.error('Error generating certificate ID:', error);
+        // Fallback
+        certificateId = `C2D-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      }
+      
+      console.log('Generated Certificate ID:', certificateId);
+      console.log('Issuing certificate with data:', {
+        enrollmentId: student.enrollmentId,
+        certificateId,
+        amountRemaining: 0,
+        paymentStatus: 'FULLY_PAID'
+      });
+
+      const requestData = {
+        enrollmentId: student.enrollmentId,
+        certificateId: certificateId,
+        amountRemaining: 0,
+        paymentStatus: 'FULLY_PAID',
+      };
+
+      console.log('Request data before API call:', JSON.stringify(requestData));
+
+      const response = await adminService.issueCertificateByEnrollmentId(requestData);
+
+      if (response.success) {
+        toast.success('Certificate issued successfully', { id: 'cert-issue' });
+        setIsCertDialogOpen(false);
+        if (onRefresh) {
+          onRefresh(); // Refresh list
+        }
+      } else {
+        throw new Error(response.message || 'Failed to issue certificate');
+      }
+    } catch (err) {
+      console.error('Error issuing certificate:', err);
+      toast.error('Failed to issue certificate', {
+        id: 'cert-issue',
+        description: err.message || 'Please try again later',
+      });
+    } finally {
+      setIsIssuingCert(false);
+    }
   };
 
   const handleExportCSV = () => {
     console.log('Exporting CSV...');
     toast.success('CSV export initiated');
-  };
-
-  const openCertificateDialog = student => {
-    setSelectedStudent(student);
-    setIsDialogOpen(true);
   };
 
   // Define columns
@@ -544,146 +576,13 @@ const StudentsTable = ({ data = [] }) => {
       </div>
 
       {/* Certificate Issue Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <svg
-                className="w-5 h-5 text-purple-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                />
-              </svg>
-              Issue Certificate
-            </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Review the project details before issuing the certificate
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedStudent && (
-            <div className="space-y-4 py-4">
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <span className="text-xs text-zinc-500 uppercase font-bold">Student Name</span>
-                  <p className="font-medium text-base text-zinc-100">{selectedStudent.name}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs text-zinc-500 uppercase font-bold">
-                    GitHub Repository
-                  </span>
-                  <a
-                    href={selectedStudent.githubLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm hover:underline break-all"
-                  >
-                    <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    {selectedStudent.githubLink}
-                  </a>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs text-zinc-500 uppercase font-bold">
-                    Live Project Link
-                  </span>
-                  <a
-                    href={selectedStudent.liveLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-green-400 hover:text-green-300 text-sm hover:underline break-all"
-                  >
-                    <svg
-                      className="w-4 h-4 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                    {selectedStudent.liveLink}
-                  </a>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs text-zinc-500 uppercase font-bold">Payment ID</span>
-                  <div className="flex flex-row items-center gap-2">
-                    <div className="flex items-center gap-2 text-blue-400 text-sm font-mono">
-                      <svg
-                        className="w-4 h-4 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                        />
-                      </svg>
-                      {selectedStudent.paymentId || 'TXN_123456789'}
-                    </div>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(selectedStudent.paymentId || 'TXN_123456789');
-                        toast.success('Payment ID copied to clipboard');
-                      }}
-                      className="text-zinc-500 hover:text-zinc-300 transition-colors"
-                      title="Copy Payment ID"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="border-zinc-700 text-zinc-900"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => selectedStudent && handleIssueCertificate(selectedStudent)}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              Issue Certificate
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CertificateIssueDialog
+        isOpen={isCertDialogOpen}
+        onOpenChange={setIsCertDialogOpen}
+        student={selectedStudent}
+        onConfirm={handleConfirmIssueCertificate}
+        isIssuing={isIssuingCert}
+      />
     </div>
   );
 };

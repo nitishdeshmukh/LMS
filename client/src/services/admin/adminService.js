@@ -90,7 +90,7 @@ export const getOngoingStudents = async () => {
 export const approveOngoingStudent = async (enrollmentId, data) => {
   const response = await api.patch(
     `/admin/ongoing/students/${enrollmentId}/update-payment-status`,
-    data,
+    data
   );
   return response.data;
 };
@@ -111,8 +111,9 @@ export const getActiveStudents = async () => {
   return response.data;
 };
 
-export const issueCertificateByEnrollmentId = async () => {
-  const response = await api.post('admin/active/students/certificate');
+export const issueCertificateByEnrollmentId = async (data) => {
+  console.log("Data:", data);
+  const response = await api.post('/admin/active/students/certificate', data);
   return response.data;
 };
 
@@ -190,3 +191,4 @@ const adminService = {
 };
 
 export default adminService;
+

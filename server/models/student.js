@@ -145,12 +145,12 @@ studentSchema.methods.generateLmsPassword = async function () {
     return randomPassword;
 };
 
-studentSchema.methods.generateLmsId = async function () {
-    const randomId = crypto.randomBytes(8).toString("hex");
-    const salt = await bcrypt.genSalt(10);
-    this.lmsId = await bcrypt.hash(randomId, salt);
-    return randomId;
+studentSchema.methods.generateLmsId = function () {
+    const uuid = crypto.randomUUID();
+    this.lmsId = `LMS00-${uuid}`;
+    return this.lmsId;
 };
+
 
 studentSchema.pre("validate", function (next) {
     if (!this.myReferralCode && this.name) {

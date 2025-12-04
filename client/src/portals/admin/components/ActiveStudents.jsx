@@ -63,14 +63,16 @@ const ActiveStudents = () => {
           email: enrollment.student?.email,
           college: enrollment.student?.collegeName,
           year: enrollment.student?.yearOfStudy,
+          courseDetails: enrollment.course,
+          courseName: enrollment.course?.title || 'N/A',
           currentProgress: enrollment.progressPercentage || 0,
           capstoneStatus: getCapstoneStatus(enrollment),
           partialPaymentDetails: enrollment.partialPaymentDetails,
           fullPaymentDetails: enrollment.fullPaymentDetails,
           paymentStatus: getPaymentStatus(enrollment.paymentStatus),
           isCompleted: enrollment.isCompleted || false,
-          courseAmount: enrollment.courseAmount,
-          amountRemaining: enrollment.amountRemaining,
+          courseAmount: enrollment.courseAmount || 0,
+          amountRemaining: enrollment.amountRemaining || 0,
           certificateId: enrollment.certificateId,
           userId: enrollment.student?._id,
         }));
@@ -91,7 +93,7 @@ const ActiveStudents = () => {
   };
 
   // Open Certificate Dialog
-  const handleIssueCertificateClick = enrollmentId => {
+  const handleIssueCertificateClick = (enrollmentId) => {
     const student = studentsData.find(s => s.enrollmentId === enrollmentId);
     if (student) {
       setSelectedStudentForCert(student);
@@ -100,12 +102,42 @@ const ActiveStudents = () => {
   };
 
   // Confirm Issue Certificate
-  const handleConfirmIssueCertificate = async student => {
+  const handleConfirmIssueCertificate = async (student) => {
     try {
       setIsIssuingCert(true);
       toast.loading('Issuing certificate...', { id: 'cert-issue' });
 
-      // const response = await adminService.issueCertificateByEnrollmentId({ enrollmentId: student.enrollmentId });
+      // Generate certificate ID using browser crypto API with fallback
+      let certificateId;
+       certificateId = `C2D-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+        
+      
+      console.log('Generated Certificate ID:', certificateId);
+      console.log('Issuing certificate with data:', {
+        enrollmentId: student.enrollmentId,
+        certificateId,
+        amountRemaining: 0,
+        paymentStatus: 'FULLY_PAID'
+      });
+
+      const requestData = { 
+        enrollmentId: student.enrollmentId, 
+        certificateId: certificateId,
+        amountRemaining: 0, 
+        paymentStatus: 'FULLY_PAID',
+      };
+
+      console.log('Request data before API call:', JSON.stringify(requestData));
+
+      const response = await adminService.issueCertificateByEnrollmentId(requestData);
+
+      if (response.success) {
+        toast.success('Certificate issued successfully', { id: 'cert-issue' });
+        setIsCertDialogOpen(false);
+        fetchActiveStudents(false); // Refresh list
+      } else {
+        throw new Error(response.message || 'Failed to issue certificate');
+      }
     } catch (err) {
       console.error('Error issuing certificate:', err);
       toast.error('Failed to issue certificate', {
@@ -180,7 +212,6 @@ const ActiveStudents = () => {
               <div className="mt-8">
                 <StudentsTable
                   data={studentsData}
-                  onIssueCertificate={handleIssueCertificateClick}
                   onRefresh={handleRefresh}
                 />
               </div>

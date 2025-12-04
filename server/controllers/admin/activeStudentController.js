@@ -1,4 +1,8 @@
-import { Student, Enrollment, Submission } from "../../models/index.js";
+import {
+    Student,
+    Enrollment,
+    Submission,
+} from "../../models/index.js";
 import { Parser } from "json2csv";
 
 /**
@@ -337,9 +341,6 @@ export const getAllStudentsWithEnrollments = async (req, res) => {
                 $nin: ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING"],
             },
         })
-            .select(
-                "-completedQuizzes -completedTasks -completedModules -progressPercentage -isCompleted"
-            )
             .populate("student")
             .populate("course", "title slug price thumbnail stream")
             .populate("partialPaymentDetails")
@@ -464,7 +465,22 @@ export const updateCapstoneStatus = async (req, res) => {
  */
 export const issueCertificate = async (req, res) => {
     try {
-        const { enrollmentId } = req.body;
+        const { 
+            enrollmentId, 
+            certificateId,
+            amountRemaining, 
+            paymentStatus 
+        } = req.body;
+
+        console.log("Request body:", { enrollmentId, certificateId, amountRemaining, paymentStatus });
+
+        // Validate required fields
+        if (!certificateId) {
+            return res.status(400).json({
+                success: false,
+                message: "Certificate ID is required",
+            });
+        }
 
         const enrollment = await Enrollment.findById(enrollmentId)
             .populate("student", "name lastName email")
@@ -486,45 +502,43 @@ export const issueCertificate = async (req, res) => {
             });
         }
 
-        // Check if capstone is graded
+        // Check capstone submission
         const capstoneSubmission = await Submission.findOne({
             enrollment: enrollmentId,
-            type: "assignment",
+            type: "capstone",
             status: "graded",
         });
 
         if (!capstoneSubmission) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "Student must complete and pass capstone project first",
+                message: "Student must complete and pass capstone project first",
             });
         }
 
-        // Generate certificate ID
-        const certificateId = `C2D-${Math.random()
-            .toString(36)
-            .substr(2, 8)
-            .toUpperCase()}`;
-
-        // Update enrollment
+        // Generate certificate ID if not provided
+        
         enrollment.isCompleted = true;
         enrollment.completionDate = new Date();
         enrollment.certificateId = certificateId;
         enrollment.progressPercentage = 100;
+        
+        // Conditionally update payment fields only if provided
+        if (paymentStatus !== undefined) {
+            enrollment.paymentStatus = paymentStatus;
+        }
+        if (amountRemaining !== undefined) {
+            enrollment.amountRemaining = amountRemaining;
+        }
+        
         await enrollment.save();
-
-        // TODO: Generate PDF certificate and store URL
-        // const pdfUrl = await generateCertificatePDF(enrollment);
 
         res.status(200).json({
             success: true,
             message: "Certificate issued successfully",
             data: {
-                certificateId,
-                studentName: `${enrollment.student.name} ${
-                    enrollment.student.lastName || ""
-                }`,
+                certificateId: certificateId,
+                studentName: `${enrollment.student.name} ${enrollment.student.lastName || ""}`,
                 courseName: enrollment.course.title,
                 completionDate: enrollment.completionDate,
             },
@@ -539,6 +553,7 @@ export const issueCertificate = async (req, res) => {
     }
 };
 
+
 /**
  * Export Students Data to CSV
  */
@@ -549,10 +564,7 @@ export const exportStudentsCSV = async (req, res) => {
             {
                 $match: {
                     paymentStatus: {
-                        $nin: [
-                            "UNPAID",
-                            "PARTIAL_PAYMENT_VERIFICATION_PENDING",
-                        ],
+                        $nin: ["UNPAID", "PARTIAL_PAYMENT_VERIFICATION_PENDING"],
                     },
                 },
             },
