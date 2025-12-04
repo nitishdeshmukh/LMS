@@ -388,19 +388,19 @@ const EnrollmentsTable = () => {
 
   // Handler functions
   const handleRevoke = student => {
+    //logic to revoke student access
     setSelectedStudent(student);
     setIsPasswordModalOpen(true);
   };
 
-  const handlePasswordSubmit = password => {
-    const correctPassword = 'admin123';
-
-    if (password === correctPassword) {
+  const handlePasswordSubmit = async password => {
+    try {
+      await adminService.verifyAdmin(password);
       setIsPasswordModalOpen(false);
       setIsRevokeModalOpen(true);
-    } else {
-      alert('Incorrect password!');
-      // You can replace this with a toast notification
+    } catch (error) {
+      console.error('Error verifying admin:', error);
+      return;
     }
   };
 

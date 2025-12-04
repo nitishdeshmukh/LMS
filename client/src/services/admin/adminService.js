@@ -14,13 +14,33 @@ export const getDashboard = async () => {
   return response.data;
 };
 
-export const getDashboardStats = async () => {
-  const response = await api.get('/admin/dashboard/stats');
+export const getDashboardStats = async (params = {}) => {
+  const response = await api.get('/admin/dashboard/stats', { params });
   return response.data;
 };
 
-export const getAllStudents = async () => {
-  const response = await api.get('/admin/dashboard/enrollments');
+export const getAllStudents = async (params = {}) => {
+  const response = await api.get('/admin/dashboard/enrollments', { params });
+  return response.data;
+};
+
+export const getEnrollmentsByCourse = async (params = {}) => {
+  const response = await api.get('/admin/dashboard/enrollments/by/course', { params });
+  return response.data;
+};
+
+export const getCollegesList = async () => {
+  const response = await api.get('/admin/dashboard/colleges');
+  return response.data;
+};
+
+export const getCoursesList = async () => {
+  const response = await api.get('/admin/dashboard/courses');
+  return response.data;
+};
+
+export const getStudentById = async studentId => {
+  const response = await api.get(`/admin/dashboard/student/info/${studentId}`);
   return response.data;
 };
 
@@ -67,8 +87,11 @@ export const getOngoingStudents = async () => {
   return response.data;
 };
 
-export const approveOngoingStudent = async userId => {
-  const response = await api.patch(`/admin/ongoing/students/${userId}/approve`);
+export const approveOngoingStudent = async (enrollmentId, data) => {
+  const response = await api.patch(
+    `/admin/ongoing/students/${enrollmentId}/update-payment-status`,
+    data
+  );
   return response.data;
 };
 
@@ -141,6 +164,10 @@ const adminService = {
   getDashboard,
   getDashboardStats,
   getAllStudents,
+  getEnrollmentsByCourse,
+  getCollegesList,
+  getCoursesList,
+  getStudentById,
   getAllCourses,
   getCourseById,
   createCourse,

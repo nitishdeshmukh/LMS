@@ -8,8 +8,6 @@ import DoughnutChart from './DoughnutChart';
 
 /**
  * Formats a date object into a readable string format
- * @param {Date} date - The date to format
- * @returns {string} Formatted date string or empty string if invalid
  */
 function formatDate(date) {
   if (!date) return '';
@@ -22,8 +20,6 @@ function formatDate(date) {
 
 /**
  * Validates if a date object is valid
- * @param {Date} date - The date to validate
- * @returns {boolean} True if valid, false otherwise
  */
 function isValidDate(date) {
   if (!date) return false;
@@ -32,8 +28,11 @@ function isValidDate(date) {
 
 /**
  * ReferralSourceChart - Displays enrollment breakdown by source (Direct vs Referral)
+ * Note: Currently uses mock data until backend endpoint is available
+ * Has independent date filters for future API integration
  */
-function ReferralSourceChart({ data }) {
+function ReferralSourceChart({ college }) {
+  // Independent date filter state
   const [fromOpen, setFromOpen] = useState(false);
   const [fromDate, setFromDate] = useState(undefined);
   const [fromMonth, setFromMonth] = useState(undefined);
@@ -44,6 +43,13 @@ function ReferralSourceChart({ data }) {
   const [toMonth, setToMonth] = useState(undefined);
   const [toValue, setToValue] = useState('');
 
+  // Mock data - will be replaced when backend endpoint is available
+  // TODO: Integrate with API when /api/admin/dashboard/referrals endpoint is created
+  const data = [
+    { category: 'Direct', value: 45, color: '#145efc' },
+    { category: 'Referral', value: 25, color: '#FFB84D' },
+  ];
+
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
       <div className="mb-4">
@@ -53,11 +59,12 @@ function ReferralSourceChart({ data }) {
         </p>
       </div>
 
+      {/* Independent Date Filters */}
       <div className="flex items-center gap-4 mb-4">
         {/* From Date Picker */}
         <div className="relative flex gap-2">
           <Input
-            id="from-date-referral"
+            id="referral-from-date"
             value={fromValue}
             placeholder="From Date"
             className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -67,6 +74,8 @@ function ReferralSourceChart({ data }) {
               if (isValidDate(date)) {
                 setFromDate(date);
                 setFromMonth(date);
+              } else if (e.target.value === '') {
+                setFromDate(undefined);
               }
             }}
             onKeyDown={e => {
@@ -110,7 +119,7 @@ function ReferralSourceChart({ data }) {
         {/* To Date Picker */}
         <div className="relative flex gap-2">
           <Input
-            id="to-date-referral"
+            id="referral-to-date"
             value={toValue}
             placeholder="To Date"
             className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -120,6 +129,8 @@ function ReferralSourceChart({ data }) {
               if (isValidDate(date)) {
                 setToDate(date);
                 setToMonth(date);
+              } else if (e.target.value === '') {
+                setToDate(undefined);
               }
             }}
             onKeyDown={e => {

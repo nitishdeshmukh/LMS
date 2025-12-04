@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, CalendarIcon } from 'lucide-react';
 
 import {
@@ -11,8 +11,8 @@ import { Button } from '../../../common/components/ui/button';
 import { Input } from '../../../common/components/ui/input';
 import { Popover, PopoverTrigger, PopoverContent } from '../../../common/components/ui/popover';
 import { Calendar } from '../../../common/components/ui/calendar';
+import adminService from '@/services/admin/adminService';
 
-const collegeOptions = ['All Colleges', 'Stanford University', 'MIT', 'Harvard'];
 const statusOptions = ['All Status', 'Graded', 'Submitted', 'In Progress'];
 
 function formatDate(date) {
@@ -34,21 +34,52 @@ function isValidDate(date) {
   return !isNaN(date.getTime());
 }
 
-const DashboardHeader = () => {
-  const [selectedCollege, setSelectedCollege] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+const DashboardHeader = ({
+  selectedCollege,
+  setSelectedCollege,
+  selectedStatus,
+  setSelectedStatus,
+  fromDate,
+  setFromDate,
+  toDate,
+  setToDate,
+}) => {
+  const [collegeOptions, setCollegeOptions] = useState(['All Colleges']);
 
-  // From Date State
+  // From Date UI State
   const [fromOpen, setFromOpen] = useState(false);
-  const [fromDate, setFromDate] = useState(undefined);
   const [fromMonth, setFromMonth] = useState(undefined);
   const [fromValue, setFromValue] = useState('');
 
-  // To Date State
+  // To Date UI State
   const [toOpen, setToOpen] = useState(false);
-  const [toDate, setToDate] = useState(undefined);
   const [toMonth, setToMonth] = useState(undefined);
   const [toValue, setToValue] = useState('');
+
+  // Fetch colleges list on mount
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const response = await adminService.getCollegesList();
+        if (response.success && response.data) {
+          setCollegeOptions(['All Colleges', ...response.data]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch colleges:', error);
+      }
+    };
+
+    fetchColleges();
+  }, []);
+
+  // Sync date value inputs with parent state
+  useEffect(() => {
+    setFromValue(fromDate ? formatDate(fromDate) : '');
+  }, [fromDate]);
+
+  useEffect(() => {
+    setToValue(toDate ? formatDate(toDate) : '');
+  }, [toDate]);
 
   return (
     <div className="mb-8">
@@ -72,7 +103,9 @@ const DashboardHeader = () => {
                 <DropdownMenuItem
                   key={option}
                   className="text-zinc-200 hover:bg-zinc-700 cursor-pointer"
-                  onClick={() => setSelectedCollege(option)}
+                  onClick={() =>
+                    setSelectedCollege(option === 'All Colleges' ? null : option)
+                  }
                 >
                   {option}
                 </DropdownMenuItem>
@@ -128,7 +161,7 @@ const DashboardHeader = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex items-centerb gap-4">
+        <div className="flex items-center gap-4">
           {/* From Date Picker */}
           <div className="relative flex gap-2">
             <Input
@@ -142,6 +175,8 @@ const DashboardHeader = () => {
                 if (isValidDate(date)) {
                   setFromDate(date);
                   setFromMonth(date);
+                } else if (e.target.value === '') {
+                  setFromDate(undefined);
                 }
               }}
               onKeyDown={e => {
@@ -196,6 +231,8 @@ const DashboardHeader = () => {
                 if (isValidDate(date)) {
                   setToDate(date);
                   setToMonth(date);
+                } else if (e.target.value === '') {
+                  setToDate(undefined);
                 }
               }}
               onKeyDown={e => {

@@ -274,7 +274,6 @@ export const getAllEnrolledStudents = async (req, res) => {
                     accountStatus: 1,
                     avatar: 1,
                     phoneNumber: 1,
-                    lmsId: 1,
                     createdAt: 1,
                     updatedAt: 1,
                 },

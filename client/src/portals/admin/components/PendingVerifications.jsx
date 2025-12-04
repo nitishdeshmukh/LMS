@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useId, useMemo, useState, useEffect } from 'react';
 import { SearchIcon, ChevronDown, MoreVertical, Loader2, RefreshCw } from 'lucide-react';
 import {
@@ -31,18 +29,11 @@ import {
   DropdownMenuTrigger,
 } from '../../../common/components/ui/dropdown-menu';
 import { Input } from '../../../common/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/common/components/ui/dialog';
 import { Button } from '@/common/components/ui/button';
 import TablePagination from '@/common/components/TablePagination';
 import { cn } from '@/common/lib/utils';
 import adminService from '@/services/admin/adminService';
+import VerificationDialog from './VerificationDialog';
 
 // Filter Component
 function Filter({ column }) {
@@ -143,7 +134,6 @@ const PendingVerifications = () => {
   // API State
   const [studentsData, setStudentsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
 
   // Fetch students data
@@ -155,19 +145,19 @@ const PendingVerifications = () => {
 
       if (response.success) {
         // Transform API data to match table structure
-        const transformedData = response.data.pendingUsers.map(student => ({
-          id: student._id || student.id,
-          name: `${student.name || ''} ${student.middleName || ''} ${student.lastName || ''}`.trim(),
-          email: student.email,
-          college: student.collegeName,
-          year: student.yearOfStudy,
-          domain: student.courseName,
-          paymentStatus: student.accountStatus === 'pending' ? 'Pending' : student.accountStatus,
-          paymentId:
-            student.partialPaymentDetails?.transactionId ||
-            student.fullPaymentDetails?.transactionId ||
-            'N/A',
-          enrollmentId: student.enrollmentId,
+        // response.data is an array of enrollments
+        const transformedData = response.data.map(enrollment => ({
+          id: enrollment._id,
+          studentId: enrollment.student?._id,
+          name: `${enrollment.student?.name || ''} ${enrollment.student?.middleName || ''} ${enrollment.student?.lastName || ''}`.trim(),
+          email: enrollment.student?.email,
+          college: enrollment.student?.collegeName,
+          year: enrollment.student?.yearOfStudy,
+          domain: enrollment.course?.title,
+          coursePrice: enrollment.course?.price,
+          paymentStatus: enrollment.paymentStatus === 'PARTIAL_PAYMENT_VERIFICATION_PENDING' ? 'Pending' : enrollment.paymentStatus,
+          paymentDetails: enrollment.partialPaymentDetails,
+          enrollmentId: enrollment._id,
         }));
         setStudentsData(transformedData);
       } else {
@@ -188,50 +178,6 @@ const PendingVerifications = () => {
   useEffect(() => {
     fetchStudents();
   }, []);
-
-  const handleVerifyStudent = async studentData => {
-    try {
-      setIsVerifying(true);
-
-      const response = await adminService.approveOngoingStudent(studentData.id);
-
-      if (response.success) {
-        setIsDialogOpen(false);
-
-        toast.success('Student verified successfully', {
-          description: `${studentData.name} has been verified and will receive a confirmation email.`,
-          icon: (
-            <svg
-              className="w-5 h-5 text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          ),
-          duration: 5000,
-        });
-
-        // Refresh the students list
-        fetchStudents();
-      } else {
-        throw new Error(response.message || 'Verification failed');
-      }
-    } catch (err) {
-      console.error('Error verifying student:', err);
-      toast.error('Verification failed', {
-        description: err.message || 'Please try again later',
-      });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
 
   const openVerifyDialog = student => {
     setSelectedStudent(student);
@@ -494,81 +440,12 @@ const PendingVerifications = () => {
       </div>
 
       {/* Verification Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <svg
-                className="w-5 h-5 text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              Confirm Verification
-            </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Do you really want to verify this student? They will receive a confirmation email.
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedStudent && (
-            <div className="space-y-3 py-4 border-y border-zinc-800">
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Name:</span>
-                <span className="font-medium text-zinc-100">{selectedStudent.name}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Email:</span>
-                <span className="font-medium text-zinc-100">{selectedStudent.email}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">College:</span>
-                <span className="font-medium text-zinc-100">{selectedStudent.college}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Domain:</span>
-                <span className="font-medium text-zinc-100">{selectedStudent.domain}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Payment ID:</span>
-                <span className="font-mono text-blue-400">{selectedStudent.paymentId}</span>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              disabled={isVerifying}
-              className="border-zinc-700 text-zinc-100 hover:bg-zinc-800 hover:text-red-400 hover:border-red-500/20"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => selectedStudent && handleVerifyStudent(selectedStudent)}
-              disabled={isVerifying}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              {isVerifying ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                'Verify & Send Email'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <VerificationDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        student={selectedStudent}
+        onVerificationComplete={fetchStudents}
+      />
     </div>
   );
 };

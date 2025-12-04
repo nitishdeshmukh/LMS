@@ -19,6 +19,7 @@ export const getOngoingUsers = async (req, res) => {
             .populate("student")
             .populate("course", "title slug price thumbnail")
             .populate("partialPaymentDetails")
+            .populate("fullPaymentDetails")
             .sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
@@ -66,27 +67,6 @@ export const updatePaymentStatus = async (req, res) => {
         }
         const coursePrice = enrollment.courseAmount || enrollment.course.price;
 
-        // Validate amount based on payment type
-        if (paymentType === "partial") {
-            if (amountPaid !== Math.ceil(coursePrice * 0.1)) {
-                await session.abortTransaction();
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Partial payment amount must be 10% of course price",
-                });
-            }
-        } else if (paymentType === "full") {
-            if (amountPaid !== coursePrice) {
-                await session.abortTransaction();
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Full payment amount must be equal to course price",
-                });
-            }
-        }
-
         if (action === "approve") {
             if (paymentType === "partial") {
                 enrollment.paymentStatus = "PARTIAL_PAID";
@@ -123,7 +103,7 @@ export const updatePaymentStatus = async (req, res) => {
                     error: emailError.message,
                 });
             }
-        } else if (action === "reject") {
+        } else if (action === "reject" && paymentType === "partial") {
             // Send rejection email
             try {
                 await sendPaymentRejectionEmail(

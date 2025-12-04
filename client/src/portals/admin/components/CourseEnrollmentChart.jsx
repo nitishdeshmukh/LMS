@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { Input } from '@/common/components/ui/input';
 import { Popover, PopoverTrigger, PopoverContent } from '@/common/components/ui/popover';
 import { Calendar } from '@/common/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Loader2 } from 'lucide-react';
 import ColumnChart from './ColumnChart';
+import adminService from '@/services/admin/adminService';
 
 /**
  * Formats a date object into a readable string format
- * @param {Date} date - The date to format
- * @returns {string} Formatted date string or empty string if invalid
  */
 function formatDate(date) {
   if (!date) return '';
@@ -22,8 +21,6 @@ function formatDate(date) {
 
 /**
  * Validates if a date object is valid
- * @param {Date} date - The date to validate
- * @returns {boolean} True if valid, false otherwise
  */
 function isValidDate(date) {
   if (!date) return false;
@@ -31,9 +28,11 @@ function isValidDate(date) {
 }
 
 /**
- * CourseEnrollmentChart - Displays total enrollments by course with date filtering
+ * CourseEnrollmentChart - Displays total enrollments by course stream
+ * Has independent date filters
  */
-function CourseEnrollmentChart({ data }) {
+function CourseEnrollmentChart({ college }) {
+  // Independent date filter state
   const [fromOpen, setFromOpen] = useState(false);
   const [fromDate, setFromDate] = useState(undefined);
   const [fromMonth, setFromMonth] = useState(undefined);
@@ -44,6 +43,49 @@ function CourseEnrollmentChart({ data }) {
   const [toMonth, setToMonth] = useState(undefined);
   const [toValue, setToValue] = useState('');
 
+  // Data state
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch data when dates or college change
+  useEffect(() => {
+    const fetchEnrollmentData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const params = {};
+        if (college) {
+          params.college = college;
+        }
+        if (fromDate) {
+          params.fromDate = fromDate.toISOString();
+        }
+        if (toDate) {
+          params.toDate = toDate.toISOString();
+        }
+
+        const response = await adminService.getEnrollmentsByCourse(params);
+
+        if (response.success) {
+          const chartData = response.data.map(item => ({
+            category: item.stream || 'Other',
+            value: item.uniqueStudentCount || item.enrollmentCount || 0,
+          }));
+          setData(chartData);
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to fetch enrollment data');
+        console.error('Error fetching enrollments by course:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEnrollmentData();
+  }, [fromDate, toDate, college]);
+
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
       <div className="mb-4">
@@ -53,11 +95,12 @@ function CourseEnrollmentChart({ data }) {
         </p>
       </div>
 
+      {/* Independent Date Filters */}
       <div className="flex items-center gap-4 mb-4">
         {/* From Date Picker */}
         <div className="relative flex gap-2">
           <Input
-            id="from-date-course"
+            id="course-from-date"
             value={fromValue}
             placeholder="From Date"
             className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -67,6 +110,8 @@ function CourseEnrollmentChart({ data }) {
               if (isValidDate(date)) {
                 setFromDate(date);
                 setFromMonth(date);
+              } else if (e.target.value === '') {
+                setFromDate(undefined);
               }
             }}
             onKeyDown={e => {
@@ -110,7 +155,7 @@ function CourseEnrollmentChart({ data }) {
         {/* To Date Picker */}
         <div className="relative flex gap-2">
           <Input
-            id="to-date-course"
+            id="course-to-date"
             value={toValue}
             placeholder="To Date"
             className="bg-zinc-800 border-zinc-700 text-zinc-200 pr-10 min-w-[180px] placeholder:text-zinc-400"
@@ -120,6 +165,8 @@ function CourseEnrollmentChart({ data }) {
               if (isValidDate(date)) {
                 setToDate(date);
                 setToMonth(date);
+              } else if (e.target.value === '') {
+                setToDate(undefined);
               }
             }}
             onKeyDown={e => {
@@ -162,7 +209,21 @@ function CourseEnrollmentChart({ data }) {
         </div>
       </div>
 
-      <ColumnChart data={data} height={350} />
+      {/* Chart Display */}
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[350px]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+            <p className="text-zinc-400 text-sm">Loading chart data...</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-[350px]">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      ) : (
+        <ColumnChart data={data} height={350} />
+      )}
     </div>
   );
 }
