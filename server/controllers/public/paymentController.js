@@ -7,7 +7,7 @@ import crypto from "crypto";
  * Upload file to R2 and return the URL
  */
 const uploadToR2 = async (file) => {
-    const uniqueKey = `payment-screenshots/${Date.now()}-${crypto.randomUUID()}-${file.originalname}`;
+    const uniqueKey = `final-payment-screenshots/${Date.now()}-${crypto.randomUUID()}-${file.originalname}`;
     
     const uploadParams = {
         Bucket: process.env.R2_BUCKET_NAME,
@@ -21,7 +21,7 @@ const uploadToR2 = async (file) => {
     // Return the R2 public URL or custom domain URL
     const publicUrl = process.env.R2_PUBLIC_URL 
         ? `${process.env.R2_PUBLIC_URL}/${uniqueKey}`
-        : `/api/r2/${uniqueKey}`;
+        : `/api/file/${uniqueKey}`;
     
     return publicUrl;
 };

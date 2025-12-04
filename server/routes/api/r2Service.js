@@ -25,17 +25,30 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-router.get("/:name", async (req, res) => {
+router.get("/*", async (req, res) => {
   try {
+    // Get the full path after /api/r2/
+    const key = req.params[0];
+    
+    if (!key) {
+      return res.status(400).json({ error: "File key is required" });
+    }
+
     const command = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: req.params.name
+      Key: key
     });
 
     const data = await r2.send(command);
 
+    // Set content type header
+    if (data.ContentType) {
+      res.setHeader('Content-Type', data.ContentType);
+    }
+
     data.Body.pipe(res); // Stream to browser
   } catch (error) {
+    console.error("R2 fetch error:", error);
     res.status(404).json({ error: "File not found" });
   }
 });
