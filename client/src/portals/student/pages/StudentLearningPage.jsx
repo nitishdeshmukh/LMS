@@ -28,6 +28,7 @@ import CapstoneCard from '../components/CapstoneCard';
 import PaymentModal from '../components/PaymentModal';
 import { useCourseDetails, useMarkModuleAccessed, useCourseProgress, useProfile } from '../hooks';
 import { downloadModuleCertificate } from '../utils/downloadModuleCertificate';
+import { downloadFinalCertificate } from '../utils/downloadFinalCertificate';
 
 // Loading component
 const LoadingState = memo(() => (
@@ -68,6 +69,7 @@ const StudentLearningPage = () => {
   const [bar, setbar] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [downloadingCertificate, setDownloadingCertificate] = useState(null);
+  const [downloadingFinalCert, setDownloadingFinalCert] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Fetch course details and progress
@@ -1005,11 +1007,38 @@ const StudentLearningPage = () => {
                       Congratulations! Your certificate is ready to download.
                     </p>
                     <button
-                      onClick={() => window.open(`/student/certificates/${coursename}`, '_blank')}
-                      className="w-full bg-green-600 hover:bg-green-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      onClick={async () => {
+                        setDownloadingFinalCert(true);
+                        try {
+                          await downloadFinalCertificate({
+                            studentName: profile?.name || 'Student',
+                            courseName: course?.title || 'Course',
+                            certificateId: course?.certificateId || `C2D-${Date.now()}`,
+                            issueDate: new Date(),
+                            skills: course?.skills || [],
+                          });
+                          toast.success('Certificate downloaded successfully!');
+                        } catch (error) {
+                          console.error('Failed to download certificate:', error);
+                          toast.error('Failed to download certificate. Please try again.');
+                        } finally {
+                          setDownloadingFinalCert(false);
+                        }
+                      }}
+                      disabled={downloadingFinalCert}
+                      className="w-full bg-green-600 hover:bg-green-500 disabled:bg-green-800 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
-                      <Award size={16} />
-                      Get Certificate
+                      {downloadingFinalCert ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Generating Certificate...
+                        </>
+                      ) : (
+                        <>
+                          <Award size={16} />
+                          Download Certificate (PDF)
+                        </>
+                      )}
                     </button>
                   </>
                 );
