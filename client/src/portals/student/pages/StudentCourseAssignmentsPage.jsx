@@ -145,16 +145,16 @@ const StudentCourseAssignmentsPage = () => {
   }
 
   return (
-    <div className="p-6 sm:p-8 h-full overflow-y-auto custom-scrollbar bg-black text-white w-full">
-      <h1 className="text-2xl font-bold mb-6">{courseTitle} - Assignments</h1>
+    <div className="p-4 sm:p-6 md:p-8 h-full overflow-y-auto custom-scrollbar bg-black text-white w-full">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{courseTitle} - Assignments</h1>
 
       {!assignments || assignments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <FileText size={64} className="text-zinc-600 mb-4" />
-          <p className="text-zinc-400">No assignments available for this course</p>
+        <div className="flex flex-col items-center justify-center py-12 sm:py-16">
+          <FileText size={48} className="sm:w-16 sm:h-16 text-zinc-600 mb-4" />
+          <p className="text-zinc-400 text-sm sm:text-base">No assignments available for this course</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {assignments.map(assignment => {
             const isLocked = assignment.status === 'Locked' || assignment.isModuleLocked;
             const isSubmitted = assignment.status === 'Submitted' || assignment.isSubmitted;
@@ -162,53 +162,53 @@ const StudentCourseAssignmentsPage = () => {
             return (
               <div
                 key={assignment.id}
-                className={`bg-zinc-900 border rounded-xl p-6 transition-colors ${
+                className={`bg-zinc-900 border rounded-lg sm:rounded-xl p-4 sm:p-6 transition-colors ${
                   isLocked ? 'border-zinc-800 opacity-60' : 'border-zinc-800 hover:border-zinc-700'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                       {isLocked ? (
-                        <Lock size={20} className="text-zinc-500" />
+                        <Lock size={18} className="text-zinc-500 shrink-0" />
                       ) : (
-                        <FileText size={20} className="text-green-400" />
+                        <FileText size={18} className="text-green-400 shrink-0" />
                       )}
-                      <h3 className="font-bold text-lg">{assignment.title}</h3>
+                      <h3 className="font-bold text-base sm:text-lg line-clamp-1">{assignment.title}</h3>
                       {getStatusBadge(assignment)}
                     </div>
-                    <p className="text-zinc-500 text-sm mb-1">{assignment.moduleTitle}</p>
+                    <p className="text-zinc-500 text-xs sm:text-sm mb-1 truncate">{assignment.moduleTitle}</p>
                     {assignment.description && (
-                      <p className="text-zinc-400 text-sm line-clamp-2">{assignment.description}</p>
+                      <p className="text-zinc-400 text-xs sm:text-sm line-clamp-2">{assignment.description}</p>
                     )}
                     {assignment.grade && (
-                      <p className="text-green-400 text-sm mt-2">Grade: {assignment.grade}</p>
+                      <p className="text-green-400 text-xs sm:text-sm mt-2">Grade: {assignment.grade}</p>
                     )}
                     {/* Show submitted link for submitted assignments */}
                     {isSubmitted && assignment.githubLink && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-zinc-500 text-sm">Submitted:</span>
+                      <div className="mt-2 flex flex-wrap items-center gap-1 sm:gap-2">
+                        <span className="text-zinc-500 text-xs sm:text-sm">Submitted:</span>
                         <a
                           href={assignment.githubLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1"
+                          className="text-blue-400 hover:text-blue-300 text-xs sm:text-sm flex items-center gap-1 truncate max-w-[200px] sm:max-w-[300px]"
                         >
-                          {assignment.githubLink.substring(0, 40)}...
-                          <ExternalLink size={12} />
+                          {assignment.githubLink.substring(0, 30)}...
+                          <ExternalLink size={12} className="shrink-0" />
                         </a>
                       </div>
                     )}
                   </div>
                   {isLocked ? (
-                    <div className="px-6 py-2 bg-zinc-800 text-zinc-500 rounded-lg font-medium flex items-center gap-2 cursor-not-allowed">
-                      <Lock size={16} />
+                    <div className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-zinc-800 text-zinc-500 rounded-lg text-sm sm:text-base font-medium flex items-center justify-center gap-2 cursor-not-allowed">
+                      <Lock size={14} className="sm:w-4 sm:h-4" />
                       Locked
                     </div>
                   ) : (
                     <button
                       onClick={() => setSelectedAssignment(assignment)}
-                      className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
                         assignment.isCompleted
                           ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
                           : isSubmitted
@@ -231,7 +231,7 @@ const StudentCourseAssignmentsPage = () => {
           {/* Capstone Project Section */}
           {course?.capstone?.title && (
             <div
-              className={`bg-linear-to-br from-zinc-900 to-zinc-900/80 border rounded-xl p-6 transition-all ${
+              className={`bg-linear-to-br from-zinc-900 to-zinc-900/80 border rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
                 !allModulesCompleted
                   ? 'border-zinc-800 opacity-60'
                   : course.capstone.isCompleted
@@ -239,66 +239,68 @@ const StudentCourseAssignmentsPage = () => {
                     : 'border-yellow-500/30'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                     {!allModulesCompleted ? (
-                      <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center">
-                        <Lock size={20} className="text-zinc-500" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
+                        <Lock size={16} className="sm:w-5 sm:h-5 text-zinc-500" />
                       </div>
                     ) : course.capstone.isCompleted ? (
-                      <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <CheckCircle size={20} className="text-green-500" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                        <CheckCircle size={16} className="sm:w-5 sm:h-5 text-green-500" />
                       </div>
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                        <Trophy size={20} className="text-yellow-500" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 flex items-center justify-center shrink-0">
+                        <Trophy size={16} className="sm:w-5 sm:h-5 text-yellow-500" />
                       </div>
                     )}
-                    <div>
-                      <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Award size={18} className="text-yellow-400" />
-                        Capstone Project
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-base sm:text-lg flex items-center gap-2">
+                        <Award size={16} className="sm:w-[18px] sm:h-[18px] text-yellow-400 shrink-0" />
+                        <span className="truncate">Capstone Project</span>
                       </h3>
-                      <p className="text-zinc-400 text-sm">{course.capstone.title}</p>
+                      <p className="text-zinc-400 text-xs sm:text-sm truncate">{course.capstone.title}</p>
                     </div>
-                    {!allModulesCompleted ? (
-                      <span className="flex items-center gap-1 text-zinc-500 text-sm ml-2">
-                        <Lock size={14} />
-                        Locked
-                      </span>
-                    ) : course.capstone.isCompleted ? (
-                      <span className="flex items-center gap-1 text-green-400 text-sm ml-2">
-                        <CheckCircle size={14} />
-                        Completed
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-yellow-400 text-sm ml-2">
-                        <Award size={14} />
-                        Available
-                      </span>
-                    )}
+                    <div className="w-full sm:w-auto mt-1 sm:mt-0">
+                      {!allModulesCompleted ? (
+                        <span className="flex items-center gap-1 text-zinc-500 text-xs sm:text-sm">
+                          <Lock size={12} className="sm:w-[14px] sm:h-[14px]" />
+                          Locked
+                        </span>
+                      ) : course.capstone.isCompleted ? (
+                        <span className="flex items-center gap-1 text-green-400 text-xs sm:text-sm">
+                          <CheckCircle size={12} className="sm:w-[14px] sm:h-[14px]" />
+                          Completed
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-yellow-400 text-xs sm:text-sm">
+                          <Award size={12} className="sm:w-[14px] sm:h-[14px]" />
+                          Available
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {course.capstone.description && (
-                    <p className="text-zinc-400 text-sm line-clamp-2 ml-13 pl-13">
+                    <p className="text-zinc-400 text-xs sm:text-sm line-clamp-2 sm:ml-11">
                       {course.capstone.description}
                     </p>
                   )}
                   {!allModulesCompleted && (
-                    <p className="text-yellow-500/70 text-xs mt-2 ml-13">
+                    <p className="text-yellow-500/70 text-xs mt-2 sm:ml-11">
                       Complete all module assignments to unlock
                     </p>
                   )}
                 </div>
                 {!allModulesCompleted ? (
-                  <div className="px-6 py-2 bg-zinc-800 text-zinc-500 rounded-lg font-medium flex items-center gap-2 cursor-not-allowed">
-                    <Lock size={16} />
+                  <div className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-zinc-800 text-zinc-500 rounded-lg text-sm sm:text-base font-medium flex items-center justify-center gap-2 cursor-not-allowed">
+                    <Lock size={14} className="sm:w-4 sm:h-4" />
                     Locked
                   </div>
                 ) : (
                   <button
                     onClick={() => setShowCapstone(true)}
-                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                    className={`w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
                       course.capstone.isCompleted
                         ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
                         : 'bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white'
