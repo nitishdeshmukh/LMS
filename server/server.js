@@ -38,6 +38,9 @@ app.use(express.urlencoded({ extended: false, limit: "10mb" })); // Body parser 
 // This serves the 'uploads' folder publicly
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
+app.get("/", (req, res) => {
+    res.send("Hello World!");
+});
 // --- API Routes ---
 app.use("/api", apiRoutes);
 
