@@ -14,7 +14,7 @@ import EnrollmentDetails from './pages/EnrollmentForm.jsx';
 import EnrollmentPayment from './pages/EnrollmentPayment.jsx';
 import PageNotFound from '@/common/pages/PageNotFound.jsx';
 import CourseDetails from './pages/CourseDetails.jsx';
-import PublicProtectedRoute from '@/common/components/PublicProtectedRoute.jsx';
+import PublicProtectedRoute from '@/common/components/_PublicProtectedRoute.jsx';
 import AuthSuccess from './pages/AuthSuccess.jsx';
 
 const PublicPortal = () => {
