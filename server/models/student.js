@@ -135,14 +135,6 @@ studentSchema.methods.generateRefreshToken = function () {
     );
 };
 
-// Generate LMS Password method
-studentSchema.methods.generateLmsPassword = async function () {
-    const randomPassword = crypto.randomBytes(8).toString("hex");
-    const salt = await bcrypt.genSalt(10);
-    this.lmsPassword = await bcrypt.hash(randomPassword, salt);
-    return randomPassword;
-};
-
 studentSchema.methods.generateLmsId = function () {
     const uuid = crypto.randomUUID();
     this.lmsId = `LMS00-${uuid}`;

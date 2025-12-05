@@ -506,7 +506,7 @@ export const issueCertificate = async (req, res) => {
         const capstoneSubmission = await Submission.findOne({
             enrollment: enrollmentId,
             type: "capstone",
-            status: "graded",
+            status: "submitted",
         });
 
         if (!capstoneSubmission) {

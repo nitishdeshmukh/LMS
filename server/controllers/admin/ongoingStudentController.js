@@ -81,7 +81,7 @@ export const updatePaymentStatus = async (req, res) => {
 
             const student = enrollment.student;
 
-            const lmsPassword = await student.generateLmsPassword();
+            const lmsPassword = await crypto.randomBytes(8).toString("hex");
             const lmsId = await student.generateLmsId();
 
             try {
