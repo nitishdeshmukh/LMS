@@ -2,7 +2,7 @@
 import React, { memo, useMemo } from 'react';
 import { Mail, Globe, FileText, Building2, MapPin, Award, Shield } from 'lucide-react';
 
-import signature from '../../../assets/images/signature.png';
+
 
 // Default company details - defined outside component
 const DEFAULT_COMPANY_DATA = {
